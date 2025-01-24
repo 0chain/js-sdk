@@ -1,5 +1,10 @@
 # @zerochain/sdk
 
+## 🚧 **Work in Progress** 🚧  
+
+# Züs JS Client SDK
+
+<!--
 ## Configure package and its deployment on NPM
 - Replace all instances of `your-package-name` with your package name
 - Replace all instances of `your-org` with your GitHub org name / your username
@@ -14,4 +19,4 @@
 ## Issues
 - Is `changeset` unable to publish? 
   - https://github.com/changesets/action/issues/98#issuecomment-2546826646
-
+-->

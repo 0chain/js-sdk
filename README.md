@@ -1,4 +1,4 @@
-# NPM package template
+# @zerochain/sdk
 
 ## Configure package and its deployment on NPM
 - Replace all instances of `your-package-name` with your package name

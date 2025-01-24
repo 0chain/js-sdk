@@ -1,7 +1,7 @@
 {
-  "name": "your-package-name",
+  "name": "@zerochain/sdk",
   "version": "0.0.0",
-  "description": "description of your-package-name",
+  "description": "The Züs SDK is a JavaScript client library that provides a convenient interface for interacting with the Züs Network. It allows developers to perform various operations such as creating and managing allocations, uploading and downloading files, executing smart contracts, and more.",
   "source": "src/index.ts",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
@@ -30,11 +30,11 @@
     "tsup": "^8.3.5",
     "typescript": "^5.7.2"
   },
-  "author": "Author of your-package-name",
+  "author": "Ashutosh Khanduala (@ashuvssut)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/your-org/your-package-name/issues"
+    "url": "https://github.com/0chain/js-sdk/issues"
   },
-  "homepage": "https://github.com/your-org/your-package-name#readme",
+  "homepage": "https://github.com/0chain/js-sdk#readme",
   "keywords": []
 }

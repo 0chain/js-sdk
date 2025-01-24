@@ -5,20 +5,20 @@ import { themes as prismThemes } from 'prism-react-renderer'
 // This runs in Node.js - Don't use client-side code here (browser APIs, JSX...)
 
 const config: Config = {
-  title: 'your-package-name',
-  tagline: 'Description of your-package-name package goes here',
+  title: 'Züs JS SDK',
+  tagline: 'Züs SDK: Simplifying JavaScript integration with the Züs Network.',
   favicon: 'img/favicon.ico',
 
   // Set the production url of your site here
   url: 'https://your-org.github.io/',
   // Set the /<baseUrl>/ pathname under which your site is served
   // For GitHub pages deployment, it is often '/<projectName>/'
-  baseUrl: '/your-package-name/',
+  baseUrl: '/js-sdk/',
 
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
-  organizationName: 'your-org', // Usually your GitHub org/user name.
-  projectName: 'your-package-name', // Usually your repo name.
+  organizationName: '0chain', // Usually your GitHub org/user name.
+  projectName: 'js-sdk', // Usually your repo name.
   trailingSlash: false,
 
   onBrokenLinks: 'throw',
@@ -41,7 +41,7 @@ const config: Config = {
           sidebarPath: './sidebars.ts',
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
-          editUrl: 'https://github.com/your-org/your-package-name/tree/main/docs',
+          editUrl: 'https://github.com/0chain/js-sdk/tree/main/docs',
         },
         blog: {
           showReadingTime: true,
@@ -51,7 +51,7 @@ const config: Config = {
           },
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
-          editUrl: 'https://github.com/your-org/your-package-name/tree/main/docs',
+          editUrl: 'https://github.com/0chain/js-sdk/tree/main/docs',
           // Useful options to enforce blogging best practices
           onInlineTags: 'warn',
           onInlineAuthors: 'warn',
@@ -82,7 +82,7 @@ const config: Config = {
         },
         { to: '/blog', label: 'Blog', position: 'left' },
         {
-          href: 'https://github.com/your-org/your-package-name',
+          href: 'https://github.com/0chain/js-sdk',
           label: 'GitHub',
           position: 'right',
         },

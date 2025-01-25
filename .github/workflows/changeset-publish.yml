@@ -27,13 +27,17 @@ jobs:
           # registry-url: "https://registry.npmjs.org"
           # cache: "yarn"
 
-      - name: Apply hacky fixes to package.json and Install dependencies. Hacky fixes are required for publishing to npm.
-        run: |
-          rm -f yarn.lock
-          jq '. + {"packageManager": "yarn@4.6.0"}' package.json > temp.json && mv temp.json package.json
-          yarn install
-        env:
-          YARN_ENABLE_IMMUTABLE_INSTALLS: false
+      # - name: Apply hacky fixes to package.json. This is required for publishing to npm.
+      #   run: |
+      #     rm -f yarn.lock
+      #     jq '. + {"packageManager": "yarn@4.6.0"}' package.json > temp.json && mv temp.json package.json
+      - name: Install dependencies
+        run: yarn install
+        # env:
+        #   YARN_ENABLE_IMMUTABLE_INSTALLS: false
+
+      - name: DEBUG - print package.json and yarn.lock
+        run: cat package.json && cat yarn.lock
 
       - name: Create Release Pull Request or Publish
         id: changesets

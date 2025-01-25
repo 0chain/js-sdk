@@ -25,7 +25,15 @@
     "lint": "yarn lint:tsc && yarn lint:biome",
     "format": "biome check --write ./src"
   },
+  "dependencies": {
+    "jotai": "^2.11.1",
+    "lodash.debounce": "^4.0.8"
+  },
+  "peerDependencies": {
+    "react": ">= 16.8 || 18.0.0"
+  },
   "devDependencies": {
+    "@types/lodash.debounce": "^4.0.9",
     "@biomejs/biome": "1.9.4",
     "lefthook": "^1.9.2",
     "tsup": "^8.3.5",

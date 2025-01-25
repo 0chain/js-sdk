@@ -14,7 +14,7 @@
   "author": "Ashutosh Khanduala (@ashuvssut)",
   "license": "MIT",
   "workspaces": [
-    "docs",
-    "package"
+    "docs/",
+    "package/"
   ]
 }

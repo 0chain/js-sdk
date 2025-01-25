@@ -21,9 +21,7 @@
     "dev": "tsup src/index.ts --format cjs,esm --dts --watch",
     "build": "tsup src/index.ts --format cjs,esm --dts",
     "lint:tsc": "tsc --noEmit",
-    "lint:biome": "biome check ./src",
-    "lint": "yarn lint:tsc && yarn lint:biome",
-    "format": "biome check --write ./src"
+    "lint": "yarn lint:tsc"
   },
   "dependencies": {
     "jotai": "^2.11.1",
@@ -34,8 +32,6 @@
   },
   "devDependencies": {
     "@types/lodash.debounce": "^4.0.9",
-    "@biomejs/biome": "1.9.4",
-    "lefthook": "^1.9.2",
     "tsup": "^8.3.5",
     "typescript": "^5.7.2"
   },

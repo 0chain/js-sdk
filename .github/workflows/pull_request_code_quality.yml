@@ -27,15 +27,6 @@ jobs:
       - name: Installing dependenciesn
         run: yarn install --frozen-lockfile
 
-      - name: Setup Biome
-        uses: biomejs/setup-biome@v2
-        with:
-          version: latest
-
-      - name: Run Biome
-        working-directory: package
-        run: biome ci .
-
       - name: Run Package Lint
         working-directory: package
         run: yarn lint

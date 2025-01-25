@@ -1,5 +1,3 @@
-import { useAtom } from 'jotai'
-import { isWasmLoadedAtom } from './useIsWasmLoaded'
 import { useCallback, useRef } from 'react'
 import { Config, createWasm } from '../createWasm'
 import debounce from 'lodash.debounce'
@@ -13,17 +11,22 @@ import {
 
 const DEBOUNCE_TIMEOUT = 500
 const MAX_RETRIES = 3
-export const useWasmLoader = (
-  onLog: OnLog,
-  debounceTimeout = DEBOUNCE_TIMEOUT
-) => {
-  const [, setIsWasmLoaded] = useAtom(isWasmLoadedAtom)
-
+export const useWasmLoader = ({
+  onLog,
+  debounceTimeout = DEBOUNCE_TIMEOUT,
+  setIsWasmLoaded = () => {},
+}: {
+  onLog?: OnLog
+  debounceTimeout?: number
+  setIsWasmLoaded: (isWasmLoaded: boolean) => void
+}) => {
   const reInitializeTries = useRef(0)
-  const initializeWasm: (
+
+  type InitializeWasm = (
     config: Config,
     isSwitchingWasm?: boolean
-  ) => Promise<void> | undefined = useCallback(
+  ) => Promise<void> | undefined
+  const initializeWasm: InitializeWasm = useCallback(
     debounce(async (config: Config, isSwitchingWasm = false) => {
       if (!config) {
         onLog?.('error', 'Unable to initialize wasm. Invalid config.', config)

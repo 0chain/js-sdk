@@ -304,7 +304,7 @@ const getVersionedWasmDetails = () => {
   if (customUrl) return { url: customUrl, version: wasmVersion, type: wasmType }
 
   // For Zus prod apps only
-  const defaultVersionedUrl = `${c.cdnUrl}/wasm/zcn-${wasmVersion}-${wasmType}.wasm`
+  const defaultVersionedUrl = `${c.zus.cdnUrl}/wasm/zcn-${wasmVersion}-${wasmType}.wasm`
   return { url: defaultVersionedUrl, version: wasmVersion, type: wasmType }
 }
 
@@ -456,7 +456,7 @@ const getDefaultUrl = () => {
   else if (isHost('staging')) suffix = 'staging'
   else if (isHost('test')) suffix = 'test'
 
-  const defaultUrl = `${c.cdnUrl}/${suffix}/${wasmType}`
+  const defaultUrl = `${c.zus.cdnUrl}/${suffix}/${wasmType}`
   return { defaultUrl, suffix }
 }
 

@@ -24,11 +24,16 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "lts/*"
-          registry-url: "https://registry.npmjs.org"
-          cache: "yarn"
+          # registry-url: "https://registry.npmjs.org"
+          # cache: "yarn"
 
-      - name: Installing dependencies
-        run: yarn install --frozen-lockfile
+      - name: Apply hacky fixes to package.json and Install dependencies
+        run: |
+          rm -f yarn.lock
+          jq '. + {"packageManager": "yarn@4.6.0"}' package.json > temp.json && mv temp.json package.json
+          yarn install
+        env:
+          YARN_ENABLE_IMMUTABLE_INSTALLS: false
 
       - name: Create Release Pull Request or Publish
         id: changesets

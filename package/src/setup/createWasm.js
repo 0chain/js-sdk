@@ -1,5 +1,3 @@
-'use strict'
-
 const g = typeof window !== 'undefined' ? window : global
 
 function hexStringToByte(str) {
@@ -469,14 +467,7 @@ const getWasmPath = () => {
 /** @type {import("./createWasm").Config} */
 const DEFAULT_CONFIG = {
   wasmBaseUrl: '',
-  useCachedWasm: process.env.USE_CACHED_WASM === 'true',
-  cacheConfig: {
-    enterpriseGosdkVersion: process.env.EGOSDK_VERSION,
-    enterpriseWasmUrl: '',
-    standardGosdkVersion: process.env.GOSDK_VERSION,
-    standardWasmUrl: '',
-  },
-  zus: { cdnUrl: null },
+  useCachedWasm: false,
 }
 
 /** @returns {import("./createWasm").Config} */

@@ -1,5 +1,11 @@
 # @zerochain/sdk
 
+## 0.0.4
+
+### Patch Changes
+
+- 27d70ee: fix peer dependency versions
+
 ## 0.0.3
 
 ### Patch Changes

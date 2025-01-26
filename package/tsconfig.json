@@ -7,7 +7,7 @@
     /* Base Options: */
     "esModuleInterop": true,
     "skipLibCheck": true,
-    // "target": "es2016",
+    "target": "esnext",
     "allowJs": true,
     "resolveJsonModule": true,
     "forceConsistentCasingInFileNames": true /* Ensure that casing is correct in imports. */,
@@ -15,8 +15,8 @@
     /* Strictness */
     "strict": true,
     "noUncheckedIndexedAccess": true,
-    // "moduleResolution": "node",
-    // "module": "commonjs",
+    "moduleResolution": "bundler",
+    "module": "esnext",
     "noEmit": true,
 
     /* Output Configuration: */
@@ -26,15 +26,12 @@
     /* If your code runs in the DOM: */
     "preserveWatchOutput": true,
 
-    "target": "esnext",
     "jsx": "react-jsx",
-    "module": "esnext",
-    "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
     "exactOptionalPropertyTypes": true
     // "verbatimModuleSyntax": true
     // "isolatedDeclarations": true
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist"]
+  "exclude": ["node_modules", "dist", "dist-tsc"]
 }

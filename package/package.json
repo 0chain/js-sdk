@@ -19,7 +19,7 @@
   "scripts": {
     "dev:tsc": "tsc -w -p tsc.tsconfig.json",
     "dev": "tsup src/index.ts --format cjs,esm --dts --watch",
-    "build": "tsup src/index.ts --format cjs,esm --dts",
+    "build": "NODE_ENV=development tsup src/index.ts --format cjs,esm --dts",
     "lint:tsc": "tsc --noEmit",
     "lint": "yarn lint:tsc"
   },

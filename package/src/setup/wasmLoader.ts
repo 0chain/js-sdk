@@ -1,5 +1,5 @@
 import { OnLog } from '../types'
-import { sleep } from './createWasm'
+import { sleep } from './utils'
 import { resetGoWasm } from './wasm'
 
 export const getDesiredMode = () => {

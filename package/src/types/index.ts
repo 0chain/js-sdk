@@ -1,3 +1,5 @@
+import { JsProxyMethods, SdkProxyMethods } from '../setup/createWasm'
+
 const LOG_CODES = [
   'WASM_LOADING', // Info
   'WASM_LOADED', // Info
@@ -51,31 +53,61 @@ declare global {
   }
 }
 
-export const globalCtx = () => {
-  if (typeof window !== 'undefined') return window || globalThis || self
-  else {
-    console.error('Window object not available')
-    return {} as Window
-  }
+export type SetIsWasmLoaded = (isLoaded: boolean) => void
+
+export type Config = {
+  /**
+   * `wasmBaseUrl` is the base URL of your enterprise-zcn.wasm & zcn.wasm
+   *
+   * Example: if `wasmBaseUrl` is `https://example.com/wasm` then WASM files
+   * should be located at:
+   * - `https://example.com/wasm/enterprise-zcn.wasm` for Enterprise WASM
+   * - `https://example.com/wasm/zcn.wasm` for Standard WASM
+   */
+  wasmBaseUrl?: string
+  zus?: ZusConfig
+} & (
+  | { useCachedWasm?: false; cacheConfig?: never }
+  | { useCachedWasm: true; cacheConfig: CacheConfig }
+)
+
+type CacheConfig = {
+  enterpriseGosdkVersion: string
+  enterpriseWasmUrl?: string
+  standardGosdkVersion: string
+  standardWasmUrl?: string
+}
+
+type ZusConfig = {
+  cdnUrl?: string
 }
 
 export type Bridge = {
   wasmType?: 'normal' | 'enterprise'
   __wasm_initialized__?: boolean
+  __config__?: Config
   glob: {
     index: number
   }
-  /** walletId is avilable when setWallet method is called */
+  /** walletId is available after setWallet method succeeds */
   walletId?: string
+  /** secretKey is available after setWallet method succeeds */
+  secretKey?: any // TODO -- is it a string?
+  /** peerPublicKey is available after setWallet method succeeds */
+  peerPublicKey?: any
   jsProxy: {
     /** BLS object is available when setWallet method is called */
     bls?: any
     /** secretKey is available when setWallet method is called */
-    secretKey?: any
+    secretKey?: any // TODO -- is it a string?
     /** secretKey is available when setWallet method is called */
     publicKey?: any
+    /** publicKey is available when setWallet method is called */
+    pubkeyStr?: string
+    /** isSplit is set when setWallet method is called */
+    isSplit?: boolean
   } & {
-    // [K in keyof JsProxyMethods]: JsProxyMethods[K] // TODO
+    [K in keyof JsProxyMethods]: JsProxyMethods[K]
   }
   /** proxy object for go to expose its methods */
   sdk: any
@@ -86,7 +118,7 @@ export type Bridge = {
     /** `bridge.__proxy__.jsProxy`: Proxy object that Exposes JS methods for go */
     jsProxy: {}
   } & {
-    // [K in keyof SdkProxyMethods]: SdkProxyMethods[K] // TODO
+    [K in keyof SdkProxyMethods]: SdkProxyMethods[K] // TODO
   }
 }
 
@@ -124,4 +156,6 @@ export type UploadObject = {
   isRepair: boolean
   numBlocks: number
   callback: (totalBytes: number, completedBytes: number, error: any) => void
+  /** @deprecated */
+  webstreaming: boolean
 }

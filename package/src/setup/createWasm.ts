@@ -1,37 +1,15 @@
+import { Bridge, Config, SetIsWasmLoaded, UploadObject } from '../types'
+import {
+  createObjectURL,
+  globalCtx,
+  hexStringToByte,
+  md5Hash,
+  sleep,
+} from './utils'
+
 const g = typeof window !== 'undefined' ? window : global
 
-function hexStringToByte(str) {
-  if (!str) return new Uint8Array()
-
-  const a = []
-  for (let i = 0, len = str.length; i < len; i += 2) {
-    a.push(parseInt(str.substr(i, 2), 16))
-  }
-
-  return new Uint8Array(a)
-}
-
-async function createObjectURL(buf, mimeType) {
-  var blob = new Blob([buf], { type: mimeType })
-  return URL.createObjectURL(blob)
-}
-
-/**
- * Sleep is used when awaiting for Go Wasm to initialize.
- * It uses the lowest possible sane delay time (via requestAnimationFrame).
- * However, if the window is not focused, requestAnimationFrame never returns.
- * A timeout will ensure to be called after 50 ms, regardless of whether or not
- * the tab is in focus.
- *
- * @returns {Promise} an always-resolving promise when a tick has been
- *     completed.
- */
-export const sleep = (ms = 1000) => {
-  return new Promise(resolve => {
-    requestAnimationFrame(resolve)
-    setTimeout(resolve, ms)
-  })
-}
+/** BRIDGE SETUP START */
 
 /**
  * The maximum amount of time that we would expect Wasm to take to initialize.
@@ -39,16 +17,19 @@ export const sleep = (ms = 1000) => {
  * Most likely something has gone wrong if it takes more than 10 seconds to
  * initialize.
  */
-const maxTime = 10 * 1000
+const maxTime = 10000 // 10 seconds // TODO
 
 /**
- * bridge is an easier way to refer to the Go WASM object.
+ * Initializes the `window.__zcn_wasm__` bridge object.
+ * @returns Bridge object. This is an easier way to refer to the Go WASM object.
  */
-let bridge = g.__zcn_wasm__
+const getBridge = (): Bridge => {
+  const g = globalCtx()
 
-// Initialize __zcn_wasm__
-const initZcnWasmObject = async () => {
-  g.__zcn_wasm__ = g.__zcn_wasm__ || {
+  const currBridge = g.__zcn_wasm__
+  if (currBridge) return currBridge
+
+  const newBridge: Bridge = {
     glob: { index: 0 },
     jsProxy: {
       secretKey: null,
@@ -60,23 +41,43 @@ const initZcnWasmObject = async () => {
       createObjectURL,
       sleep,
     },
-    sdk: {}, //proxy object for go to expose its methods
+    sdk: {},
   }
+  g.__zcn_wasm__ = newBridge
 
-  bridge = g.__zcn_wasm__
+  return newBridge
 }
-initZcnWasmObject()
 
-const readChunk = (offset, chunkSize, file) =>
-  new Promise((res, rej) => {
+// Initialize __zcn_wasm__
+getBridge()
+
+/** BRIDGE SETUP END */
+
+const getProxy = (bridge: Bridge) => {
+  const proxy = bridge.__proxy__
+  if (!proxy) {
+    throw new Error(
+      'The Bridge proxy (__proxy__) is not initialized. Make sure to call createWasm first.'
+    )
+  }
+  return proxy
+}
+
+const readChunk = (offset: number, chunkSize: number, file: File) =>
+  new Promise<{ size: number; buffer: Uint8Array }>((res, rej) => {
     const fileReader = new FileReader()
     const blob = file.slice(offset, chunkSize + offset)
     fileReader.onload = e => {
       const t = e.target
+      if (t === null) {
+        rej('err: fileReader onload target is null')
+        return
+      }
       if (t.error == null) {
+        const result = t.result as ArrayBuffer
         res({
-          size: t.result.byteLength,
-          buffer: new Uint8Array(t.result),
+          size: result.byteLength,
+          buffer: new Uint8Array(result),
         })
       } else {
         rej(t.error)
@@ -86,32 +87,16 @@ const readChunk = (offset, chunkSize, file) =>
     fileReader.readAsArrayBuffer(blob)
   })
 
-async function md5Hash(file) {
-  const result = new Promise((resolve, reject) => {
-    const worker = new Worker('md5worker.js')
-    worker.postMessage(file)
-    worker.onmessage = e => {
-      resolve(e.data)
-      worker.terminate()
-    }
-    worker.onerror = reject
-  })
+/**
+ * Performs a bulk upload of multiple files.
+ *
+ * @param options An array of upload options for each file.
+ * @returns // TODO - return type
+ */
+async function bulkUpload(options: UploadObject[]) {
+  const g = globalCtx()
+  const bridge = getBridge()
 
-  return result
-}
-
-// bulk upload files with FileReader
-// objects: the list of upload object
-//  - allocationId: string
-//  - remotePath: string
-//  - file: File
-//  - thumbnailBytes: []byte
-//  - encrypt: bool
-//  - isUpdate: bool
-//  - isRepair: bool
-//  - numBlocks: int
-//  - callback: function(totalBytes,completedBytes,error)
-async function bulkUpload(options) {
   const start = bridge.glob.index
   const opts = options.map(obj => {
     const i = bridge.glob.index
@@ -120,7 +105,7 @@ async function bulkUpload(options) {
     const callbackFuncName = '__zcn_upload_callback_' + i.toString()
     let md5HashFuncName = ''
 
-    g[readChunkFuncName] = async (offset, chunkSize) => {
+    g[readChunkFuncName] = async (offset: number, chunkSize: number) => {
       console.log(
         'bulk_upload: read chunk remotePath:' +
           obj.remotePath +
@@ -143,21 +128,24 @@ async function bulkUpload(options) {
     }
 
     if (obj.callback) {
-      g[callbackFuncName] = async (totalBytes, completedBytes, error) =>
-        obj.callback(totalBytes, completedBytes, error)
+      g[callbackFuncName] = async (
+        totalBytes: number,
+        completedBytes: number,
+        error: any
+      ) => obj.callback(totalBytes, completedBytes, error)
     }
 
     return {
       allocationId: obj.allocationId,
       remotePath: obj.remotePath,
-      readChunkFuncName: readChunkFuncName,
       fileSize: obj.file.size,
-      thumbnailBytes: Array.from(obj?.thumbnailBytes || []).toString(),
       encrypt: obj.encrypt,
-      webstreaming: obj.webstreaming,
       isUpdate: obj.isUpdate,
       isRepair: obj.isRepair,
       numBlocks: obj.numBlocks,
+      webstreaming: obj.webstreaming,
+      thumbnailBytes: Array.from(obj?.thumbnailBytes || []).toString(),
+      readChunkFuncName: readChunkFuncName,
       callbackFuncName: callbackFuncName,
       md5HashFuncName: md5HashFuncName,
     }
@@ -165,7 +153,8 @@ async function bulkUpload(options) {
 
   const end = bridge.glob.index
 
-  const result = await bridge.__proxy__.sdk.bulkUpload(JSON.stringify(opts))
+  const proxy = getProxy(bridge)
+  const result = await proxy.sdk.bulkUpload(JSON.stringify(opts))
   for (let i = start; i < end; i++) {
     g['__zcn_upload_reader_' + i.toString()] = null
     g['__zcn_upload_callback_' + i.toString()] = null
@@ -173,8 +162,15 @@ async function bulkUpload(options) {
   return result
 }
 
-async function blsSign(hash, secretKey) {
-  if (!bridge.jsProxy) {
+/**
+ * Signs a hash using BLS signature scheme.
+ *
+ * @param hash The hash to be signed.
+ * @returns The serialized signature in hexadecimal format.
+ */
+async function blsSign(hash: string, secretKey: string) {
+  const bridge = getBridge()
+  if (!bridge.jsProxy || !bridge.jsProxy.secretKey) {
     const errMsg = 'err: bls.secretKey is not initialized'
     console.warn(errMsg)
     throw new Error(errMsg)
@@ -191,18 +187,37 @@ async function blsSign(hash, secretKey) {
     throw new Error(errMsg)
   }
 
-  return sig.serializeToHexStr()
+  return sig.serializeToHexStr() as string
 }
 
-async function blsVerifyWith(pk, signature, hash) {
+/**
+ * Verifies a BLS signature against a given hash and public key.
+ *
+ * @param pk The public key.
+ * @param signature The serialized BLS signature.
+ * @param hash The hash to verify the signature against.
+ * @returns A boolean indicating whether the signature is valid or not.
+ */
+async function blsVerifyWith(pk: string, signature: string, hash: string) {
+  const bridge = getBridge()
+
   const publicKey = bridge.jsProxy.bls.deserializeHexStrToPublicKey(pk)
   const bytes = hexStringToByte(hash)
   const sig = bridge.jsProxy.bls.deserializeHexStrToSignature(signature)
   return publicKey.verify(sig, bytes)
 }
 
-async function blsVerify(signature, hash) {
-  if (!bridge.jsProxy && !bridge.jsProxy.publicKey) {
+/**
+ * Verifies a BLS signature against a given hash.
+ *
+ * @param signature The serialized BLS signature.
+ * @param hash The hash to verify the signature against.
+ * @returns A boolean indicating whether the signature is valid or not.
+ */
+async function blsVerify(signature: string, hash: string) {
+  const bridge = getBridge()
+
+  if (!bridge.jsProxy || !bridge.jsProxy.publicKey) {
     const errMsg = 'err: bls.publicKey is not initialized'
     console.warn(errMsg)
     throw new Error(errMsg)
@@ -213,7 +228,21 @@ async function blsVerify(signature, hash) {
   return bridge.jsProxy.publicKey.verify(sig, bytes)
 }
 
-async function blsAddSignature(secretKey, signature, hash) {
+/**
+ * Adds a signature to an existing signature.
+ *
+ * @param secretKey The secret key.
+ * @param signature The serialized BLS signature.
+ * @param hash The hash to verify the signature against.
+ *
+ * @returns The serialized signature in hexadecimal format.
+ */
+async function blsAddSignature(
+  secretKey: string,
+  signature: string,
+  hash: string
+) {
+  const bridge = getBridge()
   if (!bridge.jsProxy) {
     const errMsg = 'err: bls.secretKey is not initialized'
     console.warn(errMsg)
@@ -232,24 +261,37 @@ async function blsAddSignature(secretKey, signature, hash) {
 
   sig.add(sig2)
 
-  return sig.serializeToHexStr()
+  return sig.serializeToHexStr() as string
 }
 
+/**
+ * Sets the wallet information in the bridge and the Go instance.
+ *
+ * @param bls The BLS object from bls-wasm script.
+ * @param clientID The client ID.
+ * @param clientKey The client key.
+ * @param peerPublicKey The peer public key.
+ * @param sk The serialized secret key.
+ * @param pk The serialized public key.
+ * @param mnemonic The mnemonic.
+ * @param isSplit Whether the wallet has split keys enabled or not.
+ */
 async function setWallet(
-  bls,
-  clientID,
-  clientKey,
-  peerPublicKey,
-  sk,
-  pk,
-  mnemonic,
-  isSplit
+  bls: any, // TODO: check bls
+  clientID: string,
+  clientKey: string,
+  peerPublicKey: string,
+  sk: string,
+  pk: string,
+  mnemonic: string,
+  isSplit: boolean
 ) {
-  if (!bls) throw new Error('bls is undefined, on wasm setWallet fn')
-  if (!sk) throw new Error('secret key is undefined, on wasm setWallet fn')
-  if (!pk) throw new Error('public key is undefined, on wasm setWallet fn')
-  if (isSplit && !clientKey)
-    throw new Error('clientKey is undefined, on wasm setWallet fn')
+  if (!bls) throw new Error('bls is undefined')
+  if (!sk) throw new Error('secret key is undefined')
+  if (!pk) throw new Error('public key is undefined')
+  if (isSplit && !clientKey) throw new Error('clientKey is undefined')
+
+  const bridge = getBridge()
 
   if (
     bridge.walletId != clientID ||
@@ -262,8 +304,11 @@ async function setWallet(
     bridge.jsProxy.pubkeyStr = pk
     bridge.jsProxy.isSplit = isSplit
 
-    // use proxy.sdk to detect if sdk is ready
-    await bridge.__proxy__.sdk.setWallet(
+    const proxy = getProxy(bridge)
+
+    if (!proxy?.sdk?.setWallet)
+      throw new Error('proxy.sdk.setWallet is not defined')
+    await proxy.sdk.setWallet(
       clientID,
       clientKey,
       peerPublicKey,
@@ -279,19 +324,24 @@ async function setWallet(
 }
 
 function getWalletId() {
+  const bridge = getBridge()
   return bridge.walletId
 }
 
 function getPrivateKey() {
+  const bridge = getBridge()
   return bridge.secretKey
 }
 
 function getPeerPublicKey() {
+  const bridge = getBridge()
   return bridge.peerPublicKey
 }
 
 const getVersionedWasmDetails = () => {
   const c = getConfig()
+  if (!c.useCachedWasm) return { url: null, version: null, type: null }
+
   const isEnterpriseMode = getIsEnterpriseMode()
   const wasmVersion = isEnterpriseMode
     ? c.cacheConfig.enterpriseGosdkVersion
@@ -304,6 +354,7 @@ const getVersionedWasmDetails = () => {
   if (customUrl) return { url: customUrl, version: wasmVersion, type: wasmType }
 
   // For Zus prod apps only
+  if (!c.zus?.cdnUrl) return { url: null, version: null, type: null }
   const defaultVersionedUrl = `${c.zus.cdnUrl}/wasm/zcn-${wasmVersion}-${wasmType}.wasm`
   return { url: defaultVersionedUrl, version: wasmVersion, type: wasmType }
 }
@@ -323,7 +374,13 @@ const getWasmUrl = () => {
   }
 }
 
-const getCachedWasmResponse = async ({ wasmCache, wasmPath }) => {
+const getCachedWasmResponse = async ({
+  wasmCache,
+  wasmPath,
+}: {
+  wasmCache: Cache | undefined
+  wasmPath: string
+}) => {
   if (!wasmCache || !wasmPath) return null
 
   const c = getConfig()
@@ -339,7 +396,15 @@ const getCachedWasmResponse = async ({ wasmCache, wasmPath }) => {
   return wasmCache.match(wasmPath)
 }
 
-const fetchWasm = async ({ wasmUrl, wasmPath, defaultUrl }) => {
+const fetchWasm = async ({
+  wasmUrl,
+  wasmPath,
+  defaultUrl,
+}: {
+  wasmUrl: string | null
+  wasmPath: string
+  defaultUrl: string | null
+}) => {
   const caches = 'caches' in window ? window.caches : null
 
   // Check if the WASM file is cached
@@ -349,17 +414,20 @@ const fetchWasm = async ({ wasmUrl, wasmPath, defaultUrl }) => {
   let shouldCache = false
   if (!response?.ok) {
     // WASM not found in cache, fetching from CDN
-    response = await fetch(wasmUrl, {
-      headers: {
-        'Content-Encoding': 'gzip',
-        'Content-Type': 'application/wasm',
-      },
-    }).catch(err => {
-      console.error('Failed to fetch from CDN, trying CDN fallback:', err)
-    })
-    if (response?.ok) shouldCache = true
+    if (wasmUrl) {
+      response = await fetch(wasmUrl, {
+        headers: {
+          'Content-Encoding': 'gzip',
+          'Content-Type': 'application/wasm',
+        },
+      }).catch(err => {
+        console.error('Failed to fetch from CDN, trying CDN fallback:', err)
+        return null
+      })
+      if (response?.ok) shouldCache = true
+    }
 
-    if (!response?.ok && wasmUrl !== defaultUrl) {
+    if (!response?.ok && wasmUrl !== defaultUrl && defaultUrl) {
       response = await fetch(defaultUrl, {
         headers: {
           'Content-Encoding': 'gzip',
@@ -367,6 +435,7 @@ const fetchWasm = async ({ wasmUrl, wasmPath, defaultUrl }) => {
         },
       }).catch(err => {
         console.error('Failed to fetch from CDN fallback, trying local:', err)
+        return null
       })
     }
 
@@ -383,10 +452,12 @@ const fetchWasm = async ({ wasmUrl, wasmPath, defaultUrl }) => {
       await wasmCache?.put(wasmPath, response.clone())
 
       const c = getConfig()
-      const storedWasmVersion = getIsEnterpriseMode()
-        ? c.cacheConfig.enterpriseGosdkVersion
-        : c.cacheConfig.standardGosdkVersion
-      localStorage.setItem(wasmPath, storedWasmVersion)
+      if (c.useCachedWasm) {
+        const storedWasmVersion = getIsEnterpriseMode()
+          ? c.cacheConfig.enterpriseGosdkVersion
+          : c.cacheConfig.standardGosdkVersion
+        localStorage.setItem(wasmPath, storedWasmVersion)
+      }
     }
   } else {
     console.log('Using cached WASM.')
@@ -395,7 +466,15 @@ const fetchWasm = async ({ wasmUrl, wasmPath, defaultUrl }) => {
   return { source: response, isVersioned: shouldCache }
 }
 
-async function loadWasm(go, setIsWasmLoaded) {
+/**
+ * Loads the WebAssembly (Wasm) module and runs it within the Go instance.
+ *
+ * @param go The Go instance.
+ */
+async function loadWasm(
+  go: InstanceType<Window['Go']>,
+  setIsWasmLoaded: (newState: boolean) => void
+) {
   // If instantiateStreaming doesn't exists, polyfill/create it on top of instantiate
   if (!WebAssembly?.instantiateStreaming) {
     WebAssembly.instantiateStreaming = async (resp, importObject) => {
@@ -414,7 +493,8 @@ async function loadWasm(go, setIsWasmLoaded) {
   const result = await WebAssembly.instantiateStreaming(source, go.importObject)
 
   setTimeout(() => {
-    if (g.__zcn_wasm__?.__wasm_initialized__ !== true) {
+    const bridge = getBridge()
+    if (bridge?.__wasm_initialized__ !== true) {
       console.warn(
         'wasm window.__zcn_wasm__ (zcn.__wasm_initialized__) still not true after max time'
       )
@@ -428,7 +508,8 @@ async function loadWasm(go, setIsWasmLoaded) {
   while (!hasInitialized) {
     await sleep(300)
 
-    if (g.__zcn_wasm__?.__wasm_initialized__ === true) {
+    const bridge = getBridge()
+    if (bridge?.__wasm_initialized__ === true) {
       hasInitialized = true
       setIsWasmLoaded(true)
     }
@@ -448,7 +529,7 @@ const getDefaultUrl = () => {
 
   // For Zus prod apps only
   const currentLocation = window?.location?.hostname
-  const isHost = host => currentLocation?.includes(host)
+  const isHost = (host: string) => currentLocation?.includes(host)
 
   if (isHost('localhost') || isHost('mob')) suffix = 'mob'
   else if (isHost('dev') || isHost('mob.desktop')) suffix = 'dev'
@@ -456,6 +537,7 @@ const getDefaultUrl = () => {
   else if (isHost('staging')) suffix = 'staging'
   else if (isHost('test')) suffix = 'test'
 
+  if (!c.zus?.cdnUrl) return { defaultUrl: null, suffix }
   const defaultUrl = `${c.zus.cdnUrl}/${suffix}/${wasmType}`
   return { defaultUrl, suffix }
 }
@@ -465,84 +547,98 @@ const getWasmPath = () => {
 }
 
 /** @type {import("./createWasm").Config} */
-const DEFAULT_CONFIG = {
+const DEFAULT_CONFIG: Config = {
   wasmBaseUrl: '',
   useCachedWasm: false,
 }
 
-/** @returns {import("./createWasm").Config} */
-const getConfig = () => g.__zcn_wasm__.__config__ || DEFAULT_CONFIG
+const getConfig = () => getBridge().__config__ || DEFAULT_CONFIG
 
 /**
- * Loads and initializes WASM
- * @param {import("./createWasm").Config} config
- * @param {import("./createWasm").setIsWasmLoaded} setIsWasmLoaded
- * @returns {Proxy} WASM proxy
+ * Creates a WebAssembly (Wasm) instance and returns a proxy object for accessing SDK methods.
+ * @returns The proxy object for accessing SDK methods.
  */
-export async function createWasm(config = {}, setIsWasmLoaded) {
-  initZcnWasmObject()
-  g.__zcn_wasm__.__config__ = { ...DEFAULT_CONFIG, ...config }
+export async function createWasm(
+  config: Config,
+  setIsWasmLoaded: SetIsWasmLoaded
+) {
+  const bridge = getBridge()
+  bridge.__config__ = config
 
   if (bridge.__proxy__) {
     return bridge.__proxy__
   }
 
+  const g = globalCtx()
   const go = new g.Go()
 
   loadWasm(go, setIsWasmLoaded)
 
-  const sdkGet =
-    (_, key) =>
-    (...args) =>
-      // eslint-disable-next-line
-      new Promise(async (resolve, reject) => {
-        if (!go || go.exited) {
-          return reject(new Error('The Go instance is not active.'))
-        }
+  const sdkProxy = new Proxy(
+    {},
+    {
+      get:
+        (_, key) =>
+        (...args: any[]) =>
+          // eslint-disable-next-line
+          new Promise(async (resolve, reject) => {
+            if (!go || go.exited) {
+              return reject(new Error('The Go instance is not active.'))
+            }
 
-        while (bridge.__wasm_initialized__ !== true) {
-          await sleep(1000)
-        }
+            while (bridge.__wasm_initialized__ !== true) {
+              await sleep(1000)
+            }
 
-        if (typeof bridge.sdk[key] !== 'function') {
-          resolve(bridge.sdk[key])
+            if (typeof bridge.sdk[key] !== 'function') {
+              resolve(bridge.sdk[key])
 
-          if (args.length !== 0) {
-            reject(
-              new Error(
-                'Retrieved value from WASM returned function type, however called with arguments.'
-              )
-            )
-          }
-          return
-        }
+              if (args.length !== 0) {
+                reject(
+                  new Error(
+                    'Retrieved value from WASM returned function type, however called with arguments.'
+                  )
+                )
+              }
+              return
+            }
 
-        try {
-          let resp = bridge.sdk[key].apply(undefined, args)
+            try {
+              let resp = bridge.sdk[key].apply(undefined, args)
 
-          // support wasm.BindAsyncFunc
-          if (resp && typeof resp.then === 'function') {
-            resp = await Promise.race([resp])
-          }
+              // support wasm.BindAsyncFunc
+              if (resp && typeof resp.then === 'function') {
+                resp = await Promise.race([resp])
+              }
 
-          if (resp && resp.error) {
-            reject(resp.error)
-          } else {
-            resolve(resp)
-          }
-        } catch (e) {
-          reject(e)
-        }
-      })
-
-  const sdkProxy = new Proxy({}, { get: sdkGet })
+              if (resp && resp.error) {
+                reject(resp.error)
+              } else {
+                resolve(resp)
+              }
+            } catch (e) {
+              reject(e)
+            }
+          }),
+    }
+  )
 
   const jsProxy = new Proxy(
     {},
     {
-      get: (_, key) => bridge.jsProxy[key],
-      set: (_, key, value) => {
+      get: <T extends keyof Bridge['jsProxy']>(_: {}, key: T) => {
+        const bridge = getBridge()
+        return bridge.jsProxy[key]
+      },
+      set: <T extends keyof Bridge['jsProxy']>(
+        _: {},
+        key: T,
+        value: Bridge['jsProxy'][T]
+      ) => {
+        const bridge = getBridge()
+
         bridge.jsProxy[key] = value
+        return true
       },
     }
   )
@@ -562,4 +658,18 @@ export async function createWasm(config = {}, setIsWasmLoaded) {
   g.goWasm = proxy
 
   return proxy
+}
+
+export type JsProxyMethods = {
+  sign: typeof blsSign
+  verify: typeof blsVerify
+  verifyWith: typeof blsVerifyWith
+  addSignature: typeof blsAddSignature
+  createObjectURL: typeof createObjectURL
+  sleep: typeof sleep
+}
+
+export type SdkProxyMethods = {
+  bulkUpload: typeof bulkUpload
+  setWallet: typeof setWallet
 }

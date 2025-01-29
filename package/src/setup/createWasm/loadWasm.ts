@@ -6,7 +6,7 @@ const DEFAULT_CONFIG: Config = {
   useCachedWasm: false,
 }
 
-const getConfig = () => getBridge().__config__ || DEFAULT_CONFIG
+export const getConfig = () => getBridge().__config__ || DEFAULT_CONFIG
 
 const getWasmPath = () => {
   return getIsEnterpriseMode() ? '/enterprise-zcn.wasm' : '/zcn.wasm'
@@ -172,7 +172,7 @@ const fetchWasm = async ({
  * Most likely something has gone wrong if it takes more than 10 seconds to
  * initialize.
  */
-const MAX_LOAD_TIMOUT = 10000 // 10 seconds // TODO
+const MAX_LOAD_TIMOUT = 10000 // 10 seconds
 
 /**
  * Loads the WebAssembly (Wasm) module and runs it within the Go instance.

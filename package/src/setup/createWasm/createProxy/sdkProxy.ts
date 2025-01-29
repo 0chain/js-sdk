@@ -1,8 +1,12 @@
 import { Bridge, getBridge, globalCtx } from '../bridge'
+import { getConfig } from '../loadWasm'
 
 export const md5Hash = async (file: File) => {
+  const workerUrl = getConfig().md5WorkerUrl
+  if (!workerUrl) throw new Error('md5WorkerUrl is undefined')
+
   const result = new Promise<string>((resolve, reject) => {
-    const worker = new Worker('md5worker.js') // TODO
+    const worker = new Worker(workerUrl)
     worker.postMessage(file)
     worker.onmessage = e => {
       resolve(e.data)

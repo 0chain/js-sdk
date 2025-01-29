@@ -92,6 +92,7 @@ export type Config = {
    */
   wasmBaseUrl?: string
   zus?: ZusConfig
+  md5WorkerUrl?: string
 } & (
   | { useCachedWasm?: false; cacheConfig?: never }
   | { useCachedWasm: true; cacheConfig: CacheConfig }

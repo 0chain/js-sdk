@@ -1,4 +1,4 @@
-import { Domain, Wallet } from '../types'
+import { Domain, Wallet } from '../types/wallet'
 import { getBls } from './blockchain'
 import { networkConfig } from './constants'
 import { awaitWasmLoad } from './wasmLoader'
@@ -13,12 +13,12 @@ const getWasm = async ({
   domain,
   wallet,
 }: {
-  domain: Domain
+  domain: Domain | (string & {})
   wallet: Wallet
 }) => {
   if (!window.newGoWasm) {
     if (!window.createWasmPromise) {
-      window.createWasmPromise = createWasm(domain)
+      window.createWasmPromise = createWasm(domain as Domain)
     }
 
     window.newGoWasm = await window.createWasmPromise

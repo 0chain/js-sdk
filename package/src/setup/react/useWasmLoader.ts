@@ -1,13 +1,14 @@
 import { useCallback, useRef } from 'react'
 import { createWasm } from '../createWasm'
 import debounce from 'lodash.debounce'
-import { Config, OnLog } from '../../types'
+import { OnLog } from '../../types/log'
 import {
   checkIfWasmLoaded,
   awaitWasmLoad,
   getDesiredMode,
   isDesiredWasmInitiated,
 } from '../wasmLoader'
+import { Config } from '../createWasm/bridge'
 
 const DEBOUNCE_TIMEOUT = 500
 const MAX_RETRIES = 3

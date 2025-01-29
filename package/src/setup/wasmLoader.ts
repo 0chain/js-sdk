@@ -1,4 +1,4 @@
-import { OnLog } from '../types'
+import { OnLog } from '../types/log'
 import { sleep } from './utils'
 import { resetGoWasm } from './wasm'
 

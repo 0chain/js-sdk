@@ -1,0 +1,1 @@
+export { createWasm } from './createWasm'

@@ -1,6 +1,6 @@
 import { OnLog } from '../types/log'
 import { sleep } from './utils'
-import { resetGoWasm } from './wasm'
+import { resetGoWasm } from './wasm/wasm'
 
 export const getDesiredMode = () => {
   const isEnterpriseModeDesired =
@@ -31,10 +31,7 @@ export const isDesiredWasmInitiated = (onLog?: OnLog) => {
 /** @param onLog Optional logger, e.g., console.log */
 export const awaitWasmLoad = async (onLog?: OnLog) => {
   while (!window.__zcn_wasm__?.__wasm_initialized__) {
-    onLog?.('debug', {
-      message: 'Wasm: Waiting...',
-      code: 'WASM_LOADING',
-    })
+    onLog?.('debug', { message: 'Wasm: Waiting...', code: 'WASM_LOADING' })
     await sleep(500)
   }
 

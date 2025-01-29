@@ -1,7 +1,7 @@
-import { Domain, Wallet } from '../types/wallet'
+import { Domain, Wallet } from '../../types/wallet'
+import { awaitWasmLoad } from '../wasmLoader'
 import { getBls } from './blockchain'
 import { networkConfig } from './constants'
-import { awaitWasmLoad } from './wasmLoader'
 
 export const resetGoWasm = () => {
   window.__zcn_wasm__ = undefined

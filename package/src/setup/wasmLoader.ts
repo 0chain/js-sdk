@@ -16,7 +16,10 @@ export const isDesiredWasmInitiated = (onLog?: OnLog) => {
 
   if (wasmType === undefined) {
     // This is for old wasm versions which don't have wasmType
-    onLog?.('debug', 'Wasm type: undefined')
+    onLog?.('debug', {
+      message: 'Wasm type: undefined',
+      code: 'OUTDATED_WASM_VERSION',
+    })
     return true
   }
 
@@ -28,11 +31,17 @@ export const isDesiredWasmInitiated = (onLog?: OnLog) => {
 /** @param onLog Optional logger, e.g., console.log */
 export const awaitWasmLoad = async (onLog?: OnLog) => {
   while (!window.__zcn_wasm__?.__wasm_initialized__) {
-    onLog?.('debug', 'Wasm: Waiting...')
+    onLog?.('debug', {
+      message: 'Wasm: Waiting...',
+      code: 'WASM_LOADING',
+    })
     await sleep(500)
   }
 
-  onLog?.('info', `Wasm: Loaded. Type: ${window.__zcn_wasm__.wasmType}`)
+  onLog?.('info', {
+    message: `Wasm: Loaded. Type: ${window.__zcn_wasm__.wasmType}`,
+    code: 'WASM_LOADED',
+  })
 
   await sleep(1000) // This avoids the error shown here: https://0chain.slack.com/archives/G01EXH6EYC9/p1729268246489569?thread_ts=1729214879.267689&cid=G01EXH6EYC9
 }

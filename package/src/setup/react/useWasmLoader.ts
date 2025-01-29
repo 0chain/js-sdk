@@ -29,19 +29,32 @@ export const useWasmLoader = ({
   const initializeWasm: InitializeWasm = useCallback(
     debounce(async (config: Config, isSwitchingWasm = false) => {
       if (!config) {
-        onLog?.('error', 'Unable to initialize wasm. Invalid config.', config)
+        // onLog?.('error', 'Unable to initialize wasm. Invalid config.', config)
+        onLog?.('error', {
+          message: 'Unable to initialize wasm. Invalid config.',
+          code: 'INVALID_WASM_CONFIG',
+          data: config,
+        })
         return
       }
 
       setIsWasmLoaded(false)
 
       if (await checkIfWasmLoaded()) {
-        onLog?.('debug', 'Wasm already initialized.', { isSwitchingWasm })
+        onLog?.('debug', {
+          message: 'Wasm already initialized.',
+          code: 'WASM_LOADED',
+          data: { isSwitchingWasm },
+        })
         setIsWasmLoaded(true)
         return
       }
 
-      onLog?.('info', 'Initializing wasm...', { isSwitchingWasm })
+      onLog?.('info', {
+        message: 'Initializing wasm...',
+        code: 'WASM_LOADING',
+        data: { isSwitchingWasm },
+      })
 
       createWasm(config, setIsWasmLoaded)
 
@@ -52,12 +65,12 @@ export const useWasmLoader = ({
           reInitializeTries.current = 0
           const msg = 'Wasm type mismatch: Unable to reset. Exiting.'
           console.warn(msg)
-          onLog?.('warn', msg)
+          onLog?.('debug', { message: msg, code: 'WASM_TYPE_MISMATCH' })
           const desiredMode = getDesiredMode()
-          onLog?.(
-            'error',
-            `Unable to switch to ${desiredMode} mode. Please reload.`
-          )
+          onLog?.('error', {
+            message: `Unable to switch to ${desiredMode} mode. Please reload.`,
+            code: 'WASM_TYPE_MISMATCH',
+          })
           setIsWasmLoaded(true)
           return
         }
@@ -65,7 +78,7 @@ export const useWasmLoader = ({
         reInitializeTries.current += 1
         const msg = `Wasm type mismatch: ${window.__zcn_wasm__?.wasmType}. Resetting ${reInitializeTries.current}/${MAX_RETRIES}`
         console.warn(msg)
-        onLog?.('debug', msg)
+        onLog?.('error', { message: msg, code: 'WASM_TYPE_MISMATCH_RETRY' })
 
         initializeWasm(config) // Retry initializeWasm due to wasm type mismatch
       }

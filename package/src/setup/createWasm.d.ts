@@ -34,17 +34,19 @@ export declare function createWasm(
   setIsWasmLoaded: SetIsWasmLoaded
 ): Promise<any>
 
-declare global {
-  interface Window {
-    __zcn_wasm__?: ZcnWasm
-    newGoWasm?: any
-    createWasmPromise?: Promise<any>
-  }
-
-  type ZcnWasm = {
-    wasmType?: 'normal' | 'enterprise'
-    __wasm_initialized__?: boolean
-  }
-}
-
 export declare function sleep(ms: number): Promise<void>
+
+// const jsProxyMethods = {
+//   sign: blsSign,
+//   verify: blsVerify,
+//   verifyWith: blsVerifyWith,
+//   createObjectURL,
+//   sleep,
+// }
+// export type JsProxyMethods = typeof jsProxyMethods
+
+// const sdkProxyMethods = {
+//   bulkUpload,
+//   setWallet,
+// }
+// export type SdkProxyMethods = typeof sdkProxyMethods

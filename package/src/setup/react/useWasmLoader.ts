@@ -1,7 +1,7 @@
 import { useCallback, useRef } from 'react'
 import { createWasm } from '../createWasm'
 import debounce from 'lodash.debounce'
-import { OnLog } from '../../types/log'
+import { OnLog } from '@/types/log'
 import {
   checkIfWasmLoaded,
   awaitWasmLoad,

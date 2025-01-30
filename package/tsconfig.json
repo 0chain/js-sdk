@@ -28,9 +28,14 @@
 
     "jsx": "react-jsx",
     "allowImportingTsExtensions": true,
-    "exactOptionalPropertyTypes": true
+    "exactOptionalPropertyTypes": true,
     // "verbatimModuleSyntax": true
     // "isolatedDeclarations": true
+
+    "baseUrl": "./",
+    "paths": {
+      "@/*": ["src/*"]
+    }
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist", "dist-tsc"]

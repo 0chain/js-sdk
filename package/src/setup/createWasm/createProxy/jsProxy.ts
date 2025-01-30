@@ -1,21 +1,5 @@
-import { sleep } from '../../utils'
+import { hexStringToByte, sleep } from '@/utils'
 import { getBridge } from '../bridge'
-
-/**
- * Converts a hexadecimal string to a Uint8Array.
- *
- * @param str The hexadecimal string to convert.
- * @returns The Uint8Array bytes representation of the hexadecimal string.
- */
-export const hexStringToByte = (str: string) => {
-  if (!str) return new Uint8Array()
-
-  const a: number[] = []
-  for (let i = 0, len = str.length; i < len; i += 2) {
-    a.push(parseInt(str.substring(i, i + 2), 16))
-  }
-  return new Uint8Array(a)
-}
 
 /**
  * Signs a hash using BLS signature scheme.

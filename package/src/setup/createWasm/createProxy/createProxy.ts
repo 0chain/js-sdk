@@ -1,4 +1,4 @@
-import { sleep } from '../../utils'
+import { sleep } from '@/utils'
 import { Bridge, getBridge, GoInstance } from '../bridge'
 import { bulkUpload, setWallet } from './sdkProxy'
 

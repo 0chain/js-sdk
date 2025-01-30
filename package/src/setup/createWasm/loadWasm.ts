@@ -1,4 +1,4 @@
-import { sleep } from '../utils'
+import { sleep } from '@/utils'
 import { Config, getBridge, GoInstance, SetIsWasmLoaded } from './bridge'
 
 const DEFAULT_CONFIG: Config = {

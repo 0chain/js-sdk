@@ -1,4 +1,4 @@
-import type { Domain, Wallet } from '../../types/wallet'
+import type { Domain, Wallet } from '@/types/wallet'
 import { awaitWasmLoad } from '../wasmLoader'
 import { networkConfig } from './constants'
 

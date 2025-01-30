@@ -1,6 +1,6 @@
-import { OnLog } from '../types/log'
-import { sleep } from './utils'
-import { resetGoWasm } from './wasm/wasm'
+import { sleep } from '@/utils'
+import { OnLog } from '@/types/log'
+import { resetGoWasm } from '@/setup/wasm/wasm'
 
 export const getDesiredMode = () => {
   const isEnterpriseModeDesired =

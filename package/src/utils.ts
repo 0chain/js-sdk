@@ -1,4 +1,20 @@
 /**
+ * Converts a hexadecimal string to a Uint8Array.
+ *
+ * @param str The hexadecimal string to convert.
+ * @returns The Uint8Array bytes representation of the hexadecimal string.
+ */
+export const hexStringToByte = (str: string) => {
+  if (!str) return new Uint8Array()
+
+  const a: number[] = []
+  for (let i = 0, len = str.length; i < len; i += 2) {
+    a.push(parseInt(str.substring(i, i + 2), 16))
+  }
+  return new Uint8Array(a)
+}
+
+/**
  * Sleep is used when awaiting for Go Wasm to initialize.
  * It uses the lowest possible sane delay time (via requestAnimationFrame).
  * However, if the window is not focused, requestAnimationFrame never returns.

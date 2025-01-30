@@ -6,3 +6,4 @@ export {
   isDesiredWasmInitiated,
 } from './setup/wasmLoader'
 export { useWasmLoader } from './setup/react/useWasmLoader'
+export { getWasm, resetGoWasm } from './setup/wasm'

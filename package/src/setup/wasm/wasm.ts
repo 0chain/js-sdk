@@ -1,6 +1,5 @@
-import { Domain, Wallet } from '../../types/wallet'
+import type { Domain, Wallet } from '../../types/wallet'
 import { awaitWasmLoad } from '../wasmLoader'
-import { getBls } from './blockchain'
 import { networkConfig } from './constants'
 
 export const resetGoWasm = () => {
@@ -9,16 +8,25 @@ export const resetGoWasm = () => {
   window.createWasmPromise = undefined
 }
 
+export const getBls = async () => {
+  const bls = window.bls
+  if (!bls?.mod?.calledRun) await bls?.init(bls.BN254)
+  return bls
+}
+
+type ZboxAppType = 'vult' | 'blimp' | 'chalk' | 'chimney' | 'bolt' | 'atlus'
 const getWasm = async ({
   domain,
   wallet,
+  zboxAppType,
 }: {
   domain: Domain | (string & {})
   wallet: Wallet
+  zboxAppType?: ZboxAppType
 }) => {
   if (!window.newGoWasm) {
     if (!window.createWasmPromise) {
-      window.createWasmPromise = createWasm(domain as Domain)
+      window.createWasmPromise = createWasm(domain as Domain, zboxAppType)
     }
 
     window.newGoWasm = await window.createWasmPromise
@@ -62,7 +70,7 @@ const getWasm = async ({
   return window.newGoWasm
 }
 
-const createWasm = async (domain: Domain) => {
+const createWasm = async (domain: Domain, zboxAppType?: ZboxAppType) => {
   if (domain.startsWith('http'))
     throw new Error('domain should not start with http')
 
@@ -75,7 +83,7 @@ const createWasm = async (domain: Domain) => {
     networkConfig.minSubmit,
     networkConfig.confirmationChainLength,
     `https://0box.${domain}`,
-    '',
+    zboxAppType || '',
     3,
   ]
 
@@ -87,4 +95,4 @@ const createWasm = async (domain: Domain) => {
   return window.newGoWasm
 }
 
-export { createWasm, getWasm }
+export { getWasm }

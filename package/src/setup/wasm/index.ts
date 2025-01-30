@@ -1,1 +1,1 @@
-export { createWasm, getWasm, resetGoWasm } from './wasm'
+export { getWasm, resetGoWasm } from './wasm'

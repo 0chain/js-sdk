@@ -1,17 +1,12 @@
-import type { Domain, Wallet } from '@/types/wallet'
+import type { NetworkDomain, Domain, ActiveWallet } from '@/types/wallet'
 import { awaitWasmLoad } from '../wasmLoader'
-import { networkConfig } from './constants'
+import { networkConfig } from '@/constants'
+import { getBls } from '@/utils'
 
 export const resetGoWasm = () => {
   window.__zcn_wasm__ = undefined
   window.newGoWasm = undefined
   window.createWasmPromise = undefined
-}
-
-export const getBls = async () => {
-  const bls = window.bls
-  if (!bls?.mod?.calledRun) await bls?.init(bls.BN254)
-  return bls
 }
 
 type ZboxAppType = 'vult' | 'blimp' | 'chalk' | 'chimney' | 'bolt' | 'atlus'
@@ -20,8 +15,8 @@ const getWasm = async ({
   wallet,
   zboxAppType,
 }: {
-  domain: Domain | (string & {})
-  wallet: Wallet
+  domain: NetworkDomain
+  wallet?: ActiveWallet
   zboxAppType?: ZboxAppType
 }) => {
   if (!window.newGoWasm) {

@@ -82,7 +82,9 @@ export const getLookupHash = async ({
   return (await goWasm.sdk.getLookupHash(allocationId, filePath)) as string
 }
 
-/** makeSCRestAPICall issues a request to the public API of one of the smart contracts */
+/** makeSCRestAPICall issues a request to the public API of one of the smart contracts 
+ * @returns Response in JSON string
+*/
 export const makeSCRestAPICall = async ({
   domain,
   scType = 'sharders',
@@ -106,6 +108,8 @@ export const makeSCRestAPICall = async ({
     relativePath,
     JSON.stringify(params)
   )
+
+  return data as string
 }
 
 export const getWasmType = () => {

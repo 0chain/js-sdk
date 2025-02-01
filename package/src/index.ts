@@ -1,10 +1,4 @@
-export { createWasm } from './setup/createWasm'
-export {
-  awaitWasmLoad,
-  checkIfWasmLoaded,
-  getDesiredMode,
-  isDesiredWasmInitiated,
-} from './setup/wasmLoader'
-export { useWasmLoader } from './setup/react/useWasmLoader'
-export { getWasm, resetGoWasm } from './setup/wasm'
-export * from './sdk'
+import * as sdk from './barrelExport'
+export default sdk
+
+export * from './barrelExport'

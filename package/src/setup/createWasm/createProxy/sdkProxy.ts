@@ -18,7 +18,7 @@ export const md5Hash = async (file: File) => {
   return result
 }
 
-const readChunk = (offset: number, chunkSize: number, file: File) =>
+export const readChunk = (offset: number, chunkSize: number, file: File) =>
   new Promise<{ size: number; buffer: Uint8Array }>((res, rej) => {
     const fileReader = new FileReader()
     const blob = file.slice(offset, chunkSize + offset)

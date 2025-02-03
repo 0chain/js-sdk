@@ -1,5 +1,6 @@
 // TODO: not used in webapps: deleteFile, multiDownload, multiUpload, downloadBlocks, updateBlobberSettings, getRemoteFileMap (deprecated), getContainers, updateContainer, searchContainer, repairAllocation, checkAllocStatus, createWorkers, getFileMetaByName, downloadDirectory.
 // TODO: gosdk methods related to "player" proxy are deprecated
+import { errorOut } from '@/sdk/utils/misc'
 import { getBridge, globalCtx } from '@/setup/createWasm/bridge'
 import { readChunk } from '@/setup/createWasm/createProxy/sdkProxy'
 import { getWasm } from '@/setup/wasm'
@@ -8,16 +9,8 @@ import {
   FileRefByName,
   GolangFileRefByName,
   ListResult,
-  Transaction,
 } from '@/types/blobber'
-import { ActiveWallet, NetworkDomain } from '@/types/wallet'
-
-const errorOut = (method: string, e: unknown) => {
-  console.error(`${method}: `, e)
-  if (typeof e === 'string') throw new Error(e)
-  else if (e instanceof Error) throw e
-  else throw new Error(`${method}: Unknown error`)
-}
+import type { ActiveWallet, NetworkDomain, Transaction } from '@/types/wallet'
 
 /** Deletes a file from an allocation. Only the owner of the allocation can delete a file.
  *
@@ -458,7 +451,11 @@ export const downloadBlocks = async ({
   authTicket?: string
   /** Lookup hash of the file, which is used to locate the file if remotepath and allocation id are not provided */
   lookupHash?: string
-  writeChunkFunc: (chunk: ArrayBuffer) => void
+  writeChunkFunc: (
+    lookupHash: string,
+    chunk: Uint8Array,
+    offset: number
+  ) => void
   startBlock: number
   endBlock: number
 }) => {

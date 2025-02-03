@@ -70,7 +70,8 @@ export type UploadObject = {
  * Performs a bulk upload of multiple files.
  *
  * @param options An array of upload options for each file.
- * @returns // TODO - return type
+ *
+ * @deprecated use `multiUplaod` methods instead
  */
 export async function bulkUpload(options: UploadObject[]) {
   const g = globalCtx()
@@ -201,6 +202,7 @@ export async function setWallet(
 }
 
 export type SdkProxyMethods = {
+  /** @deprecated use `multiUplaod` methods instead */
   bulkUpload: typeof bulkUpload
   setWallet: typeof setWallet
 }

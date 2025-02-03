@@ -127,22 +127,3 @@ type Terms = {
   read_price: number
   write_price: number
 }
-
-export type Transaction = {
-  chain_id?: string
-  client_id?: string
-  creation_date?: number
-  hash?: string
-  output_hash?: string
-  public_key?: string
-  signature?: string
-  status?: number
-  to_client_id?: string
-  transaction_data: string
-  transaction_fee: number
-  transaction_nonce?: number
-  transaction_output?: string
-  transaction_type: number
-  transaction_value: number
-  version?: string
-}

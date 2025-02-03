@@ -49,7 +49,7 @@ export const share = async ({
   domain,
   allocationId,
   remotePath,
-  clientID,
+  clientId,
   encryptionPublicKey,
   expiration,
   revoke,
@@ -61,7 +61,7 @@ export const share = async ({
   /** Remote path of the file to be shared */
   remotePath: string
   /** Client ID / wallet ID of the recipient */
-  clientID: string
+  clientId: string
   /** Encryption public key of the recipient (for private sharing) */
   encryptionPublicKey: string
   /** Expiration time of the auth ticket */
@@ -76,7 +76,7 @@ export const share = async ({
     const authTicket = (await goWasm.sdk.share(
       allocationId,
       remotePath,
-      clientID,
+      clientId,
       encryptionPublicKey,
       expiration,
       revoke,

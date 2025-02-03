@@ -635,6 +635,7 @@ export const unlockStakePool = async ({
   /** Transaction fee (in SAS) */
   fee: number
   providerId: string
+  /** Wallet ID */
   clientId: string
 }) => {
   const providerTypeId = getProviderTypeId(providerType)

@@ -146,7 +146,7 @@ export async function bulkUpload(options: UploadObject[]) {
  * Sets the wallet information in the bridge and the Go instance.
  *
  * @param bls The BLS object from bls-wasm script.
- * @param clientID The client ID.
+ * @param clientID The client ID / wallet ID.
  * @param clientKey The client key.
  * @param peerPublicKey The peer public key.
  * @param sk The serialized secret key.

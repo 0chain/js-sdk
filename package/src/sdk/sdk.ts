@@ -9,13 +9,6 @@ import {
 import { getWasm } from '@/setup/wasm'
 import type { ActiveWallet, NetworkDomain } from '@/types/wallet'
 
-type WalletKeys = {
-  walletId: string
-  privateKey: string
-  publicKey: string
-  publicEncryptionKey: string
-}
-
 export async function createWalletKeys(customBip39Mnemonic?: string) {
   const { mnemonic, buffer } = await getBip39MnemonicSeedBuffer(
     customBip39Mnemonic
@@ -40,18 +33,6 @@ export const getPublicEncryptionKey = async ({
 }) => {
   const goWasm = await getWasm({ domain, wallet: { id: keys.walletId, keys } })
   return (await goWasm.sdk.getPublicEncryptionKeyV2(keys?.publicKey)) as string
-}
-
-type TokenSymbol = 'zcn' | (string & {})
-export const getUSDRate = async ({
-  domain,
-  symbol = 'zcn',
-}: {
-  domain: NetworkDomain
-  symbol?: TokenSymbol
-}) => {
-  const goWasm = await getWasm({ domain })
-  return (await goWasm.sdk.getUSDRate(symbol)) as number
 }
 
 // TODO: check why we are not using sdk.isWalletId instead
@@ -82,9 +63,9 @@ export const getLookupHash = async ({
   return (await goWasm.sdk.getLookupHash(allocationId, filePath)) as string
 }
 
-/** makeSCRestAPICall issues a request to the public API of one of the smart contracts 
+/** makeSCRestAPICall issues a request to the public API of one of the smart contracts
  * @returns Response in JSON string
-*/
+ */
 export const makeSCRestAPICall = async ({
   domain,
   scType = 'sharders',

@@ -403,7 +403,7 @@ export const updateAllocationWithRepair = async ({
  *
  * Lock value is the amount of tokens that the client needs to lock in the allocation's write pool to be able to pay for the write operations.
  *
- * @returns the minimum lock value
+ * @returns the minimum lock value (in SAS)
  */
 export const getAllocationMinLock = async ({
   domain,
@@ -509,7 +509,9 @@ export const createFreeAllocation = async ({
   return txnHash as string
 }
 
-// TODO: docs + use it in webapps
+/**
+ * This method is used to sign updateAllocAuthTicket. This ticket is needed to allow someone else to run update transaction for your allocation on your terms.
+ */
 export const getUpdateAllocTicket = async ({
   domain,
   wallet,
@@ -540,9 +542,8 @@ export const getUpdateAllocTicket = async ({
 // Rewards sdk methods
 // ----------------------------------------
 
-// TODO: docs + use it in webapps
 /**
- * CollectRewards collects the rewards for a provider (txn: `storagesc.collect_reward`)
+ * CollectRewards collect all rewards which are available for delegate & provider pair. (txn: `storagesc.collect_reward`)
  *
  * @returns the hash of the transaction
  */

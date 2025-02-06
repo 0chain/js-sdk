@@ -1,4 +1,4 @@
-// TODO: skipped initBridge, getNotProcessedWZCNBurnEvents, getNotProcessedZCNBurnTickets
+// TODO: skipped getNotProcessedWZCNBurnEvents, getNotProcessedZCNBurnTickets
 import { errorOut } from '@/sdk/utils/misc'
 import { getWasm } from '@/setup/wasm'
 import type { ActiveWallet, NetworkDomain } from '@/types/wallet'

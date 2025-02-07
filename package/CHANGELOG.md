@@ -1,5 +1,11 @@
 # @zerochain/sdk
 
+## 1.0.1
+
+### Patch Changes
+
+- 1f92df5: Documentation update
+
 ## 1.0.0
 
 ### Major Changes

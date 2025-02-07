@@ -43,20 +43,21 @@ const config: Config = {
           // Remove this to remove the "edit this page" links.
           editUrl: 'https://github.com/0chain/js-sdk/tree/main/docs',
         },
-        blog: {
-          showReadingTime: true,
-          feedOptions: {
-            type: ['rss', 'atom'],
-            xslt: true,
-          },
-          // Please change this to your repo.
-          // Remove this to remove the "edit this page" links.
-          editUrl: 'https://github.com/0chain/js-sdk/tree/main/docs',
-          // Useful options to enforce blogging best practices
-          onInlineTags: 'warn',
-          onInlineAuthors: 'warn',
-          onUntruncatedBlogPosts: 'warn',
-        },
+        // blog: {
+        //   showReadingTime: true,
+        //   feedOptions: {
+        //     type: ['rss', 'atom'],
+        //     xslt: true,
+        //   },
+        //   // Please change this to your repo.
+        //   // Remove this to remove the "edit this page" links.
+        //   editUrl: 'https://github.com/0chain/js-sdk/tree/main/docs',
+        //   // Useful options to enforce blogging best practices
+        //   onInlineTags: 'warn',
+        //   onInlineAuthors: 'warn',
+        //   onUntruncatedBlogPosts: 'warn',
+        // },
+        blog: false,
         theme: {
           customCss: './src/css/custom.css',
         },
@@ -68,9 +69,9 @@ const config: Config = {
     // Replace with your project's social card
     image: 'img/docusaurus-social-card.jpg',
     navbar: {
-      title: 'My Site',
+      title: 'Züs JS SDK',
       logo: {
-        alt: 'My Site Logo',
+        alt: 'Züs Logo',
         src: 'img/logo.svg',
       },
       items: [
@@ -78,9 +79,9 @@ const config: Config = {
           type: 'docSidebar',
           sidebarId: 'tutorialSidebar',
           position: 'left',
-          label: 'Tutorial',
+          label: 'Getting Started',
         },
-        { to: '/blog', label: 'Blog', position: 'left' },
+        { href: 'https://medium.com/0chain', label: 'Blog', position: 'left' },
         {
           href: 'https://github.com/0chain/js-sdk',
           label: 'GitHub',
@@ -95,8 +96,20 @@ const config: Config = {
           title: 'Docs',
           items: [
             {
-              label: 'Tutorial',
+              label: 'JS SDK Docs',
               to: '/docs/getting-started',
+            },
+            {
+              label: 'Go SDK Docs',
+              href: 'https://docs-old.zus.network/guides/zus-gosdk',
+            },
+            {
+              label: 'HTTP API Reference',
+              href: 'https://docs.zus.network/zus-docs/http-apis',
+            },
+            {
+              label: 'Whitepapers',
+              href: 'https://zus.network/whitepapers/?v=1',
             },
           ],
         },
@@ -104,16 +117,24 @@ const config: Config = {
           title: 'Community',
           items: [
             {
-              label: 'Stack Overflow',
-              href: 'https://stackoverflow.com/questions/tagged/docusaurus',
-            },
-            {
               label: 'Discord',
-              href: 'https://discordapp.com/invite/docusaurus',
+              href: 'https://discord.com/invite/h3BFjdtCp4',
             },
             {
               label: 'X',
-              href: 'https://x.com/docusaurus',
+              href: 'https://twitter.com/zus_network',
+            },
+            {
+              label: 'Facebook',
+              href: 'https://www.facebook.com/ZusNetwork',
+            },
+            {
+              label: 'Linkedin',
+              href: 'https://www.linkedin.com/company/zusnetwork/',
+            },
+            {
+              label: 'Telegram',
+              href: 'https://t.me/zus_network',
             },
           ],
         },
@@ -121,17 +142,29 @@ const config: Config = {
           title: 'More',
           items: [
             {
+              href: 'https://zus.network/?v=1',
+              label: 'Züs Network',
+            },
+            {
+              href: 'https://zus.network/blog/',
               label: 'Blog',
-              to: '/blog',
+            },
+            {
+              href: 'https://medium.com/0chain',
+              label: 'Medium',
             },
             {
               label: 'GitHub',
-              href: 'https://github.com/facebook/docusaurus',
+              href: 'https://github.com/0chain',
+            },
+            {
+              label: 'YouTube',
+              href: 'https://www.youtube.com/@Zus_Network',
             },
           ],
         },
       ],
-      copyright: `Copyright © ${new Date().getFullYear()} My Project, Inc. Built with Docusaurus.`,
+      copyright: `Copyright © ${new Date().getFullYear()} Züs. All Rights Reserved.`,
     },
     prism: {
       theme: prismThemes.github,

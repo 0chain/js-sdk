@@ -1,13 +1,17 @@
 import Heading from '@theme/Heading'
 import clsx from 'clsx'
 import type { JSX } from 'react'
+import { BsTools } from 'react-icons/bs'
+import { GiGears } from 'react-icons/gi'
+import { FaCode } from 'react-icons/fa'
+import { IconType } from 'react-icons/lib'
 
 import styles from './styles.module.scss'
 
 type FeatureItem = {
   id: string
   title: string
-  Svg: React.ComponentType<React.ComponentProps<'svg'>>
+  Svg: IconType
   description: JSX.Element
 }
 
@@ -16,35 +20,39 @@ const FeatureList: FeatureItem[] = [
     id: 'easy-to-use',
     title: 'Easy to Use',
     // Svg: require('@site/static/img/undraw_docusaurus_mountain.svg').default,
-    Svg: () => null,
+    Svg: FaCode,
     description: (
       <>
-        Docusaurus was designed from the ground up to be easily installed and
-        used to get your website up and running quickly.
+        The Züs JS SDK provides JavaScript developers with a fully
+        TypeScript-based API to interact with the Züs Network, leveraging
+        the&nbsp;<a href="https://github.com/0chain/gosdk">GoSDK WASM</a> under
+        the hood.
       </>
     ),
   },
   {
-    id: 'focus-on-what-matters',
-    title: 'Focus on What Matters',
-    // Svg: require('@site/static/img/undraw_docusaurus_tree.svg').default,
-    Svg: () => null,
-    description: (
-      <>
-        Docusaurus lets you focus on your docs, and we&apos;ll do the chores. Go
-        ahead and move your docs into the <code>docs</code> directory.
-      </>
-    ),
-  },
-  {
-    id: 'powered-by-react',
-    title: 'Powered by React',
+    id: 'powereful',
+    title: 'Powerful',
     // Svg: require('@site/static/img/undraw_docusaurus_react.svg').default,
-    Svg: () => null,
+    Svg: GiGears,
     description: (
       <>
-        Extend or customize your website layout by reusing React. Docusaurus can
-        be extended while reusing the same header and footer.
+        Leverage multi-threaded operations for faster file transfers, enabling
+        high-speed and parallel uploads within a single batch for maximum
+        efficiency.
+      </>
+    ),
+  },
+  {
+    id: 'batteries-included',
+    title: 'Batteries Included',
+    // Svg: require('@site/static/img/undraw_docusaurus_tree.svg').default,
+    Svg: BsTools,
+    description: (
+      <>
+        Provides WASM cache management for both standard WASM and enterprise
+        WASM. Fetch and initialize WASM asynchronously and switch between both
+        WASM types easily.
       </>
     ),
   },
@@ -54,7 +62,7 @@ function Feature({ title, Svg, description }: FeatureItem) {
   return (
     <div className={clsx('col col--4')}>
       <div className="text--center">
-        <Svg className={styles.featureSvg} role="img" />
+        <Svg size={64} />
       </div>
       <div className="text--center padding-horiz--md">
         <Heading as="h3">{title}</Heading>

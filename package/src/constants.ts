@@ -1,6 +1,6 @@
-import { NetworkDomain } from '@/types/wallet'
+import { NetworkConfig, NetworkDomain } from '@/types/wallet'
 
-export const networkConfig = {
+export const networkConfig: NetworkConfig = {
   chainId: '0afc093ffb509f059c55478bc1a60351cef7b4e9c008a53a6cc8241ca8617dfe',
   signatureScheme: 'bls0chain',
   minConfirmation: 10,

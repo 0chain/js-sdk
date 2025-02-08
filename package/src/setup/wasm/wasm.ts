@@ -1,4 +1,9 @@
-import type { NetworkDomain, Domain, ActiveWallet } from '@/types/wallet'
+import type {
+  NetworkDomain,
+  Domain,
+  ActiveWallet,
+  NetworkConfig,
+} from '@/types/wallet'
 import { awaitWasmLoad } from '../wasmLoader'
 import { networkConfig } from '@/constants'
 import { getBls } from '@/utils'
@@ -14,14 +19,20 @@ const getWasm = async ({
   domain,
   wallet,
   zboxAppType,
+  networkConfig,
 }: {
   domain: NetworkDomain
   wallet?: ActiveWallet
   zboxAppType?: ZboxAppType
+  networkConfig?: NetworkConfig
 }) => {
   if (!window.newGoWasm) {
     if (!window.createWasmPromise) {
-      window.createWasmPromise = createWasm(domain as Domain, zboxAppType)
+      window.createWasmPromise = createWasm(
+        domain as Domain,
+        zboxAppType,
+        networkConfig
+      )
     }
 
     window.newGoWasm = await window.createWasmPromise
@@ -65,21 +76,26 @@ const getWasm = async ({
   return window.newGoWasm
 }
 
-const createWasm = async (domain: Domain, zboxAppType?: ZboxAppType) => {
+const createWasm = async (
+  domain: Domain,
+  zboxAppType?: ZboxAppType,
+  customNetworkConfig?: NetworkConfig
+) => {
   if (domain.startsWith('http'))
     throw new Error('domain should not start with http')
 
   const blockWorker = `https://${domain}/dns`
   const config = [
-    networkConfig.chainId,
-    blockWorker,
-    networkConfig.signatureScheme,
-    networkConfig.minConfirmation,
-    networkConfig.minSubmit,
-    networkConfig.confirmationChainLength,
-    `https://0box.${domain}`,
+    customNetworkConfig?.chainId || networkConfig.chainId,
+    customNetworkConfig?.blockWorker || blockWorker,
+    customNetworkConfig?.signatureScheme || networkConfig.signatureScheme,
+    customNetworkConfig?.minConfirmation || networkConfig.minConfirmation,
+    customNetworkConfig?.minSubmit || networkConfig.minSubmit,
+    customNetworkConfig?.confirmationChainLength ||
+      networkConfig.confirmationChainLength,
+    customNetworkConfig?.zboxHost || `https://0box.${domain}`,
     zboxAppType || '',
-    3,
+    customNetworkConfig?.sharderConsensus || 3,
   ]
 
   await awaitWasmLoad()

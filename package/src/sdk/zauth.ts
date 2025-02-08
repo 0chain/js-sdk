@@ -43,7 +43,7 @@ export const setWalletInfo = async ({
   /**
    * `true` If wallet keys is split.
    *
-   * splitKeyWallet parameter is valid only if SignatureScheme is `BLS0Chain`.
+   * splitKeyWallet parameter is valid only if SignatureScheme is `bls0chain`.
    *
    * @default false
    */

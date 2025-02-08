@@ -1,5 +1,23 @@
 export type Domain = 'mainnet.zus.network' | 'devnet.zus.network'
 export type NetworkDomain = Domain | (string & {})
+export type NetworkConfig = {
+  /** Chain ID  */
+  chainId?: string
+  /** signatureScheme is the Signature scheme used for signing transactions */
+  signatureScheme?: string
+  /** minConfirmation is the minimum number of confirmations required for a transaction to be considered final */
+  minConfirmation?: number
+  /** minSubmit is the minimum number of times a transaction must be submitted to the network */
+  minSubmit?: number
+  /** confirmationChainLength is the number of blocks to wait for a transaction to be confirmed */
+  confirmationChainLength?: number
+  /** sharderConsensus is the number of sharders to reach consensus */
+  sharderConsensus?: number
+  /** zboxHost is the url of the 0box service */
+  zboxHost?: `https://0box.${Domain}` | (string & {})
+  /** blockWorker is the block worker url */
+  blockWorker?: `https://${Domain}/dns` | (string & {})
+}
 
 export type ActiveWallet = {
   id?: string
@@ -51,7 +69,7 @@ export const getProviderTypeId = (providerType: ProviderType) => {
   return providerTypes[providerType]
 }
 
-/** StakePool information of stake pool of a provider */
+/** StakePoolInfo is the information of stake pool of a provider */
 export type StakePoolInfo = {
   pool_id: string
   balance: number

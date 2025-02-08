@@ -22,7 +22,7 @@ export const createAllocation = async ({
   minWritePrice,
   maxWritePrice,
   lock,
-  blobberIds,
+  blobberIds = [],
   blobberAuthTickets,
   setThirdPartyExtendable,
   isEnterprise,
@@ -46,8 +46,8 @@ export const createAllocation = async ({
   maxWritePrice: number
   /** Lock value to add to the allocation */
   lock: number
-  /** List of blobber IDs */
-  blobberIds: string[]
+  /** List of blobber IDs of your preferred blobbers for the allocation */
+  blobberIds?: string[]
   /** List of blobber auth tickets in case of using restricted blobbers */
   blobberAuthTickets: string[]
   /**

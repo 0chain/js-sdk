@@ -4,7 +4,7 @@ import type {
   ActiveWallet,
   NetworkConfig,
 } from '@/types/wallet'
-import { awaitWasmLoad } from '../wasmLoader'
+import { awaitWasmLoad } from '../wasmLoader/createWasmLoader'
 import { networkConfig } from '@/constants'
 import { getBls } from '@/utils'
 

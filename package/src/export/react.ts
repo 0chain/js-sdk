@@ -1,1 +1,1 @@
-export { useWasmLoader } from '../setup/react/useWasmLoader'
+export { useWasmLoader } from '../setup/wasmLoader/useWasmLoader'

@@ -3,7 +3,8 @@ export {
   awaitWasmLoad,
   checkIfWasmLoaded,
   getDesiredMode,
-  isDesiredWasmInitiated,
-} from '../setup/wasmLoader'
+  isDesiredWasmInitialized,
+} from '../setup/wasmLoader/createWasmLoader'
 export { getWasm, resetGoWasm } from '../setup/wasm'
 export * from '../sdk'
+export { wasmLoader } from '../setup/wasmLoader/wasmLoader'

@@ -1,11 +1,23 @@
 {
   "name": "@zerochain/sdk",
   "version": "1.0.0",
-  "description": "The Züs SDK is a JavaScript client library that provides a convenient interface for interacting with the Züs Network. It allows developers to perform various operations such as creating and managing allocations, uploading and downloading files, executing smart contracts, and more.",
+  "description": "The Züs JS SDK is a JavaScript client library that provides a convenient interface for interacting with the Züs Network. It allows developers to perform various operations such as creating and managing allocations, uploading and downloading files, executing smart contracts, and more.",
   "source": "src/index.ts",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    },
+    "./react": {
+      "types": "./dist/react/index.d.ts",
+      "import": "./dist/react/index.mjs",
+      "require": "./dist/react/index.js"
+    }
+  },
   "publishConfig": {
     "access": "public"
   },
@@ -18,8 +30,8 @@
   ],
   "scripts": {
     "dev:tsc": "tsc -w -p tsc.tsconfig.json",
-    "dev": "NODE_ENV=development tsup src/index.ts --format cjs,esm --dts --watch",
-    "build": "tsup src/index.ts --format cjs,esm --dts",
+    "dev": "NODE_ENV=development tsup",
+    "build": "tsup",
     "lint:tsc": "tsc --noEmit",
     "lint": "yarn lint:tsc"
   },
@@ -28,7 +40,7 @@
   "bugs": {
     "url": "https://github.com/0chain/js-sdk/issues"
   },
-  "homepage": "https://github.com/0chain/js-sdk#readme",
+  "homepage": "https://0chain.github.io/js-sdk/",
   "keywords": [
     "client",
     "sdk",

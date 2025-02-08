@@ -4,7 +4,10 @@ export default defineConfig(options => {
   const isDev = process.env.NODE_ENV === 'development'
   console.debug('isDev', isDev)
   return {
-    entry: ['src/index.ts'],
+    entry: {
+      index: 'src/index.ts',
+      "react/index": 'src/export/react.ts',
+    },
     format: ['cjs', 'esm'], // Output formats
     dts: true,
     minify: !isDev,

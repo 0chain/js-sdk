@@ -1,4 +1,4 @@
-import * as sdk from './barrelExport'
+import * as sdk from './export/vanilla'
 export default sdk
 
-export * from './barrelExport'
+export * from './export/vanilla'

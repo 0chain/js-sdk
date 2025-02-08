@@ -15,11 +15,11 @@ const MAX_RETRIES = 3
 export const useWasmLoader = ({
   onLog,
   debounceTimeout = DEBOUNCE_TIMEOUT,
-  setIsWasmLoaded = () => {},
+  setIsWasmLoaded: setIsWasmLoadedProp,
 }: {
   onLog?: OnLog
   debounceTimeout?: number
-  setIsWasmLoaded: (isWasmLoaded: boolean) => void
+  setIsWasmLoaded?: (isWasmLoaded: boolean) => void
 }) => {
   const reInitializeTries = useRef(0)
 
@@ -38,6 +38,8 @@ export const useWasmLoader = ({
         })
         return
       }
+
+      const setIsWasmLoaded = setIsWasmLoadedProp || (() => {})
 
       setIsWasmLoaded(false)
 
@@ -84,7 +86,7 @@ export const useWasmLoader = ({
         initializeWasm(config) // Retry initializeWasm due to wasm type mismatch
       }
     }, debounceTimeout),
-    [setIsWasmLoaded]
+    [setIsWasmLoadedProp]
   )
 
   return initializeWasm

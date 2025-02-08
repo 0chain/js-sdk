@@ -6,12 +6,13 @@ export default defineConfig(options => {
   return {
     entry: {
       index: 'src/index.ts',
-      "react/index": 'src/export/react.ts',
+      react: 'src/export/react.ts',
     },
     format: ['cjs', 'esm'], // Output formats
     dts: true,
     minify: !isDev,
     sourcemap: isDev,
     watch: isDev,
+    clean: isDev,
   }
 })

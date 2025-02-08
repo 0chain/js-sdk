@@ -1,0 +1,12 @@
+node_modules
+dist-tsc
+
+dist
+# chunk-*.*js*
+# createWasmLoader-*.*ts
+# index.*js*
+# index.d.*ts
+# react.*js*
+# react.d.*ts
+
+

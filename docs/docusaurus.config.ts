@@ -6,7 +6,8 @@ import { themes as prismThemes } from 'prism-react-renderer'
 
 const config: Config = {
   title: 'Züs JS SDK',
-  tagline: 'Züs SDK: Simplifying JavaScript integration with the Züs Network.',
+  tagline:
+    'Züs JS SDK: Simplifying JavaScript integration with the Züs Network.',
   favicon: 'img/favicon.ico',
 
   // Set the production url of your site here
@@ -97,7 +98,7 @@ const config: Config = {
           items: [
             {
               label: 'JS SDK Docs',
-              to: '/docs/getting-started',
+              to: '/docs/getting-started/introduction',
             },
             {
               label: 'Go SDK Docs',
@@ -169,6 +170,11 @@ const config: Config = {
     prism: {
       theme: prismThemes.github,
       darkTheme: prismThemes.dracula,
+    },
+    colorMode: {
+      defaultMode: 'dark',
+      disableSwitch: false,
+      respectPrefersColorScheme: true,
     },
   } satisfies Preset.ThemeConfig,
 }

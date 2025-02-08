@@ -1,4 +1,8 @@
-import { createWasmLoader, type WasmLoaderOptions } from './createWasmLoader'
+import {
+  createWasmLoader,
+  type InitializeWasm,
+  type WasmLoaderOptions,
+} from './createWasmLoader'
 
 let retries = 0
 
@@ -10,7 +14,7 @@ export const wasmLoader = ({
   onLog?: WasmLoaderOptions['onLog']
   debounceTimeout?: WasmLoaderOptions['debounceTimeout']
   setIsWasmLoaded?: WasmLoaderOptions['setIsWasmLoaded']
-}) => {
+}): InitializeWasm => {
   const getRetries = () => retries
   const incrementRetries = () => retries++
   const resetRetries = () => (retries = 0)

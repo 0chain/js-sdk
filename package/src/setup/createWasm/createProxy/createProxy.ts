@@ -1,8 +1,9 @@
 import { sleep } from '@/utils'
-import { Bridge, getBridge, GoInstance } from '../bridge'
+import { getBridge, type Bridge, type GoInstance } from '../bridge'
 import { bulkUpload, setWallet } from './sdkProxy'
 
-const createSdkProxyObject = (go: GoInstance) => {
+// TODO: the return type can be seen from proxy.go in gosdk
+const createSdkProxyObject = (go: GoInstance): any => {
   const bridge = getBridge()
 
   const sdkProxy = new Proxy(
@@ -56,7 +57,8 @@ const createSdkProxyObject = (go: GoInstance) => {
   return sdkProxy
 }
 
-const createJsProxyObject = () => {
+// We don't care about the return type because JS proxy methods are only used by gosdk wasm.
+const createJsProxyObject = (): any => {
   const bridge = getBridge()
 
   const jsProxy = new Proxy(
@@ -79,7 +81,18 @@ const createJsProxyObject = () => {
   return jsProxy
 }
 
-export const createProxy = (go: GoInstance) => {
+export type GoWasmProxy = {
+  /** @deprecated */
+  bulkUpload: typeof bulkUpload
+  setWallet: typeof setWallet
+  getWalletId: () => Bridge['walletId']
+  getPrivateKey: () => Bridge['secretKey']
+  getPeerPublicKey: () => Bridge['peerPublicKey']
+  sdk: ReturnType<typeof createSdkProxyObject>
+  jsProxy: ReturnType<typeof createJsProxyObject>
+}
+
+export const createProxy = (go: GoInstance): GoWasmProxy => {
   const sdkProxy = createSdkProxyObject(go)
   const jsProxy = createJsProxyObject()
 

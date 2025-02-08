@@ -19,10 +19,10 @@ export const splitKeys = async ({
   privateKey: string
   /** Number of keys to split into */
   numSplits: number
-}) => {
+}): Promise<string> => {
   const goWasm = await getWasm({ domain, wallet })
   const resp = await goWasm.sdk.splitKeys(privateKey, numSplits)
-  return resp as string
+  return resp
 }
 
 /**
@@ -48,7 +48,7 @@ export const setWalletInfo = async ({
    * @default false
    */
   splitKeyWallet?: boolean
-}) => {
+}): Promise<void> => {
   const goWasm = await getWasm({ domain, wallet })
   return goWasm.sdk.setWalletInfo(jsonWallet, splitKeyWallet)
 }
@@ -63,7 +63,7 @@ export const setAuthUrl = async ({
   wallet: ActiveWallet
   /** URL of zAuth server */
   url: string
-}) => {
+}): Promise<void> => {
   const goWasm = await getWasm({ domain, wallet })
   return goWasm.sdk.setAuthUrl(url)
 }
@@ -81,7 +81,7 @@ export const registerAuthorizer = async ({
   domain: NetworkDomain
   wallet: ActiveWallet
   authTxnCallback: (message: string) => void
-}) => {
+}): Promise<void> => {
   const goWasm = await getWasm({ domain, wallet })
   const registerAuthorizer = await goWasm.sdk.registerAuthorizer
   await registerAuthorizer(authTxnCallback)
@@ -95,7 +95,7 @@ export const registerAuthCommon = async ({
   domain: NetworkDomain
   wallet: ActiveWallet
   authTxnCallback: (message: string) => void
-}) => {
+}): Promise<void> => {
   const goWasm = await getWasm({ domain, wallet })
   const registerAuthCommon = await goWasm.sdk.registerAuthCommon
   await registerAuthCommon(authTxnCallback)
@@ -127,7 +127,7 @@ export const authResponse = async ({
   domain: NetworkDomain
   wallet: ActiveWallet
   response: string
-}) => {
+}): Promise<void> => {
   const goWasm = await getWasm({ domain, wallet })
   return goWasm.sdk.authResponse(response)
 }
@@ -140,7 +140,7 @@ export const registerZauthServer = async ({
   domain: NetworkDomain
   wallet: ActiveWallet
   serverAddress: string
-}) => {
+}): Promise<void> => {
   const goWasm = await getWasm({ domain, wallet })
   return goWasm.sdk.registerZauthServer(serverAddress)
 }
@@ -163,7 +163,7 @@ export const zauthRetrieveKey = async ({
   serverAddress: string
   /** JWT Token */
   token: string
-}) => {
+}): Promise<string> => {
   const goWasm = await getWasm({ domain, wallet })
   const resp = await goWasm.sdk.zauthRetrieveKey(
     clientId,
@@ -172,5 +172,5 @@ export const zauthRetrieveKey = async ({
     token
   )
 
-  return resp as string
+  return resp
 }

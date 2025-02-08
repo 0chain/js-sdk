@@ -1,12 +1,9 @@
-import { getJsProxy, JsProxyMethods } from './createProxy/jsProxy'
-import { SdkProxyMethods } from './createProxy/sdkProxy'
+import { getJsProxy, type JsProxyMethods } from './createProxy/jsProxy'
+import { type SdkProxyMethods } from './createProxy/sdkProxy'
 
-export const globalCtx = () => {
+export const globalCtx = (): Window => {
   if (typeof window !== 'undefined') return window || globalThis || self
-  else {
-    console.error('Window object not available')
-    return {} as Window
-  }
+  else throw new Error('Window object not available')
 }
 
 /**

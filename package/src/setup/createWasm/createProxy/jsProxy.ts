@@ -7,7 +7,7 @@ import { getBridge } from '../bridge'
  * @param hash The hash to be signed.
  * @returns The serialized signature in hexadecimal format.
  */
-async function blsSign(hash: string, secretKey: string) {
+async function blsSign(hash: string, secretKey: string): Promise<string> {
   const bridge = getBridge()
   if (!bridge.jsProxy || !bridge.jsProxy.secretKey) {
     const errMsg = 'err: bls.secretKey is not initialized'
@@ -26,7 +26,7 @@ async function blsSign(hash: string, secretKey: string) {
     throw new Error(errMsg)
   }
 
-  return sig.serializeToHexStr() as string
+  return sig.serializeToHexStr()
 }
 
 /**
@@ -36,7 +36,7 @@ async function blsSign(hash: string, secretKey: string) {
  * @param hash The hash to verify the signature against.
  * @returns A boolean indicating whether the signature is valid or not.
  */
-async function blsVerify(signature: string, hash: string) {
+async function blsVerify(signature: string, hash: string): Promise<boolean> {
   const bridge = getBridge()
 
   if (!bridge.jsProxy || !bridge.jsProxy.publicKey) {
@@ -58,7 +58,11 @@ async function blsVerify(signature: string, hash: string) {
  * @param hash The hash to verify the signature against.
  * @returns A boolean indicating whether the signature is valid or not.
  */
-async function blsVerifyWith(pk: string, signature: string, hash: string) {
+async function blsVerifyWith(
+  pk: string,
+  signature: string,
+  hash: string
+): Promise<boolean> {
   const bridge = getBridge()
 
   const publicKey = bridge.jsProxy.bls.deserializeHexStrToPublicKey(pk)
@@ -80,7 +84,7 @@ async function blsAddSignature(
   secretKey: string,
   signature: string,
   hash: string
-) {
+): Promise<string> {
   const bridge = getBridge()
   if (!bridge.jsProxy) {
     const errMsg = 'err: bls.secretKey is not initialized'
@@ -100,15 +104,21 @@ async function blsAddSignature(
 
   sig.add(sig2)
 
-  return sig.serializeToHexStr() as string
+  return sig.serializeToHexStr()
 }
 
-export async function createObjectURL(buf: ArrayBuffer, mimeType: string) {
+export async function createObjectURL(
+  buf: ArrayBuffer,
+  mimeType: string
+): Promise<string> {
   var blob = new Blob([buf], { type: mimeType })
   return URL.createObjectURL(blob)
 }
 
-export const getJsProxy = () => {
+export const getJsProxy = (): {
+  secretKey: string | null
+  publicKey: string | null
+} & JsProxyMethods => {
   return {
     secretKey: null,
     publicKey: null,

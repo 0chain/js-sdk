@@ -1,12 +1,17 @@
 import { sleep } from '@/utils'
-import { Config, getBridge, GoInstance, SetIsWasmLoaded } from './bridge'
+import {
+  getBridge,
+  type Config,
+  type GoInstance,
+  type SetIsWasmLoaded,
+} from './bridge'
 
 const DEFAULT_CONFIG: Config = {
   wasmBaseUrl: '',
   useCachedWasm: false,
 }
 
-export const getConfig = () => getBridge().__config__ || DEFAULT_CONFIG
+export const getConfig = (): Config => getBridge().__config__ || DEFAULT_CONFIG
 
 const getWasmPath = () => {
   return getIsEnterpriseMode() ? '/enterprise-zcn.wasm' : '/zcn.wasm'
@@ -182,7 +187,7 @@ const MAX_LOAD_TIMOUT = 10000 // 10 seconds
 export async function loadWasm(
   go: GoInstance,
   setIsWasmLoaded: SetIsWasmLoaded
-) {
+): Promise<void> {
   // If instantiateStreaming doesn't exists, polyfill/create it on top of instantiate
   if (!WebAssembly?.instantiateStreaming) {
     WebAssembly.instantiateStreaming = async (resp, importObject) => {

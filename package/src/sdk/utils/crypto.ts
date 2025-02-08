@@ -4,7 +4,7 @@ import sha3 from 'js-sha3'
 
 export const getBip39MnemonicSeedBuffer = async (
   customBip39Mnemonic?: string
-) => {
+): Promise<{ mnemonic: string; buffer: Uint8Array<ArrayBufferLike> }> => {
   const mnemonic = customBip39Mnemonic || generateMnemonic(256)
   const seed = await mnemonicToSeed(mnemonic, '0chain-client-split-key')
   const buffer = new Uint8Array(seed)
@@ -12,8 +12,8 @@ export const getBip39MnemonicSeedBuffer = async (
 }
 
 export const getBlsKeys = async (
-  bip39MnemonicSeedBuffer: Uint8Array<ArrayBuffer>
-) => {
+  bip39MnemonicSeedBuffer: Uint8Array<ArrayBufferLike>
+): Promise<{ publicKey: string; privateKey: string }> => {
   const bls = await getBls()
   const blsSecret = new bls.SecretKey()
   bls.setRandFunc(bip39MnemonicSeedBuffer)
@@ -24,11 +24,11 @@ export const getBlsKeys = async (
   return { publicKey, privateKey }
 }
 
-export const getSha3HashFromHexString = (hexString: string) => {
+export const getSha3HashFromHexString = (hexString: string): string => {
   return sha3.sha3_256(hexStringToByte(hexString))
 }
 
-export const isHash = (str: string) => {
+export const isHash = (str: string): boolean => {
   const regexExp = /^[a-f0-9]{64}$/gi
   return regexExp.test(str)
 }

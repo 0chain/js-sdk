@@ -7,8 +7,9 @@ import type {
 import { awaitWasmLoad } from '../wasmLoader/createWasmLoader'
 import { networkConfig } from '@/constants'
 import { getBls } from '@/utils'
+import type { GoWasmProxy } from '@/setup/createWasm/createProxy/createProxy'
 
-export const resetGoWasm = () => {
+export const resetGoWasm = (): void => {
   window.__zcn_wasm__ = undefined
   window.newGoWasm = undefined
   window.createWasmPromise = undefined
@@ -25,7 +26,7 @@ const getWasm = async ({
   wallet?: ActiveWallet
   zboxAppType?: ZboxAppType
   networkConfig?: NetworkConfig
-}) => {
+}): Promise<GoWasmProxy> => {
   if (!window.newGoWasm) {
     if (!window.createWasmPromise) {
       window.createWasmPromise = createWasm(
@@ -80,7 +81,7 @@ const createWasm = async (
   domain: Domain,
   zboxAppType?: ZboxAppType,
   customNetworkConfig?: NetworkConfig
-) => {
+): Promise<GoWasmProxy> => {
   if (domain.startsWith('http'))
     throw new Error('domain should not start with http')
 

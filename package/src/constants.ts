@@ -1,4 +1,4 @@
-import { NetworkConfig, NetworkDomain } from '@/types/wallet'
+import type { NetworkConfig, NetworkDomain } from '@/types/wallet'
 
 export const networkConfig: NetworkConfig = {
   chainId: '0afc093ffb509f059c55478bc1a60351cef7b4e9c008a53a6cc8241ca8617dfe',
@@ -8,7 +8,16 @@ export const networkConfig: NetworkConfig = {
   confirmationChainLength: 3,
 }
 
-export const getZcnContracts = (domain: NetworkDomain) => {
+export const getZcnContracts = (
+  domain: NetworkDomain
+): {
+  faucetSCAddress: string
+  storageSCAddress: string
+  minerSCAddress: string
+  interestPoolSCAddress: string
+  dexMintAddress: string
+  teamWallet: string
+} => {
   return {
     faucetSCAddress:
       '6dba10422e368813802877a85039d3985d96760ed844092319743fb3a76712d3',

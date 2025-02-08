@@ -4,7 +4,7 @@
  * @param str The hexadecimal string to convert.
  * @returns The Uint8Array bytes representation of the hexadecimal string.
  */
-export const hexStringToByte = (str: string) => {
+export const hexStringToByte = (str: string): Uint8Array<ArrayBuffer> => {
   if (!str) return new Uint8Array()
 
   const a: number[] = []
@@ -21,14 +21,14 @@ export const hexStringToByte = (str: string) => {
  * A timeout will ensure to be called after 50 ms, regardless of whether or not
  * the tab is in focus.
  */
-export const sleep = (ms = 1000) => {
+export const sleep = (ms = 1000): Promise<number | void> => {
   return new Promise<number | void>(resolve => {
     requestAnimationFrame(resolve)
     setTimeout(resolve, ms)
   })
 }
 
-export const getBls = async () => {
+export const getBls = async (): Promise<any> => {
   const bls = window.bls
   if (!bls?.mod?.calledRun) await bls?.init(bls.BN254)
   return bls

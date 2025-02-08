@@ -62,10 +62,10 @@ export const burnZCN = async ({
   wallet: ActiveWallet
   /** Amount of ZCN tokens to burn */
   amount: number
-}) => {
+}): Promise<string> => {
   const goWasm = await getWasm({ domain, wallet })
   const txnHash = await goWasm.sdk.burnZCN(amount)
-  return txnHash as string
+  return txnHash
 }
 
 /**
@@ -87,10 +87,10 @@ export const mintZCN = async ({
    * @deprecated
    */
   timeout: number
-}) => {
+}): Promise<string> => {
   const goWasm = await getWasm({ domain, wallet })
   const txnHash = await goWasm.sdk.mintZCN(burnTrxHash, timeout)
-  return txnHash as string
+  return txnHash
 }
 
 type MintPayload = {
@@ -115,11 +115,11 @@ export const getMintWZCNPayload = async ({
   wallet: ActiveWallet
   /** Hash of the burn transaction */
   burnTrxHash: string
-}) => {
+}): Promise<MintPayload> => {
   const goWasm = await getWasm({ domain, wallet })
   try {
     const mintPayloadJson = await goWasm.sdk.getMintWZCNPayload(burnTrxHash)
-    const mintPayload = JSON.parse(mintPayloadJson) as MintPayload
+    const mintPayload = JSON.parse(mintPayloadJson)
     return mintPayload
   } catch (err) {
     throw errorOut('getMintWZCNPayload', err)
@@ -138,11 +138,11 @@ export const getNotProcessedWZCNBurnEvents = async ({
 }: {
   domain: NetworkDomain
   wallet: ActiveWallet
-}) => {
+}): Promise<BurnEvent[]> => {
   const goWasm = await getWasm({ domain, wallet })
   try {
     const burnEventsJson = await goWasm.sdk.getNotProcessedWZCNBurnEvents()
-    const burnEvents = JSON.parse(burnEventsJson) as BurnEvent[]
+    const burnEvents = JSON.parse(burnEventsJson)
     return burnEvents
   } catch (err) {
     throw errorOut('getNotProcessedWZCNBurnEvents', err)
@@ -162,11 +162,11 @@ export const getNotProcessedZCNBurnTickets = async ({
 }: {
   domain: NetworkDomain
   wallet: ActiveWallet
-}) => {
+}): Promise<BurnTicket[]> => {
   const goWasm = await getWasm({ domain, wallet })
   try {
     const burnTicketsJson = await goWasm.sdk.getProcessedZCNBurnTickets()
-    const burnTickets = JSON.parse(burnTicketsJson) as BurnTicket[]
+    const burnTickets = JSON.parse(burnTicketsJson)
     return burnTickets
   } catch (err) {
     throw errorOut('getProcessedZCNBurnTickets', err)
@@ -198,7 +198,7 @@ export const estimateMintWZCNGasAmount = async ({
   nonce: number
   /** Encoded format (base-64) of the burn signatures received from the authorizers. */
   signaturesRaw: string[]
-}) => {
+}): Promise<string> => {
   const goWasm = await getWasm({ domain, wallet })
   const gasAmount = await goWasm.sdk.estimateMintWZCNGasAmount(
     from,
@@ -208,7 +208,7 @@ export const estimateMintWZCNGasAmount = async ({
     nonce,
     signaturesRaw
   )
-  return gasAmount as string
+  return gasAmount
 }
 
 // TODO: web3-utils for address?
@@ -228,14 +228,14 @@ export const estimateBurnWZCNGasAmount = async ({
   to: string
   /** Amount of tokens to burn (as a string) */
   amountTokens: string
-}) => {
+}): Promise<string> => {
   const goWasm = await getWasm({ domain, wallet })
   const gasAmount = await goWasm.sdk.estimateBurnWZCNGasAmount(
     from,
     to,
     amountTokens
   )
-  return gasAmount as string
+  return gasAmount
 }
 
 /** estimateGasPrice performs gas estimation for the given transaction using Alchemy enhanced API returning approximate final gas fee */
@@ -245,8 +245,8 @@ export const estimateGasPrice = async ({
 }: {
   domain: NetworkDomain
   wallet: ActiveWallet
-}) => {
+}): Promise<string> => {
   const goWasm = await getWasm({ domain, wallet })
   const gasPrice = await goWasm.sdk.estimateGasPrice()
-  return gasPrice as string
+  return gasPrice
 }

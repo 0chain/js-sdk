@@ -1,7 +1,7 @@
 import { createWasm } from '../createWasm'
 import debounce from 'lodash.debounce'
 import type { OnLog } from '@/types/log'
-import { Config } from '../createWasm/bridge'
+import type { Config } from '../createWasm/bridge'
 import { sleep } from '@/utils'
 import { resetGoWasm } from '@/setup/wasm/wasm'
 
@@ -17,6 +17,11 @@ export type WasmLoaderOptions = {
   resetRetries: () => void
 }
 
+export type InitializeWasm = (
+  config: Config,
+  isSwitchingWasm?: boolean
+) => Promise<void> | undefined
+
 export const createWasmLoader = ({
   onLog,
   debounceTimeout = DEBOUNCE_TIMEOUT,
@@ -24,12 +29,7 @@ export const createWasmLoader = ({
   getRetries,
   incrementRetries,
   resetRetries,
-}: WasmLoaderOptions) => {
-  type InitializeWasm = (
-    config: Config,
-    isSwitchingWasm?: boolean
-  ) => Promise<void> | undefined
-
+}: WasmLoaderOptions): InitializeWasm => {
   const initializeWasm: InitializeWasm = debounce(
     async (config: Config, isSwitchingWasm = false) => {
       if (!config) {
@@ -98,14 +98,14 @@ export const createWasmLoader = ({
 // Utils
 // ----------------------------------------
 
-export const getDesiredMode = () => {
+export const getDesiredMode = (): 'normal' | 'enterprise' => {
   const isEnterpriseModeDesired =
     localStorage.getItem('enterpriseAlloc') === 'enabled'
   return isEnterpriseModeDesired ? 'enterprise' : 'normal'
 }
 
 /** @param onLog Optional logger, e.g., console.log */
-export const isDesiredWasmInitialized = (onLog?: OnLog) => {
+export const isDesiredWasmInitialized = (onLog?: OnLog): boolean => {
   const isEnterpriseModeDesired =
     localStorage.getItem('enterpriseAlloc') === 'enabled'
   const wasmType = window.__zcn_wasm__?.wasmType
@@ -125,7 +125,7 @@ export const isDesiredWasmInitialized = (onLog?: OnLog) => {
 }
 
 /** @param onLog Optional logger, e.g., console.log */
-export const awaitWasmLoad = async (onLog?: OnLog) => {
+export const awaitWasmLoad = async (onLog?: OnLog): Promise<void> => {
   while (!window.__zcn_wasm__?.__wasm_initialized__) {
     onLog?.('debug', { message: 'Wasm: Waiting...', code: 'WASM_LOADING' })
     await sleep(500)
@@ -139,7 +139,7 @@ export const awaitWasmLoad = async (onLog?: OnLog) => {
   await sleep(1000) // This avoids the error shown here: https://0chain.slack.com/archives/G01EXH6EYC9/p1729268246489569?thread_ts=1729214879.267689&cid=G01EXH6EYC9
 }
 
-export const checkIfWasmLoaded = async () => {
+export const checkIfWasmLoaded = async (): Promise<boolean> => {
   if (window.__zcn_wasm__?.__wasm_initialized__) {
     await sleep(300) // This avoids the error shown here: https://0chain.slack.com/archives/G01EXH6EYC9/p1729268246489569?thread_ts=1729214879.267689&cid=G01EXH6EYC9
 

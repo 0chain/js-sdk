@@ -65,7 +65,7 @@ export const providerTypes = {
 } as const
 
 export type ProviderType = keyof typeof providerTypes
-export const getProviderTypeId = (providerType: ProviderType) => {
+export const getProviderTypeId = (providerType: ProviderType): number => {
   return providerTypes[providerType]
 }
 

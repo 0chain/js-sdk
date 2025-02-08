@@ -1,7 +1,7 @@
 // TODO: not used in webapps: updateAllocationWithRepair, getUpdateAllocTicket, collectRewards, getStakePoolInfo, lockStakePool, unlockStakePool (not used anywhere:- getAllocationBlobbers, getBlobberIds, reloadAllocation, getStakePoolInfo. lockWritePool, allocationRepair, repairSize)
 import {
   getProviderTypeId,
-  StakePoolInfo,
+  type StakePoolInfo,
   type ActiveWallet,
   type NetworkDomain,
   type ProviderType,
@@ -9,7 +9,7 @@ import {
 } from '@/types/wallet'
 import { getWasm } from '@/setup/wasm'
 import { errorOut } from '@/sdk/utils/misc'
-import { Allocation } from '@/types/allocation'
+import type { Allocation } from '@/types/allocation'
 
 export const createAllocation = async ({
   wallet,
@@ -68,7 +68,7 @@ export const createAllocation = async ({
    * Use this parameter with caution, as it may result in allocations with lower fault tolerance and reliability.
    */
   force: boolean
-}) => {
+}): Promise<Transaction> => {
   const goWasm = await getWasm({ domain, wallet })
 
   const transactionData = await goWasm.sdk.createAllocation(
@@ -86,7 +86,7 @@ export const createAllocation = async ({
     isEnterprise,
     force
   )
-  return transactionData as Transaction
+  return transactionData
 }
 
 /** Retrieves list of blobber IDs of the allocation */
@@ -135,7 +135,7 @@ export const getAllocationBlobbers = async ({
    * @default false
    */
   force: boolean
-}) => {
+}): Promise<string[]> => {
   const goWasm = await getWasm({ domain, wallet })
 
   const blobberIds = await goWasm.sdk.getAllocationBlobbers(
@@ -151,7 +151,7 @@ export const getAllocationBlobbers = async ({
     force
   )
 
-  return blobberIds as string[]
+  return blobberIds
 }
 
 export const getBlobberIds = async ({
@@ -163,11 +163,11 @@ export const getBlobberIds = async ({
   wallet: ActiveWallet
   /** List of blobber URLs for which IDs need to be retrieved */
   blobberUrls: string[]
-}) => {
+}): Promise<string[]> => {
   const goWasm = await getWasm({ domain, wallet })
 
   const blobberIds = await goWasm.sdk.getBlobberIds(blobberUrls)
-  return blobberIds as string[]
+  return blobberIds
 }
 
 export const listAllocations = async ({
@@ -176,10 +176,10 @@ export const listAllocations = async ({
 }: {
   domain: NetworkDomain
   wallet: ActiveWallet
-}) => {
+}): Promise<Allocation[]> => {
   const goWasm = await getWasm({ domain, wallet })
   const allocations = await goWasm.sdk.listAllocations()
-  return allocations as Allocation[]
+  return allocations
 }
 
 /** getAllocation gets allocation details using `allocationId` from cache
@@ -192,10 +192,10 @@ export const getAllocation = async ({
   domain: NetworkDomain
   wallet: ActiveWallet
   allocationId: string
-}) => {
+}): Promise<Allocation> => {
   const goWasm = await getWasm({ domain, wallet })
 
-  return (await goWasm.sdk.getAllocation(allocationId)) as Allocation
+  return await goWasm.sdk.getAllocation(allocationId)
 }
 
 /** reloadAllocation reload allocation details using `allocationId` from blockchain and update cache */
@@ -207,9 +207,9 @@ export const reloadAllocation = async ({
   domain: NetworkDomain
   wallet: ActiveWallet
   allocationId: string
-}) => {
+}): Promise<Allocation> => {
   const goWasm = await getWasm({ domain, wallet })
-  return (await goWasm.sdk.reloadAllocation(allocationId)) as Allocation
+  return await goWasm.sdk.reloadAllocation(allocationId)
 }
 
 /** transferAllocation transfers the ownership of an allocation to a new owner */
@@ -252,10 +252,10 @@ export const freezeAllocation = async ({
   wallet: ActiveWallet
   /** Allocation ID to freeze */
   allocationId: string
-}) => {
+}): Promise<string> => {
   const goWasm = await getWasm({ domain, wallet })
   const txnHash = await goWasm.sdk.freezeAllocation(allocationId)
-  return txnHash as string
+  return txnHash
 }
 
 /**
@@ -272,10 +272,10 @@ export const cancelAllocation = async ({
   wallet: ActiveWallet
   /** Allocation ID to cancel */
   allocationId: string
-}) => {
+}): Promise<string> => {
   const goWasm = await getWasm({ domain, wallet })
   const txnHash = await goWasm.sdk.cancelAllocation(allocationId)
-  return txnHash as string
+  return txnHash
 }
 
 /** updateAllocation updates the allocation settings */
@@ -312,7 +312,7 @@ export const updateAllocation = async ({
   ownerSigningPublicKey?: string
   /** Third party extendable flag, if true, the allocation can be extended (in terms of size) by a non-owner client */
   setThirdPartyExtendable: boolean
-}) => {
+}): Promise<string> => {
   const goWasm = await getWasm({ domain, wallet })
   const txnHash = await goWasm.sdk.updateAllocation(
     allocationId,
@@ -325,7 +325,7 @@ export const updateAllocation = async ({
     ownerSigningPublicKey,
     setThirdPartyExtendable
   )
-  return txnHash as string
+  return txnHash
 }
 
 export const updateAllocationWithRepair = async ({
@@ -370,7 +370,7 @@ export const updateAllocationWithRepair = async ({
     blobURL: string,
     error: string
   ) => void
-}) => {
+}): Promise<string> => {
   let callbackFuncName = ''
   if (callback) {
     callbackFuncName = `updateAllocationWithRepairCallback_${Date.now()}`
@@ -390,7 +390,7 @@ export const updateAllocationWithRepair = async ({
       updateAllocTicket,
       callbackFuncName
     )
-    return txnHash as string
+    return txnHash
   } catch (e) {
     throw errorOut('updateAllocationWithRepair', e)
   } finally {
@@ -423,7 +423,7 @@ export const getAllocationMinLock = async ({
   size: number
   /** Maximum write price set by the client */
   maxWritePrice: number
-}) => {
+}): Promise<number> => {
   const goWasm = await getWasm({ domain, wallet })
   const minLockDemand = await goWasm.sdk.getAllocationMinLock(
     dataShards,
@@ -431,7 +431,7 @@ export const getAllocationMinLock = async ({
     size,
     maxWritePrice
   )
-  return minLockDemand as number
+  return minLockDemand
 }
 
 /**
@@ -462,7 +462,7 @@ export const getUpdateAllocationMinLock = async ({
   addBlobberId: string
   /** Blobber ID to remove from the allocation */
   removeBlobberId: string
-}) => {
+}): Promise<number> => {
   const goWasm = await getWasm({ domain, wallet })
   const minLockDemand = await goWasm.sdk.getUpdateAllocationMinLock(
     allocationId,
@@ -471,7 +471,7 @@ export const getUpdateAllocationMinLock = async ({
     addBlobberId,
     removeBlobberId
   )
-  return minLockDemand as number
+  return minLockDemand
 }
 
 /**
@@ -488,9 +488,9 @@ export const getAllocationWith = async ({
   wallet: ActiveWallet
   /** Auth ticket, used by a non-owner to access a shared allocation */
   authTicket: string
-}) => {
+}): Promise<Allocation> => {
   const goWasm = await getWasm({ domain, wallet })
-  return (await goWasm.sdk.getAllocationWith(authTicket)) as Allocation
+  return await goWasm.sdk.getAllocationWith(authTicket)
 }
 
 /** createFreeAllocation creates a free allocation */
@@ -503,10 +503,10 @@ export const createFreeAllocation = async ({
   wallet: ActiveWallet
   // TODO
   freeStorageMarker: string
-}) => {
+}): Promise<string> => {
   const goWasm = await getWasm({ domain, wallet })
   const txnHash = await goWasm.sdk.createfreeallocation(freeStorageMarker)
-  return txnHash as string
+  return txnHash
 }
 
 /**
@@ -527,7 +527,7 @@ export const getUpdateAllocTicket = async ({
   userId: string
   operationType: string
   roundExpiry: number
-}) => {
+}): Promise<string> => {
   const goWasm = await getWasm({ domain, wallet })
   const ticket = await goWasm.sdk.getUpdateAllocTicket(
     allocationId,
@@ -535,7 +535,7 @@ export const getUpdateAllocTicket = async ({
     operationType,
     roundExpiry
   )
-  return ticket as string
+  return ticket
 }
 
 // ----------------------------------------
@@ -557,11 +557,11 @@ export const collectRewards = async ({
   wallet: ActiveWallet
   providerType: ProviderType
   providerId: string
-}) => {
+}): Promise<string> => {
   const providerTypeId = getProviderTypeId(providerType)
   const goWasm = await getWasm({ domain, wallet })
   const txnHash = await goWasm.sdk.collectRewards(providerTypeId, providerId)
-  return txnHash as string
+  return txnHash
 }
 
 // ----------------------------------------
@@ -579,11 +579,11 @@ export const getStakePoolInfo = async ({
   wallet: ActiveWallet
   providerType: ProviderType
   providerId: string
-}) => {
+}): Promise<StakePoolInfo> => {
   const providerTypeId = getProviderTypeId(providerType)
   const goWasm = await getWasm({ domain, wallet })
   const info = await goWasm.sdk.getSkatePoolInfo(providerTypeId, providerId)
-  return info as StakePoolInfo
+  return info
 }
 
 /**
@@ -606,7 +606,7 @@ export const lockStakePool = async ({
   /** Transaction fee (in SAS) */
   fee: number
   providerId: string
-}) => {
+}): Promise<string> => {
   const providerTypeId = getProviderTypeId(providerType)
   const goWasm = await getWasm({ domain, wallet })
   const txnHash = await goWasm.sdk.lockStakePool(
@@ -615,7 +615,7 @@ export const lockStakePool = async ({
     fee,
     providerId
   )
-  return txnHash as string
+  return txnHash
 }
 
 /**
@@ -638,7 +638,7 @@ export const unlockStakePool = async ({
   providerId: string
   /** Wallet ID */
   clientId: string
-}) => {
+}): Promise<string> => {
   const providerTypeId = getProviderTypeId(providerType)
   const goWasm = await getWasm({ domain, wallet })
   const txnHash = await goWasm.sdk.unlockStakePool(
@@ -647,7 +647,7 @@ export const unlockStakePool = async ({
     providerId,
     clientId
   )
-  return txnHash as string
+  return txnHash
 }
 
 /**
@@ -668,10 +668,10 @@ export const lockWritePool = async ({
   tokens: number
   /** Transaction fee (in SAS) */
   fee: number
-}) => {
+}): Promise<string> => {
   const goWasm = await getWasm({ domain, wallet })
   const txnHash = await goWasm.sdk.lockWritePool(allocationId, tokens, fee)
-  return txnHash as string
+  return txnHash
 }
 
 // ----------------------------------------
@@ -692,10 +692,10 @@ export const decodeAuthTicket = async ({
   domain: NetworkDomain
   wallet: ActiveWallet
   authTicket: string
-}) => {
+}): Promise<AuthToken> => {
   const goWasm = await getWasm({ domain, wallet })
   const resp = await goWasm.sdk.decodeAuthTicket(authTicket)
-  return resp as AuthToken
+  return resp
 }
 
 /**
@@ -733,11 +733,8 @@ export const repairSize = async ({
   wallet: ActiveWallet
   allocationId: string
   remotePath: string
-}) => {
+}): Promise<{ upload_size: number; download_size: number }> => {
   const goWasm = await getWasm({ domain, wallet })
   const resp = await goWasm.sdk.repairSize(allocationId, remotePath)
-  return resp as {
-    upload_size: number
-    download_size: number
-  }
+  return resp
 }

@@ -8,9 +8,9 @@ export const getUSDRate = async ({
 }: {
   domain: NetworkDomain
   symbol?: TokenSymbol
-}) => {
+}): Promise<number> => {
   const goWasm = await getWasm({ domain })
-  return (await goWasm.sdk.getUSDRate(symbol)) as number
+  return await goWasm.sdk.getUSDRate(symbol)
 }
 
 type Balance = {
@@ -26,8 +26,8 @@ export const getWalletBalance = async ({
   domain: NetworkDomain
   /** Wallet ID */
   clientId: string
-}) => {
+}): Promise<Balance> => {
   const goWasm = await getWasm({ domain })
   const balance = await goWasm.sdk.getWalletBalance(clientId)
-  return balance as Balance
+  return balance
 }

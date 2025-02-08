@@ -1,7 +1,7 @@
-import { Bridge, getBridge, globalCtx } from '../bridge'
+import { type Bridge, getBridge, globalCtx } from '../bridge'
 import { getConfig } from '../loadWasm'
 
-export const md5Hash = async (file: File) => {
+export const md5Hash = async (file: File): Promise<string> => {
   const workerUrl = getConfig().md5WorkerUrl
   if (!workerUrl) throw new Error('md5WorkerUrl is undefined')
 
@@ -18,7 +18,11 @@ export const md5Hash = async (file: File) => {
   return result
 }
 
-export const readChunk = (offset: number, chunkSize: number, file: File) =>
+export const readChunk = (
+  offset: number,
+  chunkSize: number,
+  file: File
+): Promise<{ size: number; buffer: Uint8Array }> =>
   new Promise<{ size: number; buffer: Uint8Array }>((res, rej) => {
     const fileReader = new FileReader()
     const blob = file.slice(offset, chunkSize + offset)
@@ -73,7 +77,7 @@ export type UploadObject = {
  *
  * @deprecated use `multiUplaod` methods instead
  */
-export async function bulkUpload(options: UploadObject[]) {
+export async function bulkUpload(options: UploadObject[]): Promise<any> {
   const g = globalCtx()
   const bridge = getBridge()
 
@@ -163,7 +167,7 @@ export async function setWallet(
   pk: string,
   mnemonic: string,
   isSplit: boolean
-) {
+): Promise<void> {
   if (!bls) throw new Error('bls is undefined')
   if (!sk) throw new Error('secret key is undefined')
   if (!pk) throw new Error('public key is undefined')

@@ -4,7 +4,7 @@ import { errorOut } from '@/sdk/utils/misc'
 import { getBridge, globalCtx } from '@/setup/createWasm/bridge'
 import { readChunk } from '@/setup/createWasm/createProxy/sdkProxy'
 import { getWasm } from '@/setup/wasm'
-import {
+import type {
   Blobber,
   FileRefByName,
   GolangFileRefByName,
@@ -27,13 +27,10 @@ export const deleteFile = async ({
   allocationId: string
   /** remote path of the file to be deleted*/
   remotePath: string
-}) => {
+}): Promise<{ commandSuccess: boolean; error: string }> => {
   const goWasm = await getWasm({ domain, wallet })
   try {
-    const response = (await goWasm.sdk.delete(allocationId, remotePath)) as {
-      commandSuccess: boolean
-      error: string
-    }
+    const response = await goWasm.sdk.delete(allocationId, remotePath)
 
     if (response.error) throw new Error(response.error)
 
@@ -70,10 +67,10 @@ export const share = async ({
   revoke: boolean
   /** Time after which the share becomes available */
   availableAfter: string
-}) => {
+}): Promise<string> => {
   const goWasm = await getWasm({ domain, wallet })
   try {
-    const authTicket = (await goWasm.sdk.share(
+    const authTicket = await goWasm.sdk.share(
       allocationId,
       remotePath,
       clientId,
@@ -81,7 +78,7 @@ export const share = async ({
       expiration,
       revoke,
       availableAfter
-    )) as string
+    )
     if (!authTicket) throw new Error('authTicket is undefined')
 
     return authTicket
@@ -143,7 +140,7 @@ export const multiDownload = async ({
     blobURL: string,
     error?: string
   ) => void
-}) => {
+}): Promise<DownloadCommandResponse[]> => {
   const multiDlOptions = multiDownloadOptions.map(option => {
     let downloadToDisk = option.downloadToDisk
     if (downloadToDisk) {
@@ -172,7 +169,7 @@ export const multiDownload = async ({
       callbackFuncName
     )) as string
 
-    const response = JSON.parse(jsonData) as DownloadCommandResponse[]
+    const response = JSON.parse(jsonData)
 
     return response
   } catch (e) {
@@ -239,15 +236,11 @@ const sdkMultiUpload = async ({
   domain: NetworkDomain
   wallet: ActiveWallet
   bulkUploadOptions: BulkUploadOption[]
-}) => {
+}): Promise<{ success?: boolean; error?: string }> => {
   const goWasm = await getWasm({ domain, wallet })
   try {
     const jsonOptions = JSON.stringify(bulkUploadOptions)
-    const result = (await goWasm.sdk.multiUpload(jsonOptions)) as {
-      success?: boolean
-      error?: string
-    }
-
+    const result = await goWasm.sdk.multiUpload(jsonOptions)
     if (result.error) throw new Error(result.error)
 
     return result
@@ -267,7 +260,7 @@ export const multiUpload = async ({
   domain: NetworkDomain
   wallet: ActiveWallet
   bulkUploadOptions: BulkUploadOption[]
-}) => {
+}): Promise<{ success?: boolean; error?: string }> => {
   const g = globalCtx()
   const bridge = getBridge()
   const start = bridge.glob.index
@@ -369,7 +362,7 @@ export const listObjects = async ({
   offset: number
   /** The number of items per page. @default -1 (turn off pagination) */
   pageLimit: number
-}) => {
+}): Promise<ListResult> => {
   const goWasm = await getWasm({ domain, wallet })
 
   const listResult = await goWasm.sdk.listObjects(
@@ -379,7 +372,7 @@ export const listObjects = async ({
     pageLimit
   )
 
-  return listResult as ListResult
+  return listResult
 }
 
 /** List objects from an auth ticket. It's useful for accessing a shared source by a non-owner */
@@ -403,7 +396,7 @@ export const listObjectsFromAuthTicket = async ({
   offset: number
   /** The number of items per page. @default -1 (turn off pagination) */
   pageLimit: number
-}) => {
+}): Promise<ListResult> => {
   const goWasm = await getWasm({ domain, wallet })
   const listResult = await goWasm.sdk.listObjectsFromAuthTicket(
     allocationId,
@@ -412,7 +405,7 @@ export const listObjectsFromAuthTicket = async ({
     offset,
     pageLimit
   )
-  return listResult as ListResult
+  return listResult
 }
 
 /** Create a directory on blobbers */
@@ -458,7 +451,7 @@ export const downloadBlocks = async ({
   ) => void
   startBlock: number
   endBlock: number
-}) => {
+}): Promise<Uint8Array> => {
   const goWasm = await getWasm({ domain, wallet })
 
   let writeChunkFuncName = ''
@@ -477,7 +470,7 @@ export const downloadBlocks = async ({
       endBlock
     )
 
-    return data as Uint8Array
+    return data
   } catch (e) {
     throw errorOut('downloadBlocks', e)
   } finally {
@@ -515,10 +508,10 @@ export const getFileStats = async ({
   wallet: ActiveWallet
   allocationId: string
   remotePath: string
-}) => {
+}): Promise<FileStats[]> => {
   const goWasm = await getWasm({ domain, wallet })
   const fileStats = await goWasm.sdk.getFileStats(allocationId, remotePath)
-  return fileStats as FileStats[]
+  return fileStats
 }
 
 export const updateBlobberSettings = async ({
@@ -530,7 +523,7 @@ export const updateBlobberSettings = async ({
   wallet: ActiveWallet
   /** The new settings to apply to the blobber */
   blobberSettings: Blobber
-}) => {
+}): Promise<Transaction> => {
   const goWasm = await getWasm({ domain, wallet })
 
   try {
@@ -540,7 +533,7 @@ export const updateBlobberSettings = async ({
       blobberSettingsJson
     )
 
-    return transaction as Transaction
+    return transaction
   } catch (e) {
     throw errorOut('updateBlobberSettings', e)
   }
@@ -571,10 +564,10 @@ export const getRemoteFileMap = async ({
   domain: NetworkDomain
   wallet: ActiveWallet
   allocationId: string
-}) => {
+}): Promise<FileInfo[]> => {
   const goWasm = await getWasm({ domain, wallet })
 
-  return (await goWasm.sdk.getRemoteFileMap(allocationId)) as FileInfo[]
+  return await goWasm.sdk.getRemoteFileMap(allocationId)
 }
 
 /** Get list of active blobbers */
@@ -587,9 +580,9 @@ export const getBlobbers = async ({
   wallet: ActiveWallet
   /** flag to get only stakable blobbers */
   stakable: boolean
-}) => {
+}): Promise<Blobber[]> => {
   const goWasm = await getWasm({ domain, wallet })
-  return (await goWasm.sdk.getBlobbers(stakable)) as Blobber[]
+  return await goWasm.sdk.getBlobbers(stakable)
 }
 
 /**
@@ -614,7 +607,7 @@ export const getContainers = async ({
   password: string
   /** Domain to issue the request to */
   requestDomain: string
-}) => {
+}): Promise<Array<Record<string, any>>> => {
   const goWasm = await getWasm({ domain, wallet })
 
   const containers = await goWasm.sdk.getcontainers(
@@ -622,7 +615,7 @@ export const getContainers = async ({
     password,
     requestDomain
   )
-  return containers as Array<Record<string, any>>
+  return containers
 }
 
 /**
@@ -653,7 +646,7 @@ export const updateContainer = async ({
   containerID: string
   /** New Image ID to update the container with */
   newImageID: string
-}) => {
+}): Promise<Record<string, any>> => {
   const goWasm = await getWasm({ domain, wallet })
 
   const response = await goWasm.sdk.updatecontainer(
@@ -663,7 +656,7 @@ export const updateContainer = async ({
     containerID,
     newImageID
   )
-  return response as Record<string, any>
+  return response
 }
 
 /**
@@ -691,7 +684,7 @@ export const searchContainer = async ({
   requestDomain: string
   /** Name of the container to search for */
   name: string
-}) => {
+}): Promise<Array<Record<string, any>>> => {
   const goWasm = await getWasm({ domain, wallet })
 
   const containers = await goWasm.sdk.searchcontainer(
@@ -700,7 +693,7 @@ export const searchContainer = async ({
     requestDomain,
     name
   )
-  return containers as Array<Record<string, any>>
+  return containers
 }
 
 /**
@@ -735,7 +728,7 @@ export const updateForbidAllocation = async ({
   forbidCopy: boolean
   /** If true, renaming files in the allocation is forbidden */
   forbidRename: boolean
-}) => {
+}): Promise<string> => {
   const goWasm = await getWasm({ domain, wallet })
 
   const txnHash = await goWasm.sdk.updateForbidAllocation(
@@ -747,7 +740,7 @@ export const updateForbidAllocation = async ({
     forbidCopy,
     forbidRename
   )
-  return txnHash as string
+  return txnHash
 }
 
 /**
@@ -773,11 +766,11 @@ export const send = async ({
   fee: number
   /** Description of the transaction */
   desc: string
-}) => {
+}): Promise<string> => {
   const goWasm = await getWasm({ domain, wallet })
 
   const txnHash = await goWasm.sdk.send(toClientId, tokens, fee, desc)
-  return txnHash as string
+  return txnHash
 }
 
 /** Cancel the upload operation of the file. */
@@ -834,7 +827,7 @@ export const repairAllocation = async ({
     blobURL: string,
     error: string
   ) => void
-}) => {
+}): Promise<void> => {
   const goWasm = await getWasm({ domain, wallet })
 
   let callbackFuncName = ''
@@ -951,7 +944,7 @@ export const getFileMetaByName = async <T extends FileRefByName>({
   allocationId: string
   fileName: string
   modifyFileRef?: (file: FileRefByName) => T
-}) => {
+}): Promise<T[] | FileRefByName[]> => {
   const goWasm = await getWasm({ domain, wallet })
 
   try {
@@ -1030,7 +1023,7 @@ export const downloadDirectory = async ({
     blobURL: string,
     error?: string
   ) => void
-}) => {
+}): Promise<void> => {
   const goWasm = await getWasm({ domain, wallet })
 
   let callbackFuncName = ''

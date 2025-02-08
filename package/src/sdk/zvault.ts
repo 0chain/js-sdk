@@ -56,7 +56,7 @@ export const zvaultRetrieveRestrictions = async ({
   serverAddress: string
   /** JWT Token */
   token: string
-}) => {
+}): Promise<string> => {
   const goWasm = await getWasm({ domain, wallet })
   const resp = await goWasm.sdk.zvaultRetrieveRestrictions(
     peerPublicKey,
@@ -64,7 +64,7 @@ export const zvaultRetrieveRestrictions = async ({
     token
   )
 
-  return resp as string
+  return resp
 }
 
 export const zvaultUpdateRestrictions = async ({
@@ -133,9 +133,9 @@ export const zvaultRetrieveKeys = async ({
   token: string
   /** Wallet ID */
   clientId: string
-}) => {
+}): Promise<string> => {
   const goWasm = await getWasm({ domain, wallet })
-  return goWasm.sdk.zvaultRetrieveKeys(serverAddress, token, clientId) as string
+  return goWasm.sdk.zvaultRetrieveKeys(serverAddress, token, clientId)
 }
 
 export const zvaultRevokeKey = async ({
@@ -193,9 +193,9 @@ export const zvaultRetrieveWallets = async ({
   serverAddress: string
   /** JWT Token */
   token: string
-}) => {
+}): Promise<string> => {
   const goWasm = await getWasm({ domain, wallet })
-  return goWasm.sdk.zvaultRetrieveWallets(serverAddress, token) as string
+  return goWasm.sdk.zvaultRetrieveWallets(serverAddress, token)
 }
 
 export const zvaultRetrieveSharedWallets = async ({
@@ -210,7 +210,7 @@ export const zvaultRetrieveSharedWallets = async ({
   serverAddress: string
   /** JWT Token */
   token: string
-}) => {
+}): Promise<string> => {
   const goWasm = await getWasm({ domain, wallet })
-  return goWasm.sdk.zvaultRetrieveSharedWallets(serverAddress, token) as string
+  return goWasm.sdk.zvaultRetrieveSharedWallets(serverAddress, token)
 }

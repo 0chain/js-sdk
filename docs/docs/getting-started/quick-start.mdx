@@ -55,7 +55,7 @@ There are two WASM file types available, `standard` and `enterprise`.
        - `https://example.com/wasm/enterprise-zcn.wasm` for the Enterprise WASM
        - `https://example.com/wasm/zcn.wasm` for the Standard WASM
 
-3. Upload the `md5worker.js` file for the `md5WorkerUrl` config:
+3. Upload the [`md5worker.js` file](https://cdn.zus.network/public/md5worker.js) for the `md5WorkerUrl` config:
    - This is optional if you are not using upload features of the SDK. This includes using SDK methods like `multiUpload` and `bulkUpload`. {/* DOTODO: update link to multiUpload and bulkUpload */}
    - Place it in your website’s static assets folder:
 
@@ -64,7 +64,7 @@ There are two WASM file types available, `standard` and `enterprise`.
        |--md5worker.js
      ```
      - In this case, set the `md5WorkerUrl` config to `md5worker.js`.
-   - Alternatively, use the [CDN URL](https://unpkg.com/md5-worker@1.3.0/dist/md5worker.min.js) for the `md5WorkerUrl` config.  {/* DOTODO: update link */}
+   - Alternatively, use the [CDN URL](https://cdn.zus.network/public/md5worker.js) for the `md5WorkerUrl` config.
      :::warning
 
      This is strongly not recommended as it is used only in Zus apps like Vult, Blimp & Chalk and may change in the future, potentially breaking your app.

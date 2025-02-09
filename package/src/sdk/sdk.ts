@@ -11,12 +11,16 @@ import { getWasm } from '@/setup/wasm'
 import type { WasmType } from '@/types'
 import type { ActiveWallet, BasicWallet, NetworkDomain } from '@/types/wallet'
 
+/** Creates wallet keys including wallet ID, public key, and private key using BLS (Boneh-Lynn-Shacham) cryptography. */
 export const createWalletKeys = async (
+  /** Optional 24 word [bip39](https://iancoleman.io/bip39/) mnemonic phrase. */
   customBip39Mnemonic?: string
 ): Promise<{
   keys: {
     walletId: string
+    /** BLS public key */
     publicKey: string
+    /** BLS private key */
     privateKey: string
   }
   mnemonic: string
@@ -30,13 +34,16 @@ export const createWalletKeys = async (
 }
 
 // TODO: check if we need goWasm.sdk.getPublicEncryptionKey or not
+/** Retrieves the public encryption key for a wallet. */
 export const getPublicEncryptionKey = async ({
   keys,
   domain,
 }: {
   keys: {
     walletId: string
+    /** BLS public key */
     publicKey: string
+    /** BLS private key */
     privateKey: string
   }
   domain: NetworkDomain
@@ -45,6 +52,7 @@ export const getPublicEncryptionKey = async ({
   return (await goWasm.sdk.getPublicEncryptionKeyV2(keys?.publicKey)) as string
 }
 
+/** Create a new wallet. Also, helps to recover a wallet using its mnemonic phrase. */
 export const createWallet = async ({
   domain,
   walletName,
@@ -52,6 +60,10 @@ export const createWallet = async ({
 }: {
   domain: NetworkDomain
   walletName?: string
+  /**
+   * Optional 24 word [bip39](https://iancoleman.io/bip39/) mnemonic phrase for wallet recovery.
+   * If `customBip39Mnemonic` is not provided, a new mnemonic will be generated.
+   */
   customBip39Mnemonic?: string
 }): Promise<BasicWallet> => {
   const { keys, mnemonic } = await createWalletKeys(customBip39Mnemonic)

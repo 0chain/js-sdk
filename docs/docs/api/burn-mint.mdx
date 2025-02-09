@@ -1,0 +1,277 @@
+---
+sidebar_position: 3
+---
+
+# Burn & Mint tokens SDK Methods
+
+In this section, we will learn about all the available Burn & Mint tokens methods provided by the SDK.
+
+## Prerequisites
+
+1. Initialize the SDK before using wallet methods. See the [Quick Start Guide](/docs/getting-started/quick-start) for details.
+2. All methods require a `wallet`. Refer to [`createWallet`](/docs/api/wallet#createwallet) for more information.
+3. All methods require a `domain` parameter, which is the network domain where your wallet and providers such as blobbers, sharders, miners, and validators are deployed. GoSDK will send requests to this domain.
+
+## Burn & Mint tokens Methods
+
+The [`initBridge`](#initbridge) method must be called to initialize the bridge client before using the any of the burn and mint methods.
+
+### initBridge
+Initializes the bridge client.
+
+#### Parameters
+| Name | Type | Description | Default value |
+|---|---|---|---|
+| `domain` | `NetworkDomain` | Network domain for the bridge | |
+| `wallet` | `ActiveWallet` | Active wallet instance | |
+| `ethereumAddress` | `string` | Ethereum address of the wallet owner | |
+| `bridgeAddress` | `string` | Address of the bridge contract on the Ethereum network | |
+| `authorizersAddress` | `string` | Address of the authorizers contract on the Ethereum network | |
+| `tokenAddress` | `string` | Address of the token contract on the Ethereum network | |
+| `ethereumNodeURL` | `string` | URL of the Ethereum node | |
+| `gasLimit` | `number` | Gas limit for the transactions | |
+| `value` | `number` | Value to be sent with the transaction (unused) | |
+| `consensusThreshold` | `number` | Consensus threshold for the transactions | |
+
+#### Return Type
+```typescript
+Promise<void>
+```
+
+#### Example
+```typescript
+import { initBridge } from '@zerochain/sdk'
+
+await initBridge({
+  domain: 'mainnet.zus.network',
+  wallet: activeWallet,
+  ethereumAddress: '0x1234567890123456789012345678901234567890',
+  bridgeAddress: '0x7700D773022b19622095118Fadf46f7B9448Be9b',
+  authorizersAddress: '0x481daB4407b9880DE0A68dc62E6aF611c4949E42',
+  tokenAddress: '0xb9EF770B6A5e12E45983C5D80545258aA38F3B78',
+  ethereumNodeURL: 'https://virtual.mainnet.rpc.tenderly.co/039fdd4f-053c-4a81-9c76-db6b944c7414',
+  gasLimit: 3000000,
+  value: 0,
+  consensusThreshold: 75.0
+})
+```
+
+### burnZCN
+Burns ZCN tokens.
+
+#### Parameters
+| Name | Type | Description | Default value |
+|---|---|---|---|
+| `domain` | `NetworkDomain` | Network domain for the transaction | |
+| `wallet` | `ActiveWallet` | Active wallet instance | |
+| `amount` | `number` | Amount of ZCN tokens to burn | |
+
+#### Return Type
+```typescript
+Promise<string>
+```
+
+#### Example
+```typescript
+import { burnZCN } from '@zerochain/sdk'
+
+const txnHash = await burnZCN({
+  domain: 'mainnet.zus.network',
+  wallet: activeWallet,
+  amount: 100
+})
+```
+
+### mintZCN
+Mints ZCN tokens.
+
+#### Parameters
+| Name | Type | Description | Default value |
+|---|---|---|---|
+| `domain` | `NetworkDomain` | Network domain for the transaction | |
+| `wallet` | `ActiveWallet` | Active wallet instance | |
+| `burnTxnHash` | `string` | Hash of the burn transaction | |
+| `timeout` | `number` | Timeout in seconds (deprecated) | |
+
+:::warning
+The `timeout` parameter is deprecated and may be removed in future versions.
+:::
+
+#### Return Type
+```typescript
+Promise<string>
+```
+
+#### Example
+```typescript
+import { mintZCN } from '@zerochain/sdk'
+
+const txnHash = await mintZCN({
+  domain: 'mainnet.zus.network',
+  wallet: activeWallet,
+  burnTxnHash: '0x1234567890123456789012345678901234567890123456789012345678901234',
+})
+```
+
+### getMintWZCNPayload
+Returns the *Mint WZCN Payload* for the given burn transaction hash.
+
+#### Parameters
+| Name | Type | Description | Default value |
+|---|---|---|---|
+| `domain` | `NetworkDomain` | Network domain for the transaction | |
+| `wallet` | `ActiveWallet` | Active wallet instance | |
+| `burnTxnHash` | `string` | Hash of the burn transaction | |
+
+#### Return Type
+```typescript
+Promise<MintPayload>
+```
+
+#### MintPayload Type
+```typescript
+type MintPayload = {
+  zcn_txn_id: string
+  amount: number
+  to: string
+  nonce: number
+  signatures: {
+    authorizer_id: string
+    signature: Uint8Array
+  }[]
+}
+```
+
+#### Example
+```typescript
+import { getMintWZCNPayload } from '@zerochain/sdk'
+
+const mintPayload = await getMintWZCNPayload({
+  domain: 'mainnet.zus.network',
+  wallet: activeWallet,
+  burnTxnHash: '0x1234567890123456789012345678901234567890123456789012345678901234'
+})
+```
+
+### getProcessedZCNBurnTickets
+Returns all processed ZCN burn tickets burned for a certain Ethereum address.
+
+#### Parameters
+| Name | Type | Description | Default value |
+|---|---|---|---|
+| `domain` | `NetworkDomain` | Network domain for the transaction | |
+| `wallet` | `ActiveWallet` | Active wallet instance | |
+
+#### Return Type
+```typescript
+Promise<BurnTicket[]>
+```
+
+#### BurnTicket Type
+```typescript
+type BurnTicket = {
+  hash: string
+  amount: number
+  nonce: number
+}
+```
+
+#### Example
+```typescript
+import { getProcessedZCNBurnTickets } from '@zerochain/sdk'
+
+const burnTickets = await getProcessedZCNBurnTickets({
+  domain: 'mainnet.zus.network',
+  wallet: activeWallet
+})
+```
+
+### estimateMintWZCNGasAmount
+Performs gas amount estimation for the given Mint WZCN transaction.
+
+#### Parameters
+| Name | Type | Description | Default value |
+|---|---|---|---|
+| `domain` | `NetworkDomain` | Network domain for the transaction | |
+| `wallet` | `ActiveWallet` | Active wallet instance | |
+| `from` | `string` | Address of the sender | |
+| `to` | `string` | Address of the receiver | |
+| `zcnTransaction` | `string` | Hash of the ZCN transaction | |
+| `amountToken` | `string` | Amount of tokens to mint (as a string) | |
+| `nonce` | `number` | Nonce of the transaction | |
+| `signaturesRaw` | `string[]` | Encoded format (base-64) of the burn signatures received from the authorizers | |
+
+#### Return Type
+```typescript
+Promise<string>
+```
+
+#### Example
+```typescript
+import { estimateMintWZCNGasAmount } from '@zerochain/sdk'
+
+const gasAmount = await estimateMintWZCNGasAmount({
+  domain: 'mainnet.zus.network',
+  wallet: activeWallet,
+  from: '0x1234567890123456789012345678901234567890',
+  to: '0x0987654321098765432109876543210987654321',
+  zcnTransaction: '0x1234567890123456789012345678901234567890123456789012345678901234',
+  amountToken: '10000',
+  nonce: 1,
+  signaturesRaw: ['signature1', 'signature2', 'signature3']
+})
+```
+
+### estimateBurnWZCNGasAmount
+Performs gas amount estimation for the given burn WZCN transaction.
+
+#### Parameters
+| Name | Type | Description | Default value |
+|---|---|---|---|
+| `domain` | `NetworkDomain` | Network domain for the transaction | |
+| `wallet` | `ActiveWallet` | Active wallet instance | |
+| `from` | `string` | Address of the sender | |
+| `to` | `string` | Address of the receiver | |
+| `amountTokens` | `string` | Amount of tokens to burn (as a string) | |
+
+#### Return Type
+```typescript
+Promise<string>
+```
+
+#### Example
+```typescript
+import { estimateBurnWZCNGasAmount } from '@zerochain/sdk'
+
+const gasAmount = await estimateBurnWZCNGasAmount({
+  domain: 'mainnet.zus.network',
+  wallet: activeWallet,
+  from: '0x1234567890123456789012345678901234567890',
+  to: '0x0987654321098765432109876543210987654321',
+  amountTokens: '1000000000000000000'
+})
+```
+
+### estimateGasPrice
+Performs gas estimation for the given transaction using Alchemy enhanced API, returning the approximate final gas fee.
+
+#### Parameters
+| Name | Type | Description | Default value |
+|---|---|---|---|
+| `domain` | `NetworkDomain` | Network domain for the transaction | |
+| `wallet` | `ActiveWallet` | Active wallet instance | |
+
+#### Return Type
+```typescript
+Promise<string>
+```
+
+#### Example
+```typescript
+import { estimateGasPrice } from '@zerochain/sdk'
+
+const gasPrice = await estimateGasPrice({
+  domain: 'mainnet.zus.network',
+  wallet: activeWallet
+})
+```

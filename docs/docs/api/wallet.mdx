@@ -1,0 +1,233 @@
+---
+sidebar_position: 2
+---
+
+# Wallet SDK Methods
+
+In this section, we will learn about all the available Wallet methods provided by the SDK.
+
+## Prerequisites
+
+1. Initialize the SDK before using wallet methods. See the [Quick Start Guide](/docs/getting-started/quick-start) for details.
+2. Some wallet methods require a wallet. Refer to [`createWallet`](#createwallet) for more information.
+3. All methods require a `domain` parameter, which is the network domain where your wallet and providers such as blobbers, sharders, miners, and validators are deployed. GoSDK will send requests to this domain.
+
+## Wallet Methods
+
+The wallet methods allow you to create and manage wallets, set the wallet, and get wallet information.
+
+### createWallet
+
+Creates a new wallet. It also helps to recover a wallet using its mnemonic phrase.
+
+#### Parameters
+
+| Name | Type | Description | Default value |
+|---|---|---|---|
+| `domain` | `NetworkDomain` | The network domain where the wallet will be created. |  |
+| `walletName` | `string` | Optional wallet name. | Truncated wallet ID |
+| `customBip39Mnemonic` | `string` | Optional 24 word [bip39](https://iancoleman.io/bip39/) mnemonic phrase for wallet recovery. |  |
+
+:::note
+
+1. If `customBip39Mnemonic` is not provided, a new mnemonic will be generated.
+2. `createWallet` internally uses [`createWalletKeys`](#createwalletkeys) to generate the wallet keys and mnemonic phrase & also uses [`getPublicEncryptionKey`](#getpublicencryptionkey) to get the public encryption key.
+
+:::
+
+#### Return Type
+
+```ts
+Promise<BasicWallet>
+```
+
+#### Example
+
+```js
+import { createWallet } from '@zerochain/sdk'
+
+const wallet = await createWallet({
+  domain: 'mainnet.zus.network',
+  walletName: 'MyWallet',
+})
+```
+
+### createWalletKeys
+Creates wallet keys including wallet ID, public key, and private key using BLS (Boneh-Lynn-Shacham) cryptography.
+
+#### Parameters
+| Name | Type | Description |
+|---|---|---|
+| `customBip39Mnemonic` | `string` | Optional BIP39 mnemonic phrase to generate deterministic wallet keys. If not provided, a new random mnemonic will be generated. |
+
+#### Return Type
+```typescript
+Promise<{
+  keys: {
+    walletId: string
+    publicKey: string
+    privateKey: string
+  }
+  mnemonic: string
+}>
+```
+
+:::note
+The function generates a new random mnemonic if `customBip39Mnemonic` is not provided. The generated mnemonic is included in the return value along with the keys.
+:::
+
+#### Example
+```typescript
+import { createWalletKeys } from '@zerochain/sdk'
+
+// Create new wallet keys with random mnemonic
+const { keys, mnemonic } = await createWalletKeys()
+
+// Create wallet keys using existing mnemonic
+const existingMnemonic = 'word1 word2 ... word24' // 24 word BIP39 mnemonic
+const recoveredWallet = await createWalletKeys(existingMnemonic)
+```
+
+### getPublicEncryptionKey
+Retrieves the public encryption key for a wallet.
+
+#### Parameters
+| Name | Type | Description |
+|---|---|---|
+| `keys.walletId` | `string` | Wallet ID |
+| `keys.publicKey` | `string` | BLS public key |
+| `keys.privateKey` | `string` | BLS private key |
+| `domain` | `NetworkDomain` | Network domain for the wallet |
+
+#### Return Type
+```typescript
+Promise<string>
+```
+
+#### Example
+```typescript
+import { getPublicEncryptionKey } from '@zerochain/sdk'
+
+const publicEncryptionKey = await getPublicEncryptionKey({
+  keys: {
+    walletId: '8695f8af52cdfc1e66d879407a5278703579d31de7ce0e2cf1707fdec9cc14c3',
+    publicKey: '1732060f12d232fec35db817c9512835da6f8a1869df00a950681d925f15ac2058a8222dbd6ed9c72df381e9aef08cbe1d147d80846f659bb3b',
+    privateKey: '3f537ef8a3bdd03c34b9c7bedbbdd9f034646a96fc6f3306b5fba59cdd9770e'
+  },
+  domain: 'mainnet.zus.network'
+})
+```
+
+### isWalletId
+Validates if a string is a valid wallet ID.
+
+#### Parameters
+| Name | Type | Description |
+|---|---|---|
+| `walletId` | `string` | String to validate as wallet ID |
+
+#### Return Type
+```typescript
+boolean
+```
+
+#### Example
+```typescript
+import { isWalletId } from '@zerochain/sdk'
+
+const isValid = isWalletId('8695f8af52cdfc1e66d879407a5278703579d31de7ce0e2cf1707fdec9cc14c3')
+// Returns: true
+
+const isInvalid = isWalletId('invalid-wallet-id')
+// Returns: false
+```
+
+### send
+Sends tokens to a specified client ID / wallet ID.
+
+#### Parameters
+| Name | Type | Description | 
+|---|---|---|
+| `wallet` | `ActiveWallet` | Sender's active wallet | 
+| `domain` | `NetworkDomain` | Network domain for the transaction | 
+| `toClientId` | `string` | Client ID / Wallet ID to send tokens to |
+| `tokens` | `number` | Number of tokens to send |
+| `fee` | `number` | Transaction fee |
+| `desc` | `string` | Description of the transaction |
+
+#### Return Type
+```typescript
+Promise<string>
+```
+
+#### Example
+```typescript
+import { send } from '@zerochain/sdk'
+
+const txnHash = await send({
+  wallet: activeWallet,
+  domain: 'mainnet.zus.network',
+  toClientId: '8695f8af52cdfc1e66d879407a5278703579d31de7ce0e2cf1707fdec9cc14c3',
+  tokens: 100,
+  fee: 0.1,
+  desc: 'Payment for services'
+})
+```
+
+### getWalletBalance
+Retrieves the wallet balance of the client from the network.
+
+#### Parameters
+| Name | Type | Description |
+|---|---|---|
+| `domain` | `NetworkDomain` | Network domain for the wallet |
+| `clientId` | `string` | Wallet ID |
+
+#### Return Type
+```typescript
+Promise<Balance>
+```
+
+#### Balance Type
+```typescript
+type Balance = {
+  zcn: number
+  usd: number
+  nonce: number
+}
+```
+
+#### Example
+```typescript
+import { getWalletBalance } from '@zerochain/sdk'
+
+const balance = await getWalletBalance({
+  domain: 'mainnet.zus.network',
+  clientId: '8695f8af52cdfc1e66d879407a5278703579d31de7ce0e2cf1707fdec9cc14c3'
+})
+```
+
+### getUSDRate
+Retrieves the USD rate for a given token symbol.
+
+#### Parameters
+| Name | Type | Description | Default value |
+|---|---|---|---|
+| `domain` | `NetworkDomain` | Network domain for the token | |
+| `symbol` | ```js 'zcn' \| 'eth' \| string``` | Token symbol for which the USD rate is fetched. | `'zcn'` |
+
+#### Return Type
+```typescript
+Promise<number>
+```
+
+#### Example
+```typescript
+import { getUSDRate } from '@zerochain/sdk'
+
+// Fetch USD rate for ZCN
+const zcnRate = await getUSDRate({ domain: 'mainnet.zus.network' })
+
+// Fetch USD rate for ETH
+const ethRate = await getUSDRate({ domain: 'mainnet.zus.network', symbol: 'eth' })
+```

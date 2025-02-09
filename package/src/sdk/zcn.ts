@@ -2,11 +2,13 @@ import { getWasm } from '@/setup/wasm'
 import type { NetworkDomain } from '@/types/wallet'
 
 type TokenSymbol = 'zcn' | 'eth' | (string & {})
+/** Retrieves the USD rate for a given token symbol. */
 export const getUSDRate = async ({
   domain,
   symbol = 'zcn',
 }: {
   domain: NetworkDomain
+  /** Token symbol for which the USD rate is fetched. */
   symbol?: TokenSymbol
 }): Promise<number> => {
   const goWasm = await getWasm({ domain })

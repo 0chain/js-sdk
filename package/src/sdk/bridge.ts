@@ -75,13 +75,13 @@ export const burnZCN = async ({
 export const mintZCN = async ({
   domain,
   wallet,
-  burnTrxHash,
+  burnTxnHash,
   timeout,
 }: {
   domain: NetworkDomain
   wallet: ActiveWallet
   /** Hash of the burn transaction */
-  burnTrxHash: string
+  burnTxnHash: string
   /**
    * Timeout in seconds
    * @deprecated
@@ -89,7 +89,7 @@ export const mintZCN = async ({
   timeout: number
 }): Promise<string> => {
   const goWasm = await getWasm({ domain, wallet })
-  const txnHash = await goWasm.sdk.mintZCN(burnTrxHash, timeout)
+  const txnHash = await goWasm.sdk.mintZCN(burnTxnHash, timeout)
   return txnHash
 }
 
@@ -109,16 +109,16 @@ type AuthorizerSignature = {
 export const getMintWZCNPayload = async ({
   domain,
   wallet,
-  burnTrxHash,
+  burnTxnHash,
 }: {
   domain: NetworkDomain
   wallet: ActiveWallet
   /** Hash of the burn transaction */
-  burnTrxHash: string
+  burnTxnHash: string
 }): Promise<MintPayload> => {
   const goWasm = await getWasm({ domain, wallet })
   try {
-    const mintPayloadJson = await goWasm.sdk.getMintWZCNPayload(burnTrxHash)
+    const mintPayloadJson = await goWasm.sdk.getMintWZCNPayload(burnTxnHash)
     const mintPayload = JSON.parse(mintPayloadJson)
     return mintPayload
   } catch (err) {

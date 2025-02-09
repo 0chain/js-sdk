@@ -1,5 +1,17 @@
 # @zerochain/sdk
 
+## 1.1.0
+
+### Minor Changes
+
+- c780da7: - Added createWallet, updateWasmMode, send tokens, getUnprocessedWZCNBurnEvents, getProcessedZCNBurnTickets methods
+  - Updated TypeScript types
+  - Added documentation for Quick Start and SDK Methods index
+
+### Patch Changes
+
+- 1f92df5: Documentation update
+
 ## 1.0.0
 
 ### Major Changes

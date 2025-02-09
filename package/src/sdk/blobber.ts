@@ -588,6 +588,23 @@ export const getBlobbers = async ({
   return await goWasm.sdk.getBlobbers(stakable)
 }
 
+/** Retrieves blobber IDs for the given list of blobber URLs. */
+export const getBlobberIds = async ({
+  wallet,
+  domain,
+  blobberUrls,
+}: {
+  domain: NetworkDomain
+  wallet: ActiveWallet
+  /** List of blobber URLs for which IDs need to be retrieved */
+  blobberUrls: string[]
+}): Promise<string[]> => {
+  const goWasm = await getWasm({ domain, wallet })
+
+  const blobberIds = await goWasm.sdk.getBlobberIds(blobberUrls)
+  return blobberIds
+}
+
 /**
  * GetContainers returns all the running containers in a given domain exposing the `{requestDomain}/endpoints/{endpointID}/docker/containers/json` endpoint
  *

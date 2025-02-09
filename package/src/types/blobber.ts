@@ -122,8 +122,11 @@ type StakePoolSettings = {
   service_charge?: number
 }
 
-type Terms = {
+/** Terms represents Blobber terms. A Blobber can update its terms, but any existing offer will use terms of offer signing time. */
+export type Terms = {
   max_offer_duration: number
+  /** SAS tokens / GB */
   read_price: number
+  /** SAS tokens / GB */
   write_price: number
 }

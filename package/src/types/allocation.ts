@@ -1,3 +1,5 @@
+import type { Terms } from '@/types/blobber'
+
 export type Allocation = {
   /** ID is the unique identifier of the allocation. */
   id: string
@@ -123,15 +125,6 @@ type BlobberDetails = {
   returned: number
   challenge_reward: number
   final_reward: number
-}
-
-/** Terms represents Blobber terms. A Blobber can update its terms, but any existing offer will use terms of offer signing time. */
-type Terms = {
-  max_offer_duration: number
-  /** tokens / GB */
-  read_price: number
-  /** tokens / GB */
-  write_price: number
 }
 
 /** PriceRange represents a price range allowed by user to filter blobbers. */

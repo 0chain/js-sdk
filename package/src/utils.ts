@@ -33,3 +33,18 @@ export const getBls = async (): Promise<any> => {
   if (!bls?.mod?.calledRun) await bls?.init(bls.BN254)
   return bls
 }
+
+/** Converts SAS token to ZCN */
+export const sasTokenToZcn = (token = 0): number => {
+  const zcn = token / Math.pow(10, 10)
+  return parseFloat(String(zcn))
+}
+
+/** 
+ * Converts ZCN to SAS token 
+ * Note: SAS can never be a float number
+*/
+export const zcnToSasToken = (zcn = 0): number => {
+  const sasToken = zcn * Math.pow(10, 10)
+  return parseInt(String(sasToken))
+}

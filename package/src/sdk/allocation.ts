@@ -11,7 +11,11 @@ import { getWasm } from '@/setup/wasm'
 import { errorOut } from '@/sdk/utils/misc'
 import type { Allocation } from '@/types/allocation'
 
-/** Creates an allocation with the specified allocation terms and preferred blobber IDs. */
+/**
+ * Creates an allocation with the specified allocation terms and preferred blobber IDs.
+ *
+ * To determine `minReadPrice`, `maxReadPrice`, `minWritePrice`, and `maxWritePrice`, use the `makeSCRestAPICall` SDK method to call the `/storage-config` endpoint of the sharder smart contract.
+ */
 export const createAllocation = async ({
   wallet,
   domain,
@@ -37,13 +41,13 @@ export const createAllocation = async ({
   parityShards: number
   /** Size of the allocation in bytes */
   size: number
-  /** Minimum read price set by the client */
+  /** Minimum read price */
   minReadPrice: number
-  /** Maximum read price set by the client */
+  /** Maximum read price */
   maxReadPrice: number
-  /** Minimum write price set by the client */
+  /** Minimum write price */
   minWritePrice: number
-  /** Maximum write price set by the client */
+  /** Maximum write price */
   maxWritePrice: number
   /** Lock value to add to the allocation */
   lock: number
@@ -90,7 +94,11 @@ export const createAllocation = async ({
   return transactionData
 }
 
-/** Retrieves list of blobber IDs of blobber which match your allocation terms */
+/** 
+ * Retrieves list of blobber IDs of blobber which match your allocation terms
+ * 
+ * To determine `minReadPrice`, `maxReadPrice`, `minWritePrice`, and `maxWritePrice`, use the `makeSCRestAPICall` SDK method to call the `/storage-config` endpoint of the sharder smart contract.
+ */
 export const getAllocationBlobbers = async ({
   wallet,
   domain,
@@ -152,22 +160,6 @@ export const getAllocationBlobbers = async ({
     force
   )
 
-  return blobberIds
-}
-
-export const getBlobberIds = async ({
-  wallet,
-  domain,
-  blobberUrls,
-}: {
-  domain: NetworkDomain
-  wallet: ActiveWallet
-  /** List of blobber URLs for which IDs need to be retrieved */
-  blobberUrls: string[]
-}): Promise<string[]> => {
-  const goWasm = await getWasm({ domain, wallet })
-
-  const blobberIds = await goWasm.sdk.getBlobberIds(blobberUrls)
   return blobberIds
 }
 
@@ -401,9 +393,12 @@ export const updateAllocationWithRepair = async ({
   }
 }
 
-/** getAllocationMinLock retrieves the minimum lock value for the allocation creation
+/** 
+ * getAllocationMinLock retrieves the minimum lock value for the allocation creation
  *
  * Lock value is the amount of tokens that the client needs to lock in the allocation's write pool to be able to pay for the write operations.
+ * 
+ * To determine `maxWritePrice`, use the `makeSCRestAPICall` SDK method to call the `/storage-config` endpoint of the sharder smart contract.
  *
  * @returns the minimum lock value (in SAS)
  */
@@ -423,7 +418,7 @@ export const getAllocationMinLock = async ({
   parityShards: number
   /** Size of the allocation in bytes */
   size: number
-  /** Maximum write price set by the client */
+  /** Maximum write price */
   maxWritePrice: number
 }): Promise<number> => {
   const goWasm = await getWasm({ domain, wallet })
@@ -779,7 +774,7 @@ export const decodeAuthTicket = (authTicket: string): DecodedAuthTicket => {
  * Issues the repair process for an allocation, *starting from a specific path*.
  *
  * Repair synchronizes the user's data within the allocation across all blobbers and restores any missing data on blobbers where it is incomplete.
- * 
+ *
  * @deprecated
  */
 export const allocationRepair = async ({
@@ -914,7 +909,7 @@ export const skipStatusCheck = async ({
   return goWasm.sdk.skipStatusCheck(allocationId, checkStatus)
 }
 
-/** Remove local workers that sync with the allocation. */
+/** Remove local workers that sync with the allocation. This is useful when switching between allocations. */
 export const terminateWorkers = async ({
   wallet,
   domain,

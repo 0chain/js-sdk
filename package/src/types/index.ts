@@ -6,3 +6,4 @@
 // }
 
 // export type ReqHeaders = Record<string, string | number>
+export type WasmType = 'normal' | 'enterprise'

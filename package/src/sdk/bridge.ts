@@ -1,4 +1,4 @@
-// TODO: skipped getNotProcessedWZCNBurnEvents, getNotProcessedZCNBurnTickets
+// TODO: skipped getUnprocessedWZCNBurnEvents, getProcessedZCNBurnTickets
 import { errorOut } from '@/sdk/utils/misc'
 import { getWasm } from '@/setup/wasm'
 import type { ActiveWallet, NetworkDomain } from '@/types/wallet'
@@ -105,7 +105,7 @@ type AuthorizerSignature = {
   signature: Uint8Array
 }
 
-/** getMintWZCNPayload returns the mint payload for the given burn transaction hash */
+/** getMintWZCNPayload returns the *Mint WZCN Payload* for the given burn transaction hash */
 export const getMintWZCNPayload = async ({
   domain,
   wallet,
@@ -131,8 +131,8 @@ type BurnEvent = {
   amount: number
   hash: string
 }
-/** getNotProcessedWZCNBurnEvents returns all unprocessed WZCN burn events from the Ethereum network */
-export const getNotProcessedWZCNBurnEvents = async ({
+/** getUnprocessedWZCNBurnEvents returns all unprocessed WZCN burn events from the Ethereum network */
+export const getUnprocessedWZCNBurnEvents = async ({
   domain,
   wallet,
 }: {
@@ -156,7 +156,7 @@ type BurnTicket = {
   nonce: number
 }
 /** getProcessedZCNBurnTickets Returns all processed ZCN burn tickets burned for a certain ethereum address */
-export const getNotProcessedZCNBurnTickets = async ({
+export const getProcessedZCNBurnTickets = async ({
   domain,
   wallet,
 }: {
@@ -173,7 +173,7 @@ export const getNotProcessedZCNBurnTickets = async ({
   }
 }
 
-/** estimateMintWZCNGasAmount performs gas amount estimation for the given mint wzcn transaction. */
+/** estimateMintWZCNGasAmount performs gas amount estimation for the given Mint WZCN transaction. */
 export const estimateMintWZCNGasAmount = async ({
   domain,
   wallet,

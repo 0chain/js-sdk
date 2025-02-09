@@ -1,0 +1,132 @@
+---
+sidebar_position: 1
+---
+
+# Introduction
+
+Before using the Züs JS SDK, you need to initialize the SDK first. See [Quick Start guide](/docs/getting-started/quick-start) for more details.
+
+After initializing the SDK, you can use the Züs JS SDK to perform various operations such as creating and managing allocations, uploading and downloading files, executing smart contracts, and more.
+
+## SDK Methods Index
+
+In this guide, we will introduce you to all the available methods provided by the Züs JS SDK.
+
+### Wallet Methods
+
+The wallet methods allow you to create and manage wallets, set the wallet, and get wallet information.
+
+| Method | Description |
+| --- | --- |
+| `createWallet` | Create a new wallet. Also, helps to recover a wallet using its mnemonic phrase. |
+| `createWalletKeys` | Create a new wallet keys and mnemonic. |
+| `getPublicEncryptionKey` | Get the public encryption key by wallet mnemonic. | 
+| `isWalletId` | Check whether thef wallet id is valid. |
+| `send` | Send token from one wallet to another. |
+| `getWalletBalance` | Get the balance of a wallet. |
+| `getUSDRate` | Get the USD rate by token symbol. (e g `zcn`, `eth`) |
+
+### Burn & Mint Methods
+
+The `initBridge` method must be called to initialize the bridge client before using the any of the burn and mint methods.
+
+| Method | Description |
+| --- | --- |
+| `initBridge` | Initalize the bridge for calling burn and mint functions. |
+| `burnZCN` | Bridge method to burn ZCN tokens. |
+| `mintZCN` | Bridge method to mint ZCN tokens. |
+| `getMintWZCNPayload` | Bridge method to get *Mint WZCN Payload* for a given burn transaction hash. |
+| `getUnprocessedWZCNBurnEvents` | Get all unprocessed WZCN burn events from the Ethereum network. |
+| `getProcessedZCNBurnTickets` | Get all processed ZCN burn tickets burned for a certain ethereum address. |
+| `estimateMintWZCNGasAmount` | Perform gas amount estimation for the given Mint WZCN transaction. |
+| `estimateBurnWZCNGasAmount` | Perform gas amount estimation for the given burn wzcn transaction. |
+| `estimateGasPrice` | Perform gas estimation for the given transaction using Alchemy enhanced API returning approximate final gas fee. |
+{/* | `getFaucetToken` | Get test tokens for testing. | // DOTODO: add how to get test tokens in devnet */}
+
+### Allocation Storage Methods
+
+The allocation storage methods allow you to create, update, and manage allocations.
+
+| Method | Description |
+| --- | --- |
+| `createAllocation` | Creates an allocation with the specified allocation terms and preferred blobber IDs. |
+| `getAllocationMinLock` | Retrieves the minimum lock value for the allocation creation. |
+| `listAllocations` | List all the allocations. |
+| `getAllocation` | Gets allocation details for a given `allocationId` from cache or the blockchain. |
+| `reloadAllocation` | Re-fetches allocation details using `allocationId` from blockchain and updates cache.  |
+| `getAllocationWith` | Get allocation details of a free allocation or a shared allocation details by using an authTicket. |
+| `freezeAllocation` | Freeze an allocation so that the allocation data can no longer be modified. |
+| `cancelAllocation` | Cancel an Allocation |
+| `updateAllocation` | Update the allocation settings |
+| `updateAllocationWithRepair` | Update the allocation settings with repair | {/* // DOTODO */}
+| `updateForbidAllocation` | UpdateForbidAllocation updates the permissions of an allocation, given the permission parameters in a forbid-first manner. |
+| `getUpdateAllocationMinLock` | Retrieves the minimum lock value for the allocation after update. |
+| `getUpdateAllocAuthTicket` | This method is used to sign an "Update Allocation Authticket". This ticket is needed to allow someone else to run update transaction for your allocation on your terms. |
+| `transferAllocation` | Transfer the ownership of an allocation to a new owner |
+| `checkAllocStatus` | Check the health status of the allocation.|
+| `skipStatusCheck` | Skips the `checkAlloctionStatus` health status check of the allocation. |
+| `repairAllocation` | Start a repair process for an allocation. |
+| `repairSize` | Retrieves the repair size for a specific path in an allocation. |
+| `createWorkers` | Manually create local workers that sync with the allocation. |
+| `terminateWorkers` | Remove local workers that sync with the allocation. This is useful when switching between allocations. |
+{/* createFreeAllocation // DOTODO */}
+
+### Blobber Methods
+
+The blobber methods allow you to retrieve information about blobbers.
+
+| Method | Description |
+| --- | --- |
+| `getBlobbers` | Retrieves a list of active blobbers details from the network |
+| `getBlobberIds` | Get Blobber IDs from a list of blobber URLs |
+| `getAllocationBlobbers` | Retrieves a list of blobber IDs of blobber which match your allocation terms |
+| `updateBlobberSettings` | Updates the blobber settings |
+| `getContainers` | GetContainers returns all the running containers in a given domain. |
+| `searchContainer` | searchContainer searches for a container with a given name in a given domain. |
+| `updateContainer` | UpdateContainer updates the given container ID with a new image ID in a given domain. |
+
+### File Operation Methods
+
+The file operation methods allow you to perform various operations on files.
+
+| Method | Description |
+| --- | --- |
+| `getLookupHash` | Generate lookup hash for a given file path and allocation ID |
+| `createDir` | Create a folder on the blobbers |
+| `setUploadMode` | Sets the upload mode for modifying the upload speed and CPU usage |
+| `multiUpload` | Upload multiple files in a batch. Also, used to resume a paused upload. |
+| `pauseUpload` | Pause the upload operation of the file. |
+| `cancelUpload` | Cancel the upload operation of the file. |
+| `getFileStats` | Gets the file stats |
+| `listObjects` | List the files for a given allocation ID and remote path |
+| `getFileMetaByName` | Get file metadata by name. (File Search) |
+| `multiDownload` | Download multiple files together |
+| `downloadBlocks` | Downloads a specified range of blocks from a file. |
+| `cancelDownloadBlocks` | Cancels the download of a specified range of blocks from a file. |
+| `downloadDirectory` | Download files in a directory. |
+| `cancelDownloadDirectory` | Cancel the download of a directory recursively. |
+| `multiOperation` | Perform multiple file operations (copy, move, delete, create directory) together |
+| `deleteFile` | Deletes a file from an allocation. Only the owner of the allocation can delete a file. Prefer `multiOperation` for deleting multiple files. |
+| `share` | Generate an authToken that provides the authorization to the holder to the specified file on the remotepath. |
+| `decodeAuthTicket` | Decode the AuthTicket of a shared file |
+| `listObjectsFromAuthTicket` | List objects from an auth ticket. It's useful for accessing a shared resource by a non-owner |
+
+### Smart Contract Methods
+
+The smart contract methods allow you to interact with smart contracts.
+
+| Method | Description |
+| --- | --- |
+| `makeSCRestAPICall` | Issues a request to the public API of the smart contracts |
+| `getStakePoolInfo` | Get information about the stake pool for the allocation |
+| `lockWritePool` | Lock given number of tokens for given duration in write pool |
+| `lockStakePool` | Stake number of tokens for a given provider given its type and ID |
+| `unlockStakePool` | Unlock the write pool |
+
+### Other Methods
+
+| Method | Description |
+| --- | --- |
+| `getGosdkVersion` | Retrieves the version of the initialized GoSDK WASM. |
+| `getWasmType` | Returns the type of the GoSDK WASM file (standard or enterprise). |
+| `collectRewards` | Collect all rewards for a given delegate and provider pair. |

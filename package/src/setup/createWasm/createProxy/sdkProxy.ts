@@ -46,6 +46,7 @@ export const readChunk = (
     fileReader.readAsArrayBuffer(blob)
   })
 
+// TODO: returns the proxy `GoWasmProxy`
 const getProxy = (bridge: Bridge) => {
   const proxy = bridge.__proxy__
   if (!proxy) {

@@ -16,6 +16,7 @@ export const resetGoWasm = (): void => {
 }
 
 type ZboxAppType = 'vult' | 'blimp' | 'chalk' | 'chimney' | 'bolt' | 'atlus'
+/** Set the wallet details and return the goWasm instance to call SDK methods. */
 const getWasm = async ({
   domain,
   wallet,

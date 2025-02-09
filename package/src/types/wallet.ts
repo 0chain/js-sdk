@@ -19,6 +19,21 @@ export type NetworkConfig = {
   blockWorker?: `https://${Domain}/dns` | (string & {})
 }
 
+export type BasicWallet = {
+  id: string
+  name: string
+  mnemonic: string
+  version: '1.0'
+  creationDate: number
+  keys: {
+    walletId: string
+    publicKey: string
+    privateKey: string
+    publicEncryptionKey: string
+    walletMnemonic: string
+  }
+}
+
 export type ActiveWallet = {
   id?: string
   temp_id?: string

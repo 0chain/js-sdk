@@ -10,7 +10,7 @@ import { getBridge } from '../bridge'
 async function blsSign(hash: string, secretKey: string): Promise<string> {
   const bridge = getBridge()
   if (!bridge.jsProxy || !bridge.jsProxy.secretKey) {
-    const errMsg = 'err: bls.secretKey is not initialized'
+    const errMsg = 'Error: bls.secretKey is not initialized'
     console.warn(errMsg)
     throw new Error(errMsg)
   }
@@ -21,7 +21,7 @@ async function blsSign(hash: string, secretKey: string): Promise<string> {
   const sig = privateKey.sign(bytes)
 
   if (!sig) {
-    const errMsg = 'err: wasm blsSign function failed to sign transaction'
+    const errMsg = 'Error: WASM blsSign function failed to sign transaction'
     console.warn(errMsg)
     throw new Error(errMsg)
   }
@@ -40,7 +40,7 @@ async function blsVerify(signature: string, hash: string): Promise<boolean> {
   const bridge = getBridge()
 
   if (!bridge.jsProxy || !bridge.jsProxy.publicKey) {
-    const errMsg = 'err: bls.publicKey is not initialized'
+    const errMsg = 'Error: bls.publicKey is not initialized'
     console.warn(errMsg)
     throw new Error(errMsg)
   }
@@ -87,7 +87,7 @@ async function blsAddSignature(
 ): Promise<string> {
   const bridge = getBridge()
   if (!bridge.jsProxy) {
-    const errMsg = 'err: bls.secretKey is not initialized'
+    const errMsg = 'Error: bls.secretKey is not initialized'
     console.warn(errMsg)
     throw new Error(errMsg)
   }
@@ -97,7 +97,7 @@ async function blsAddSignature(
   var sig2 = privateKey.sign(hexStringToByte(hash))
   if (!sig2) {
     const errMsg =
-      'err: wasm blsAddSignature function failed to sign transaction'
+      'Error: WASM blsAddSignature function failed to sign transaction'
     console.warn(errMsg)
     throw new Error(errMsg)
   }

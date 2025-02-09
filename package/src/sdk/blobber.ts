@@ -1,5 +1,5 @@
 // TODO: not used in webapps: deleteFile, multiDownload, multiUpload, downloadBlocks, updateBlobberSettings, getRemoteFileMap (deprecated), getContainers, updateContainer, searchContainer, repairAllocation, checkAllocStatus, createWorkers, getFileMetaByName, downloadDirectory.
-// TODO: gosdk methods related to "player" proxy are deprecated
+// TODO: GoSDK methods related to "player" proxy are deprecated
 import { errorOut } from '@/sdk/utils/misc'
 import { getBridge, globalCtx } from '@/setup/createWasm/bridge'
 import { readChunk } from '@/setup/createWasm/createProxy/sdkProxy'
@@ -180,7 +180,7 @@ export const multiDownload = async ({
   }
 }
 
-/** Sets the upload mode. Possible upload modes:
+/** Sets the upload mode for modifying the upload speed and CPU usage . Possible upload modes:
  *  - 0 = Slow uploads (Consumes less CPU & Memory)
  *  - 1 = Standard (Default)
  *  - 2 = High Speed uploads (Consumes more CPU & Memory)
@@ -249,7 +249,7 @@ const sdkMultiUpload = async ({
   }
 }
 
-/** Upload multiple files in a batch.
+/** Upload multiple files in a batch. Also, used to resume a paused upload.
  *
  *  NOTE: Keep the batch size under 50 files. */
 export const multiUpload = async ({
@@ -408,6 +408,8 @@ export const listObjectsFromAuthTicket = async ({
   return listResult
 }
 
+// TODO: listSharedFiles
+
 /** Create a directory on blobbers */
 export const createDir = async ({
   wallet,
@@ -425,6 +427,7 @@ export const createDir = async ({
   return goWasm.sdk.createDir(allocationId, remotePath)
 }
 
+/** Downloads a specified range of blocks from a file. */
 export const downloadBlocks = async ({
   wallet,
   domain,
@@ -696,83 +699,6 @@ export const searchContainer = async ({
   return containers
 }
 
-/**
- * UpdateForbidAllocation updates the permissions of an allocation, given the permission parameters in a forbid-first manner.
- *
- * @returns The transaction hash
- */
-export const updateForbidAllocation = async ({
-  wallet,
-  domain,
-  allocationId,
-  forbidUpload,
-  forbidDelete,
-  forbidUpdate,
-  forbidMove,
-  forbidCopy,
-  forbidRename,
-}: {
-  wallet: ActiveWallet
-  domain: NetworkDomain
-  /** Allocation ID to update */
-  allocationId: string
-  /** If true, uploading files to the allocation is forbidden */
-  forbidUpload: boolean
-  /** If true, deleting files from the allocation is forbidden */
-  forbidDelete: boolean
-  /** If true, updating files in the allocation is forbidden */
-  forbidUpdate: boolean
-  /** If true, moving files in the allocation is forbidden */
-  forbidMove: boolean
-  /** If true, copying files in the allocation is forbidden */
-  forbidCopy: boolean
-  /** If true, renaming files in the allocation is forbidden */
-  forbidRename: boolean
-}): Promise<string> => {
-  const goWasm = await getWasm({ domain, wallet })
-
-  const txnHash = await goWasm.sdk.updateForbidAllocation(
-    allocationId,
-    forbidUpload,
-    forbidDelete,
-    forbidUpdate,
-    forbidMove,
-    forbidCopy,
-    forbidRename
-  )
-  return txnHash
-}
-
-/**
- * send tokens to a client ID / wallet ID
- *
- * @returns The transaction hash.
- */
-export const send = async ({
-  wallet,
-  domain,
-  toClientId,
-  tokens,
-  fee,
-  desc,
-}: {
-  wallet: ActiveWallet
-  domain: NetworkDomain
-  /** Client ID / Wallet ID to send tokens to */
-  toClientId: string
-  /** Number of tokens to send */
-  tokens: number
-  /** Transaction fee */
-  fee: number
-  /** Description of the transaction */
-  desc: string
-}): Promise<string> => {
-  const goWasm = await getWasm({ domain, wallet })
-
-  const txnHash = await goWasm.sdk.send(toClientId, tokens, fee, desc)
-  return txnHash
-}
-
 /** Cancel the upload operation of the file. */
 export const cancelUpload = async ({
   wallet,
@@ -805,130 +731,6 @@ export const pauseUpload = async ({
 }): Promise<void> => {
   const goWasm = await getWasm({ domain, wallet })
   return await goWasm.sdk.pauseUpload(allocationId, remotePath)
-}
-
-/** Repairs the allocation.
- *
- * Allocation repair is a process to repair the allocation files on its blobbers by re-uploading the missing blocks. */
-export const repairAllocation = async ({
-  wallet,
-  domain,
-  allocationId,
-  callback,
-}: {
-  wallet: ActiveWallet
-  domain: NetworkDomain
-  allocationId: string
-  /** Callback function will be invoked with repair progress updates */
-  callback?: (
-    totalBytes: number,
-    completedBytes: number,
-    fileName: string,
-    blobURL: string,
-    error: string
-  ) => void
-}): Promise<void> => {
-  const goWasm = await getWasm({ domain, wallet })
-
-  let callbackFuncName = ''
-  if (callback) {
-    callbackFuncName = `repairAllocationCallback_${Date.now()}`
-    window[callbackFuncName] = callback
-  }
-
-  try {
-    await goWasm.sdk.repairAllocation(allocationId, callbackFuncName)
-    return
-  } catch (e) {
-    throw errorOut('repairAllocation', e)
-  } finally {
-    // TODO: check if this is to be avoided or not
-    if (callbackFuncName) delete window[callbackFuncName]
-  }
-}
-
-type AllocStatus = {
-  /**
-   * The status of the allocation has one of the following values:
-   * - `ok`: The allocation is healthy and fully functional.
-   * - `repair`: The allocation needs to be repaired. Repair using the `repairAllocation` method.
-   * - `broken`: The allocation is broken and it cannot be repaired anymore.
-   */
-  status: 'ok' | 'repair' | 'broken'
-  blobberStatus: {
-    ID: string
-    Status: 'available' | 'unavailable'
-  }[]
-  error: string
-}
-/** Check the status of the allocation. */
-export const checkAllocStatus = async ({
-  wallet,
-  domain,
-  allocationId,
-}: {
-  wallet: ActiveWallet
-  domain: NetworkDomain
-  allocationId: string
-}): Promise<AllocStatus> => {
-  const goWasm = await getWasm({ domain, wallet })
-
-  try {
-    const jsonResponse = await goWasm.sdk.checkAllocStatus(allocationId)
-
-    const response = JSON.parse(jsonResponse)
-    const { status, blobberStatus, error } = response as AllocStatus
-    if (error) throw new Error(error)
-
-    return { status, blobberStatus, error }
-  } catch (e) {
-    throw errorOut('checkAllocStatus', e)
-  }
-}
-
-/** Skip the status check of the allocation. */
-export const skipStatusCheck = async ({
-  wallet,
-  domain,
-  allocationId,
-  checkStatus,
-}: {
-  wallet: ActiveWallet
-  domain: NetworkDomain
-  allocationId: string
-  /** Flag to enable or disable status check */
-  checkStatus: boolean
-}): Promise<void> => {
-  const goWasm = await getWasm({ domain, wallet })
-  return goWasm.sdk.skipStatusCheck(allocationId, checkStatus)
-}
-
-/** Remove local workers that sync with the allocation. */
-export const terminateWorkers = async ({
-  wallet,
-  domain,
-  allocationId,
-}: {
-  wallet: ActiveWallet
-  domain: NetworkDomain
-  allocationId: string
-}): Promise<void> => {
-  const goWasm = await getWasm({ domain, wallet })
-  return goWasm.sdk.terminateWorkers(allocationId)
-}
-
-/** Create local workers that sync with the allocation. */
-export const createWorkers = async ({
-  wallet,
-  domain,
-  allocationId,
-}: {
-  wallet: ActiveWallet
-  domain: NetworkDomain
-  allocationId: string
-}): Promise<void> => {
-  const goWasm = await getWasm({ domain, wallet })
-  return goWasm.sdk.createWorkers(allocationId)
 }
 
 /** Get file metadata by name. (File Search) */
@@ -1061,6 +863,7 @@ export const cancelDownloadDirectory = async ({
   return goWasm.sdk.cancelDownloadDirectory(remotePath)
 }
 
+/** Cancels the download of a specified range of blocks from a file. */
 export const cancelDownloadBlocks = async ({
   wallet,
   domain,

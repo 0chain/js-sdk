@@ -1,4 +1,4 @@
-// TODO: not used in webapps: updateAllocationWithRepair, getUpdateAllocTicket, collectRewards, getStakePoolInfo, lockStakePool, unlockStakePool (not used anywhere:- getAllocationBlobbers, getBlobberIds, reloadAllocation, getStakePoolInfo. lockWritePool, allocationRepair, repairSize)
+// TODO: not used in webapps: updateAllocationWithRepair, getUpdateAllocAuthTicket (getUpdateAllocTicket), collectRewards, getStakePoolInfo, lockStakePool, unlockStakePool (not used anywhere:- getAllocationBlobbers, getBlobberIds, reloadAllocation, getStakePoolInfo. lockWritePool, allocationRepair, repairSize)
 import {
   getProviderTypeId,
   type StakePoolInfo,
@@ -11,6 +11,7 @@ import { getWasm } from '@/setup/wasm'
 import { errorOut } from '@/sdk/utils/misc'
 import type { Allocation } from '@/types/allocation'
 
+/** Creates an allocation with the specified allocation terms and preferred blobber IDs. */
 export const createAllocation = async ({
   wallet,
   domain,
@@ -89,11 +90,11 @@ export const createAllocation = async ({
   return transactionData
 }
 
-/** Retrieves list of blobber IDs of the allocation */
+/** Retrieves list of blobber IDs of blobber which match your allocation terms */
 export const getAllocationBlobbers = async ({
   wallet,
   domain,
-  preferredBlobberURLs,
+  preferredBlobberURLs = [],
   dataShards,
   parityShards,
   size,
@@ -107,7 +108,7 @@ export const getAllocationBlobbers = async ({
   domain: NetworkDomain
   wallet: ActiveWallet
   /** List of preferred blobber URLs */
-  preferredBlobberURLs: string[]
+  preferredBlobberURLs?: string[] // TODO: check if we can keep this optional or not
   /** Number of data shards */
   dataShards: number
   /** Number of parity shards */
@@ -170,6 +171,7 @@ export const getBlobberIds = async ({
   return blobberIds
 }
 
+/** List all the allocations */
 export const listAllocations = async ({
   wallet,
   domain,
@@ -198,7 +200,7 @@ export const getAllocation = async ({
   return await goWasm.sdk.getAllocation(allocationId)
 }
 
-/** reloadAllocation reload allocation details using `allocationId` from blockchain and update cache */
+/** reloadAllocation reload allocation details using `allocationId` from blockchain and updates cache */
 export const reloadAllocation = async ({
   wallet,
   domain,
@@ -475,6 +477,53 @@ export const getUpdateAllocationMinLock = async ({
 }
 
 /**
+ * UpdateForbidAllocation updates the permissions of an allocation, given the permission parameters in a forbid-first manner.
+ *
+ * @returns The transaction hash
+ */
+export const updateForbidAllocation = async ({
+  wallet,
+  domain,
+  allocationId,
+  forbidUpload,
+  forbidDelete,
+  forbidUpdate,
+  forbidMove,
+  forbidCopy,
+  forbidRename,
+}: {
+  wallet: ActiveWallet
+  domain: NetworkDomain
+  /** Allocation ID to update */
+  allocationId: string
+  /** If true, uploading files to the allocation is forbidden */
+  forbidUpload: boolean
+  /** If true, deleting files from the allocation is forbidden */
+  forbidDelete: boolean
+  /** If true, updating files in the allocation is forbidden */
+  forbidUpdate: boolean
+  /** If true, moving files in the allocation is forbidden */
+  forbidMove: boolean
+  /** If true, copying files in the allocation is forbidden */
+  forbidCopy: boolean
+  /** If true, renaming files in the allocation is forbidden */
+  forbidRename: boolean
+}): Promise<string> => {
+  const goWasm = await getWasm({ domain, wallet })
+
+  const txnHash = await goWasm.sdk.updateForbidAllocation(
+    allocationId,
+    forbidUpload,
+    forbidDelete,
+    forbidUpdate,
+    forbidMove,
+    forbidCopy,
+    forbidRename
+  )
+  return txnHash
+}
+
+/**
  * getAllocationWith retrieves the information of a free or a shared allocation given the auth ticket.
  * - **Free allocation** is an allocation that is created to the user using Vult app for the first time with no fees.
  * - **Shared allocation** is an allocation that has some shared files. The user who needs to access those files first needs to read the information of this allocation using an auth ticket.
@@ -505,14 +554,14 @@ export const createFreeAllocation = async ({
   freeStorageMarker: string
 }): Promise<string> => {
   const goWasm = await getWasm({ domain, wallet })
-  const txnHash = await goWasm.sdk.createfreeallocation(freeStorageMarker)
+  const txnHash = await goWasm.sdk.createxfreeallocation(freeStorageMarker)
   return txnHash
 }
 
 /**
- * This method is used to sign updateAllocAuthTicket. This ticket is needed to allow someone else to run update transaction for your allocation on your terms.
+ * This method is used to sign an "Update Allocation Authticket". This ticket is needed to allow someone else to run update transaction for your allocation on your terms.
  */
-export const getUpdateAllocTicket = async ({
+export const getUpdateAllocAuthTicket = async ({
   domain,
   wallet,
   allocationId,
@@ -524,8 +573,8 @@ export const getUpdateAllocTicket = async ({
   wallet: ActiveWallet
   allocationId: string
   // get from zcnContracts
-  userId: string
-  operationType: string
+  userId: string // TODO: Should we directly add teamWallet here
+  operationType: string // TODO
   roundExpiry: number
 }): Promise<string> => {
   const goWasm = await getWasm({ domain, wallet })
@@ -587,7 +636,7 @@ export const getStakePoolInfo = async ({
 }
 
 /**
- * Stake number of tokens for a given provider given its type and id
+ * Stake number of tokens for a given provider given its type and ID
  * @returns the hash of the transaction
  */
 export const lockStakePool = async ({
@@ -678,30 +727,60 @@ export const lockWritePool = async ({
 // Other sdk methods
 // ----------------------------------------
 
-type AuthToken = {
-  recipient_public_key: string
-  marker: string
-  tokens: number
+// type AuthToken = {
+//   recipient_public_key: string
+//   marker: string
+//   tokens: number
+// }
+/** TODO check usecase of wasm decodeAuthTicket */
+// /** decodeAuthTicket decodes the auth ticket and returns the recipient public key and the tokens */
+// export const decodeAuthTicket = async ({
+//   domain,
+//   wallet,
+//   authTicket,
+// }: {
+//   domain: NetworkDomain
+//   wallet: ActiveWallet
+//   authTicket: string
+// }): Promise<AuthToken> => {
+//   const goWasm = await getWasm({ domain, wallet })
+//   const resp = await goWasm.sdk.decodeAuthTicket(authTicket)
+//   return resp
+// }
+
+type DecodedAuthTicket = {
+  fileName?: string
+  walletId?: string
+  lookupHash?: string
+  referenceType?: string
+  allocationId?: string
+  isEncrypted?: boolean
 }
-/** decodeAuthTicket decodes the auth ticket and returns the recipient public key and the tokens */
-export const decodeAuthTicket = async ({
-  domain,
-  wallet,
-  authTicket,
-}: {
-  domain: NetworkDomain
-  wallet: ActiveWallet
-  authTicket: string
-}): Promise<AuthToken> => {
-  const goWasm = await getWasm({ domain, wallet })
-  const resp = await goWasm.sdk.decodeAuthTicket(authTicket)
-  return resp
+/** decodeAuthTicket decodes the Authticket */
+export const decodeAuthTicket = (authTicket: string): DecodedAuthTicket => {
+  if (!authTicket) return {}
+  try {
+    const file = JSON.parse(decodeURIComponent(escape(atob(authTicket))))
+    return {
+      fileName: file.file_name,
+      walletId: file.owner_id || file.client_id,
+      lookupHash: file.file_path_hash,
+      referenceType: file.reference_type,
+      allocationId: file.allocation_id,
+      isEncrypted: file.encrypted,
+    }
+  } catch (e) {
+    console.error('Failed decoding authticket ', e)
+    return {}
+  }
 }
 
 /**
- * Issues the repair process for an allocation, starting from a specific path.
+ * Issues the repair process for an allocation, *starting from a specific path*.
  *
  * Repair synchronizes the user's data within the allocation across all blobbers and restores any missing data on blobbers where it is incomplete.
+ * 
+ * @deprecated
  */
 export const allocationRepair = async ({
   domain,
@@ -716,6 +795,46 @@ export const allocationRepair = async ({
 }): Promise<void> => {
   const goWasm = await getWasm({ domain, wallet })
   return goWasm.sdk.allocationRepair(allocationId, remotePath)
+}
+
+/** Repairs the allocation.
+ *
+ * Allocation repair is a process to repair the allocation files on its blobbers by re-uploading the missing blocks. */
+export const repairAllocation = async ({
+  wallet,
+  domain,
+  allocationId,
+  callback,
+}: {
+  wallet: ActiveWallet
+  domain: NetworkDomain
+  allocationId: string
+  /** Callback function will be invoked with repair progress updates */
+  callback?: (
+    totalBytes: number,
+    completedBytes: number,
+    fileName: string,
+    blobURL: string,
+    error: string
+  ) => void
+}): Promise<void> => {
+  const goWasm = await getWasm({ domain, wallet })
+
+  let callbackFuncName = ''
+  if (callback) {
+    callbackFuncName = `repairAllocationCallback_${Date.now()}`
+    window[callbackFuncName] = callback
+  }
+
+  try {
+    await goWasm.sdk.repairAllocation(allocationId, callbackFuncName)
+    return
+  } catch (e) {
+    throw errorOut('repairAllocation', e)
+  } finally {
+    // TODO: check if this is to be avoided or not
+    if (callbackFuncName) delete window[callbackFuncName]
+  }
 }
 
 /**
@@ -737,4 +856,88 @@ export const repairSize = async ({
   const goWasm = await getWasm({ domain, wallet })
   const resp = await goWasm.sdk.repairSize(allocationId, remotePath)
   return resp
+}
+
+type AllocStatus = {
+  /**
+   * The health `status` of the allocation has one of the following values:
+   * - `ok`: The allocation is healthy and fully functional.
+   * - `repair`: The allocation needs to be repaired. Repair using the `repairAllocation` method.
+   * - `broken`: The allocation is broken and it cannot be repaired anymore.
+   */
+  status: 'ok' | 'repair' | 'broken'
+  blobberStatus: {
+    ID: string
+    Status: 'available' | 'unavailable'
+  }[]
+  error: string
+}
+/** Check the health status of the allocation. */
+export const checkAllocStatus = async ({
+  wallet,
+  domain,
+  allocationId,
+}: {
+  wallet: ActiveWallet
+  domain: NetworkDomain
+  allocationId: string
+}): Promise<AllocStatus> => {
+  const goWasm = await getWasm({ domain, wallet })
+
+  try {
+    const jsonResponse = await goWasm.sdk.checkAllocStatus(allocationId)
+
+    const response = JSON.parse(jsonResponse)
+    const { status, blobberStatus, error } = response as AllocStatus
+    if (error) throw new Error(error)
+
+    return { status, blobberStatus, error }
+  } catch (e) {
+    throw errorOut('checkAllocStatus', e)
+  }
+}
+
+/** Skip the health status check of the allocation. */
+export const skipStatusCheck = async ({
+  wallet,
+  domain,
+  allocationId,
+  checkStatus,
+}: {
+  wallet: ActiveWallet
+  domain: NetworkDomain
+  allocationId: string
+  /** Flag to enable or disable status check */
+  checkStatus: boolean
+}): Promise<void> => {
+  const goWasm = await getWasm({ domain, wallet })
+  return goWasm.sdk.skipStatusCheck(allocationId, checkStatus)
+}
+
+/** Remove local workers that sync with the allocation. */
+export const terminateWorkers = async ({
+  wallet,
+  domain,
+  allocationId,
+}: {
+  wallet: ActiveWallet
+  domain: NetworkDomain
+  allocationId: string
+}): Promise<void> => {
+  const goWasm = await getWasm({ domain, wallet })
+  return goWasm.sdk.terminateWorkers(allocationId)
+}
+
+/** Create local workers that sync with the allocation. */
+export const createWorkers = async ({
+  wallet,
+  domain,
+  allocationId,
+}: {
+  wallet: ActiveWallet
+  domain: NetworkDomain
+  allocationId: string
+}): Promise<void> => {
+  const goWasm = await getWasm({ domain, wallet })
+  return goWasm.sdk.createWorkers(allocationId)
 }

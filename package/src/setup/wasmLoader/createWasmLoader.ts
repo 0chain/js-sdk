@@ -4,6 +4,7 @@ import type { OnLog } from '@/types/log'
 import type { Config } from '../createWasm/bridge'
 import { sleep } from '@/utils'
 import { resetGoWasm } from '@/setup/wasm/wasm'
+import type { WasmType } from '@/types'
 
 const DEBOUNCE_TIMEOUT = 500
 const MAX_RETRIES = 3
@@ -34,7 +35,7 @@ export const createWasmLoader = ({
     async (config: Config, isSwitchingWasm = false) => {
       if (!config) {
         onLog?.('error', {
-          message: 'Unable to initialize wasm. Invalid config.',
+          message: 'Unable to initialize WASM. Invalid config.',
           code: 'INVALID_WASM_CONFIG',
           data: config,
         })
@@ -54,7 +55,7 @@ export const createWasmLoader = ({
       }
 
       onLog?.('info', {
-        message: 'Initializing wasm...',
+        message: 'Initializing WASM...',
         code: 'WASM_LOADING',
         data: { isSwitchingWasm },
       })
@@ -85,7 +86,7 @@ export const createWasmLoader = ({
         console.warn(msg)
         onLog?.('error', { message: msg, code: 'WASM_TYPE_MISMATCH_RETRY' })
 
-        initializeWasm(config) // Retry initializeWasm due to wasm type mismatch
+        initializeWasm(config) // Retry initializeWasm due to WASM type mismatch
       }
     },
     debounceTimeout
@@ -98,7 +99,7 @@ export const createWasmLoader = ({
 // Utils
 // ----------------------------------------
 
-export const getDesiredMode = (): 'normal' | 'enterprise' => {
+export const getDesiredMode = (): WasmType => {
   const isEnterpriseModeDesired =
     localStorage.getItem('enterpriseAlloc') === 'enabled'
   return isEnterpriseModeDesired ? 'enterprise' : 'normal'
@@ -111,7 +112,7 @@ export const isDesiredWasmInitialized = (onLog?: OnLog): boolean => {
   const wasmType = window.__zcn_wasm__?.wasmType
 
   if (wasmType === undefined) {
-    // This is for old wasm versions which don't have wasmType
+    // This is for old WASM versions which don't have wasmType
     onLog?.('debug', {
       message: 'Wasm type: undefined',
       code: 'OUTDATED_WASM_VERSION',

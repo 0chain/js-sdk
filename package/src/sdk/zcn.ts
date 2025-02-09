@@ -1,7 +1,7 @@
 import { getWasm } from '@/setup/wasm'
 import type { NetworkDomain } from '@/types/wallet'
 
-type TokenSymbol = 'zcn' | (string & {})
+type TokenSymbol = 'zcn' | 'eth' | (string & {})
 export const getUSDRate = async ({
   domain,
   symbol = 'zcn',

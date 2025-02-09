@@ -1,0 +1,206 @@
+---
+sidebar_position: 2
+---
+
+# Quick Start
+
+This page will focus on just how to set up a project with the Züs JS SDK. For API documentation, see [the API Reference](/api).
+
+## Install Züs JS SDK
+
+The Züs JS SDK is available as a package on NPM for use with a module bundler:
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem'
+
+<Tabs>
+  <TabItem value="npm" label="NPM" default>
+    ```sh 
+    npm install @zerochain/sdk
+    ```
+  </TabItem>
+  <TabItem value="yarn" label="Yarn">
+    ```sh
+    yarn add @zerochain/sdk 
+    ```
+    </TabItem>
+</Tabs>
+
+## Initialize the SDK
+
+The SDK must be initialized before use. This process includes fetching the appropriate WASM file and then initializing the WASM.
+
+### Fetching the WASM
+
+There are two WASM file types available, `standard` and `enterprise`.
+
+1. Download the appropriate WASM file(s):
+    - **Standard WASM** is for interacting with a Standard Allocation:
+      - Download `zcn.wasm` from the "Assets" section of any GoSDK Release [here](https://github.com/0chain/gosdk/releases)
+    - **Enterprise WASM** is for interacting with an Enterprise Allocation:
+      - Download `enterprise-zcn.wasm` from the "Assets" section of any eGoSDK Release [here](https://github.com/0chain/egosdk/releases)
+
+2. Upload your WASM file for `wasmBaseUrl` config:
+   - You can place it in your website’s static assets folder.
+
+     - ```sh title="Example Folder Structure for Static Assets"
+         public/
+           |--wasm/
+           |   |--zcn.wasm
+           |   |--enterprise-zcn.wasm
+       ```
+     - In this case, set the `wasmBaseUrl` config to `/wasm`.
+   - Alternatively, you can upload it to a web server or CDN.
+     - For example, if `wasmBaseUrl` is set to `https://example.com/wasm`, the WASM files should be located at:
+       - `https://example.com/wasm/enterprise-zcn.wasm` for the Enterprise WASM
+       - `https://example.com/wasm/zcn.wasm` for the Standard WASM
+
+3. Upload the `md5worker.js` file for the `md5WorkerUrl` config:
+   - This is optional if you are not using upload features of the SDK. This includes using SDK methods like `multiUpload` and `bulkUpload`. {/* DOTODO: update link to multiUpload and bulkUpload */}
+   - Place it in your website’s static assets folder:
+
+     ```sh title="Example Folder Structure for Static Assets"
+     public/
+       |--md5worker.js
+     ```
+     - In this case, set the `md5WorkerUrl` config to `md5worker.js`.
+   - Alternatively, use the [CDN URL](https://unpkg.com/md5-worker@1.3.0/dist/md5worker.min.js) for the `md5WorkerUrl` config.  {/* DOTODO: update link */}
+     :::warning
+
+     This is strongly not recommended as it is used only in Zus apps like Vult, Blimp & Chalk and may change in the future, potentially breaking your app.
+
+     :::
+
+
+<Tabs>
+  <TabItem value="react" label="React (JSX)" default>
+    ```jsx title="App.jsx"
+    import { useWasmLoader } from '@zerochain/sdk/dist/react'
+
+    export const App = () => {
+      const [isWasmLoaded, setIsWasmLoaded] = useState(false)
+
+       // highlight-start
+      const loadWasm = useWasmLoader({
+        onLog: (type, log) => console[type]('WASM LOG:', log.message),
+        setIsWasmLoaded,
+      })
+      // highlight-end
+
+      // Using useEffect to ensure the `window` object is accessible
+      useEffect(() => {
+        // highlight-start
+        loadWasm({
+          md5WorkerUrl: 'md5worker.js',
+          wasmBaseUrl: '/wasm', // Or, 'https://example.com/wasm'
+        })
+        // highlight-end
+      }, [loadWasm])
+
+      // ...
+    }
+    ```
+  </TabItem>
+  <TabItem value="js" label="Vanilla JS">
+    ```jsx title="loadWasm.js"
+    import { wasmLoader } from '@zerochain/sdk'
+
+    const loadWasm = wasmLoader({
+      onLog: (type, log) => console[type]('WASM LOG:', log.message),
+      setIsWasmLoaded: isWasmLoaded => updateMyUI(isWasmLoaded),
+    })
+
+    loadWasm({
+      md5WorkerUrl: 'md5worker.js',
+      wasmBaseUrl: '/wasm', // Or, 'https://example.com/wasm'
+    })
+    ```
+    </TabItem>
+</Tabs>
+
+### Fetching WASM with Caching Support
+
+The SDK supports caching the WASM file for faster access. This is **not** enabled by default, but you can modify the `loadWasm` config to enable it.
+
+- Set `useCachedWasm` to `true`.
+- Configure `cacheConfig` based on your WASM file type:
+  - For **Enterprise WASM**, set `enterpriseGosdkVersion` and `enterpriseWasmUrl`.
+  - For **Standard WASM**, set `standardGosdkVersion` and `standardWasmUrl`.
+- Optionally, set `wasmBaseUrl` as a fallback. ([Reference](#initialize-the-sdk))
+
+```js
+loadWasm({
+  // highlight-start
+  useCachedWasm: true,
+  cacheConfig: {
+    enterpriseGosdkVersion: process.env.EGOSDK_VERSION, // Example: '1.18.5'
+    enterpriseWasmUrl: process.env.EGOSDK_WASM_URL, // Example: 'https://example.com/wasm/enterprise-zcn.wasm'
+    standardGosdkVersion: process.env.GOSDK_VERSION, // Example: '1.18.17'
+    standardWasmUrl: process.env.GOSDK_WASM_URL, // Example: 'https://example.com/wasm/zcn.wasm'
+  },
+  // highlight-end
+
+  // Set other options as needed
+  md5WorkerUrl: 'md5worker.js',
+  wasmBaseUrl: '/wasm', // Or, 'https://example.com/wasm'
+});
+```
+
+### Switching between WASM modes
+
+The SDK provides `updateWasmMode` for switching between WASM modes.
+- First call `updateWasmMode` with the desired WASM mode.
+- Then call `loadWasm` with the proper config.
+
+<Tabs>
+  <TabItem value="react" label="React (TSX)" default>
+    ```tsx title="SwitchWasmMode.tsx"
+    import { useWasmLoader } from '@zerochain/sdk/dist/react'
+    // highlight-next-line
+    import { updateWasmMode } from '@zerochain/sdk'
+
+    export const SwitchWasmMode = () => {
+      const loadWasm = useWasmLoader({ /** ... */})
+
+      // highlight-start
+      const switchWasmMode = (newWasmMode: "normal" | "enterprise") => {
+        updateWasmMode(newWasmMode)
+        loadWasm({ /** Your loadWasm config */})
+      }
+      // highlight-end
+
+      // ...
+    }
+    ```
+  </TabItem>
+  <TabItem value="ts" label="TypeScript">
+    ```ts title="switchWasmMode.ts"
+    import { wasmLoader } from '@zerochain/sdk'
+    // highlight-next-line
+    import { updateWasmMode } from '@zerochain/sdk'
+
+    const loadWasm = wasmLoader({ /** ... */})
+
+    // highlight-start
+    const switchWasmMode = (newWasmMode: "normal" | "enterprise") => {
+      updateWasmMode(newWasmMode)
+      loadWasm({ /** Your loadWasm config */})
+    }
+    // highlight-end
+    ```
+    </TabItem>
+</Tabs>
+
+## Next Steps
+
+Now that the SDK is initialized, you can start using its methods in your application. Check out the [API Reference](/api).
+
+### Example: Logging the WASM version
+
+```js
+import sdk from '@zerochain/sdk'
+
+async function logWasmVersion() {
+  const version = await sdk.getGosdkVersion(domain)
+  console.log('WASM Version:', version)
+}

@@ -20,4 +20,4 @@
 
 ### Patch Changes
 
-- b1b96af: WASM loading, caching & switching between enterprise and standard wasm
+- b1b96af: WASM loading, caching & switching between enterprise and standard WASM

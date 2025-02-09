@@ -199,10 +199,10 @@ export async function loadWasm(
   const { suffix, wasmUrl, wasmPath, defaultUrl } = getWasmUrl()
   const { source } = await fetchWasm({ wasmUrl, wasmPath, defaultUrl })
 
-  // set SUFFIX env variable in gosdk
+  // set SUFFIX env variable in GoSDK
   go.env = { SUFFIX: suffix }
 
-  // initiate wasm
+  // Initiate WASM
   const result = await WebAssembly.instantiateStreaming(source, go.importObject)
 
   setTimeout(() => {

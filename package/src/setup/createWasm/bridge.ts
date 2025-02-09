@@ -1,3 +1,4 @@
+import type { WasmType } from '@/types';
 import { getJsProxy, type JsProxyMethods } from './createProxy/jsProxy'
 import { type SdkProxyMethods } from './createProxy/sdkProxy'
 
@@ -39,7 +40,7 @@ declare global {
 }
 
 export type Bridge = {
-  wasmType?: 'normal' | 'enterprise'
+  wasmType?: WasmType
   __wasm_initialized__?: boolean
   __config__?: Config
   glob: {
@@ -89,6 +90,7 @@ export type Config = {
    */
   wasmBaseUrl?: string
   zus?: ZusConfig
+  /** **NOTE**: Only needed if you are using the SDK for uploading files. */
   md5WorkerUrl?: string
 } & (
   | { useCachedWasm?: false; cacheConfig?: never }

@@ -1,0 +1,267 @@
+---
+sidebar_position: 5
+---
+
+# Blobber SDK Methods
+
+In this section, we will learn about all the available Blobber methods provided by the SDK.
+
+## Prerequisites
+
+1. Initialize the SDK before using wallet methods. See the [Quick Start Guide](/docs/getting-started/quick-start) for details.
+2. All methods require a `wallet`. Refer to [`createWallet`](/docs/api/wallet#createwallet) for more information.
+3. All methods require a `domain` parameter, which is the network domain where your wallet and providers such as blobbers, sharders, miners, and validators are deployed. GoSDK will send requests to this domain.
+
+## Blobber Methods
+
+The blobber methods allow you to retrieve information, manage and interact with blobbers.
+
+### getBlobbers
+Gets a list of active blobbers.
+
+#### Parameters
+| Name | Type | Description | Default value |
+|---|---|---|---|
+| `domain` | `NetworkDomain` | Network domain for the blobbers | |
+| `wallet` | `ActiveWallet` | Active wallet details | |
+| `stakable` | `boolean` | Flag to get only stakable blobbers | |
+
+#### Return Type
+```typescript
+Promise<Blobber[]>
+```
+
+#### Example
+```typescript
+import { getBlobbers } from '@zerochain/sdk'
+
+// Get all blobbers
+const allBlobbers = await getBlobbers({
+  domain: 'mainnet.zus.network',
+  wallet: activeWallet,
+  stakable: false
+})
+
+// Get only stakable blobbers
+const stakableBlobbers = await getBlobbers({
+  domain: 'mainnet.zus.network',
+  wallet: activeWallet,
+  stakable: true
+})
+```
+
+### getBlobberIds
+Retrieves blobber IDs for the given list of blobber URLs.
+
+#### Parameters
+| Name | Type | Description | Default value |
+|---|---|---|---|
+| `domain` | `NetworkDomain` | Network domain for the blobbers | |
+| `wallet` | `ActiveWallet` | Active Wallet details | |
+| `blobberUrls` | `string[]` | List of blobber URLs for which IDs need to be retrieved | |
+
+#### Return Type
+```typescript
+Promise<string[]>
+```
+
+#### Example
+```typescript
+import { getBlobberIds } from '@zerochain/sdk'
+
+const blobberIds = await getBlobberIds({
+  domain: 'mainnet.zus.network',
+  wallet: activeWallet,
+  blobberUrls: ['https://mainnet.zus.network/blobber01/', 'https://my-domain.com/blobber01/']
+})
+```
+
+### getAllocationBlobbers
+Retrieves a list of blobber IDs that match your allocation terms.
+
+#### Parameters
+| Name | Type | Description | Default value |
+|---|---|---|---|
+| `domain` | `NetworkDomain` | Network domain for the allocation | |
+| `wallet` | `ActiveWallet` | Active wallet details | |
+| `preferredBlobberURLs` | `string[]` | List of preferred blobber URLs | `[]` |
+| `dataShards` | `number` | Number of data shards | |
+| `parityShards` | `number` | Number of parity shards | |
+| `size` | `number` | Size of the allocation in bytes | |
+| `minReadPrice` | `number` | Minimum read price | |
+| `maxReadPrice` | `number` | Maximum read price | |
+| `minWritePrice` | `number` | Minimum write price | |
+| `maxWritePrice` | `number` | Maximum write price | |
+| `restrictedLevel` | `number` | Specifies the type of blobbers to query:<br/>- `0`: Use all blobbers (both restricted and non-restricted).<br/>- `1`: Use only restricted blobbers (require permission for allocation creation).<br/>- `2`: Use only non-restricted blobbers (do not require permission for allocation creation). | |
+| `force` | `boolean` | **Deprecated.** For internal use only. | `false` |
+
+:::note
+To determine `minReadPrice`, `maxReadPrice`, `minWritePrice`, and `maxWritePrice`, use the `makeSCRestAPICall` SDK method to call the `/storage-config` endpoint of the sharder smart contract.
+:::
+
+
+:::warning
+The `force` parameter is deprecated and should not be used.
+:::
+
+#### Return Type
+```typescript
+Promise<string[]>
+```
+
+#### Example
+```typescript
+import { getAllocationBlobbers } from '@zerochain/sdk'
+
+const blobberIds = await getAllocationBlobbers({
+  domain: 'mainnet.zus.network',
+  wallet: activeWallet,
+  preferredBlobberURLs: ['https://mainnet.zus.network/blobber01/', 'https://my-domain.com/blobber01/'],
+  dataShards: 4,
+  parityShards: 2,
+  size: 2147483648, // 2 GB
+  minReadPrice: 0,
+  maxReadPrice: 100,
+  minWritePrice: 0.001,
+  maxWritePrice: 100,
+  restrictedLevel: 0
+})
+```
+
+### updateBlobberSettings
+Updates the settings for a blobber.
+
+#### Parameters
+| Name | Type | Description | Default value |
+|---|---|---|---|
+| `domain` | `NetworkDomain` | Network domain for the blobber | |
+| `wallet` | `ActiveWallet` | Active Wallet details | |
+| `blobberSettings` | `Blobber` | The new settings to apply to the blobber | |
+
+#### Return Type
+```typescript
+Promise<Transaction>
+```
+
+#### Example
+```typescript
+import { updateBlobberSettings } from '@zerochain/sdk'
+
+const updatedBlobber = await updateBlobberSettings({
+  domain: 'mainnet.zus.network',
+  wallet: activeWallet,
+  blobberSettings: {
+    ...blobberData,
+    is_restricted: isBlobberRestricted,
+    stake_pool_settings: {
+      ...blobberData.stake_pool_settings,
+      num_delegates: noOfDelegates,
+      service_charge: serviceCharge / 100,
+    },
+    terms: {
+      ...blobberData.terms,
+      write_price: zcnToSasToken(writePrice),
+    },
+  }
+})
+```
+
+### getContainers
+Returns all the running containers in a given domain exposing the `{requestDomain}/endpoints/{endpointID}/docker/containers/json` endpoint. The request is authenticated using the provided username and password by first creating an auth token and then issuing the request.
+
+#### Parameters
+| Name | Type | Description | Default value |
+|---|---|---|---|
+| `wallet` | `ActiveWallet` | Active Wallet details | |
+| `domain` | `NetworkDomain` | Network domain for the request | |
+| `username` | `string` | Username to authenticate with | |
+| `password` | `string` | Password to authenticate with | |
+| `requestDomain` | `string` | Domain to issue the request to | |
+
+#### Return Type
+List of containers
+```typescript
+Promise<Array<Record<string, any>>>
+```
+
+#### Example
+```typescript
+import { getContainers } from '@zerochain/sdk'
+
+const containers = await getContainers({
+  wallet: activeWallet,
+  domain: 'mainnet.zus.network',
+  username: 'admin',
+  password: 'password123',
+  requestDomain: 'https://my-chimney-domain.com'
+})
+```
+
+### searchContainer
+Searches for a container with a given name in a given domain exposing the `{requestDomain}/endpoints/{endpointID}/docker/containers/json` endpoint. The request is authenticated using the provided username and password by first creating an auth token and then issuing the request. The response is a list of containers in JSON format that match the given name.
+
+#### Parameters
+| Name | Type | Description | Default value |
+|---|---|---|---|
+| `wallet` | `ActiveWallet` | Active Wallet details | |
+| `domain` | `NetworkDomain` | Network domain for the request | |
+| `username` | `string` | Username to authenticate with | |
+| `password` | `string` | Password to authenticate with | |
+| `requestDomain` | `string` | Domain to issue the request to | |
+| `name` | `string` | Name of the container to search for | |
+
+#### Return Type
+List of containers matching the name
+```typescript
+Promise<Array<Record<string, any>>>
+```
+
+#### Example
+```typescript
+import { searchContainer } from '@zerochain/sdk'
+
+const containers = await searchContainer({
+  wallet: activeWallet,
+  domain: 'mainnet.zus.network',
+  username: 'admin',
+  password: 'password123',
+  requestDomain: 'https://my-chimney-domain.com',
+  name: 'my-container'
+})
+```
+
+### updateContainer
+
+Updates the given container ID with a new image ID in a given domain. The domain should expose the docker API endpoints under `{requestDomain}/endpoints/{endpointID}/docker`. The request should be authenticated with the given username and password, by first creating an auth token then issuing the request.
+
+#### Parameters
+| Name | Type | Description | Default value |
+|---|---|---|---|
+| `wallet` | `ActiveWallet` | Active Wallet details | |
+| `domain` | `NetworkDomain` | Network domain for the request | |
+| `username` | `string` | Username to authenticate with | |
+| `password` | `string` | Password to authenticate with | |
+| `requestDomain` | `string` | Domain to issue the request to | |
+| `containerID` | `string` | Container ID to update | |
+| `newImageID` | `string` | New Image ID to update the container with | |
+
+#### Return Type
+A map containing the response from the update operation.
+```typescript
+Promise<Record<string, any>>
+```
+
+#### Example
+```typescript
+import { updateContainer } from '@zerochain/sdk'
+
+const response = await updateContainer({
+  wallet: activeWallet,
+  domain: 'mainnet.zus.network',
+  username: 'admin',
+  password: 'password123',
+  requestDomain: 'https://my-chimney-domain.com',
+  containerID: 'my-container',
+  newImageID: 'new-image-id'
+})
+```

@@ -23,7 +23,7 @@ Initializes the bridge client.
 | Name | Type | Description | Default value |
 |---|---|---|---|
 | `domain` | `NetworkDomain` | Network domain for the bridge | |
-| `wallet` | `ActiveWallet` | Active wallet instance | |
+| `wallet` | `ActiveWallet` | Active wallet details | |
 | `ethereumAddress` | `string` | Ethereum address of the wallet owner | |
 | `bridgeAddress` | `string` | Address of the bridge contract on the Ethereum network | |
 | `authorizersAddress` | `string` | Address of the authorizers contract on the Ethereum network | |
@@ -63,7 +63,7 @@ Burns ZCN tokens.
 | Name | Type | Description | Default value |
 |---|---|---|---|
 | `domain` | `NetworkDomain` | Network domain for the transaction | |
-| `wallet` | `ActiveWallet` | Active wallet instance | |
+| `wallet` | `ActiveWallet` | Active wallet details | |
 | `amount` | `number` | Amount of ZCN tokens to burn | |
 
 #### Return Type
@@ -89,7 +89,7 @@ Mints ZCN tokens.
 | Name | Type | Description | Default value |
 |---|---|---|---|
 | `domain` | `NetworkDomain` | Network domain for the transaction | |
-| `wallet` | `ActiveWallet` | Active wallet instance | |
+| `wallet` | `ActiveWallet` | Active wallet details | |
 | `burnTxnHash` | `string` | Hash of the burn transaction | |
 | `timeout` | `number` | Timeout in seconds (deprecated) | |
 
@@ -120,7 +120,7 @@ Returns the *Mint WZCN Payload* for the given burn transaction hash.
 | Name | Type | Description | Default value |
 |---|---|---|---|
 | `domain` | `NetworkDomain` | Network domain for the transaction | |
-| `wallet` | `ActiveWallet` | Active wallet instance | |
+| `wallet` | `ActiveWallet` | Active wallet details | |
 | `burnTxnHash` | `string` | Hash of the burn transaction | |
 
 #### Return Type
@@ -160,7 +160,7 @@ Returns all processed ZCN burn tickets burned for a certain Ethereum address.
 | Name | Type | Description | Default value |
 |---|---|---|---|
 | `domain` | `NetworkDomain` | Network domain for the transaction | |
-| `wallet` | `ActiveWallet` | Active wallet instance | |
+| `wallet` | `ActiveWallet` | Active wallet details | |
 
 #### Return Type
 ```typescript
@@ -193,7 +193,7 @@ Performs gas amount estimation for the given Mint WZCN transaction.
 | Name | Type | Description | Default value |
 |---|---|---|---|
 | `domain` | `NetworkDomain` | Network domain for the transaction | |
-| `wallet` | `ActiveWallet` | Active wallet instance | |
+| `wallet` | `ActiveWallet` | Active wallet details | |
 | `from` | `string` | Address of the sender | |
 | `to` | `string` | Address of the receiver | |
 | `zcnTransaction` | `string` | Hash of the ZCN transaction | |
@@ -229,7 +229,7 @@ Performs gas amount estimation for the given burn WZCN transaction.
 | Name | Type | Description | Default value |
 |---|---|---|---|
 | `domain` | `NetworkDomain` | Network domain for the transaction | |
-| `wallet` | `ActiveWallet` | Active wallet instance | |
+| `wallet` | `ActiveWallet` | Active wallet details | |
 | `from` | `string` | Address of the sender | |
 | `to` | `string` | Address of the receiver | |
 | `amountTokens` | `string` | Amount of tokens to burn (as a string) | |
@@ -259,7 +259,7 @@ Performs gas estimation for the given transaction using Alchemy enhanced API, re
 | Name | Type | Description | Default value |
 |---|---|---|---|
 | `domain` | `NetworkDomain` | Network domain for the transaction | |
-| `wallet` | `ActiveWallet` | Active wallet instance | |
+| `wallet` | `ActiveWallet` | Active wallet details | |
 
 #### Return Type
 ```typescript

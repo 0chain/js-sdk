@@ -1,0 +1,161 @@
+---
+sidebar_position: 4
+---
+
+# Allocation Storage SDK Methods
+
+In this section, we will learn about all the available Allocation Storage methods provided by the SDK.
+
+## Prerequisites
+
+1. Initialize the SDK before using wallet methods. See the [Quick Start Guide](/docs/getting-started/quick-start) for details.
+2. All methods require a `wallet`. Refer to [`createWallet`](/docs/api/wallet#createwallet) for more information.
+3. All methods require a `domain` parameter, which is the network domain where your wallet and providers such as blobbers, sharders, miners, and validators are deployed. GoSDK will send requests to this domain.
+
+## Allocation Storage Methods
+
+The allocation storage methods allow you to create, update, and manage allocations.
+
+### createAllocation
+Creates an allocation with the specified allocation terms and preferred blobber IDs.
+
+#### Parameters
+| Name | Type | Description | Default value |
+|---|---|---|---|
+| `domain` | `NetworkDomain` | Network domain for the allocation | |
+| `wallet` | `ActiveWallet` | Active wallet details | |
+| `dataShards` | `number` | Number of data shards. Data uploaded to the allocation will be split and distributed across these shards. | |
+| `parityShards` | `number` | Number of parity shards. Parity shards are used to replicate data shards for redundancy. | |
+| `size` | `number` | Size of the allocation in bytes | |
+| `minReadPrice` | `number` | Minimum read price | |
+| `maxReadPrice` | `number` | Maximum read price | |
+| `minWritePrice` | `number` | Minimum write price | |
+| `maxWritePrice` | `number` | Maximum write price | |
+| `lock` | `number` | Lock value to add to the allocation | |
+| `blobberIds` | `string[]` | List of blobber IDs of your preferred blobbers for the allocation | `[]` |
+| `blobberAuthTickets` | `string[]` | List of blobber auth tickets in case of using restricted blobbers | |
+| `setThirdPartyExtendable` | `boolean` | Determines whether third-parties are allowed to update the allocation's size and expiration property. When `true`, third-parties (e.g., 0box) can modify the allocation. | |
+| `isEnterprise` | `boolean` | Whether it's an enterprise allocation | |
+| `force` | `boolean` | Determines whether the allocation creation should proceed even if the available blobbers are insufficient to meet the required data + parity conditions. Use with caution as it may reduce fault tolerance. | `false` |
+
+:::note
+To determine `minReadPrice`, `maxReadPrice`, `minWritePrice`, and `maxWritePrice`, use the `makeSCRestAPICall` SDK method to call the `/storage-config` endpoint of the sharder smart contract.
+:::
+
+:::warning
+The `force` parameter should be used with caution. Setting it to `true` may result in allocations with lower redundancy and reliability.
+:::
+
+#### Return Type
+```typescript
+Promise<Transaction>
+```
+
+#### Example
+```typescript
+import { createAllocation } from '@zerochain/sdk'
+
+const allocation = await createAllocation({
+  domain: 'mainnet.zus.network',
+  wallet: activeWallet,
+  dataShards: 4,
+  parityShards: 2,
+  size: 2147483648, // 2 GB
+  minReadPrice: 0,
+  maxReadPrice: 100,
+  minWritePrice: 0,
+  maxWritePrice: 100,
+  lock: 10,
+  blobberIds: ['blobber1', 'blobber2'],
+  blobberAuthTickets: ['ticket1', 'ticket2'],
+  setThirdPartyExtendable: true,
+  isEnterprise: false,
+  force: false
+})
+```
+
+### getAllocationMinLock
+Retrieves the minimum lock value for the allocation creation. The lock value is the amount of tokens that the client needs to lock in the allocation's write pool to be able to pay for the write operations.
+
+#### Parameters
+| Name | Type | Description |
+|---|---|---|
+| `domain` | `NetworkDomain` | Network domain for the allocation |
+| `wallet` | `ActiveWallet` | Active wallet details |
+| `dataShards` | `number` | Number of data shards |
+| `parityShards` | `number` | Number of parity shards |
+| `size` | `number` | Size of the allocation in bytes |
+| `maxWritePrice` | `number` | Maximum write price |
+
+:::note
+To determine `maxWritePrice`, use the `makeSCRestAPICall` SDK method to call the `/storage-config` endpoint of the sharder smart contract.
+:::
+
+#### Return Type
+```typescript
+Promise<number>
+```
+
+#### Example
+```typescript
+import { getAllocationMinLock } from '@zerochain/sdk'
+
+const minLock = await getAllocationMinLock({
+  domain: 'mainnet.zus.network',
+  wallet: activeWallet,
+  dataShards: 4,
+  parityShards: 2,
+  size: 2147483648, // 2 GB
+  maxWritePrice: 100
+})
+```
+
+### listAllocations
+Lists all the allocations.
+
+#### Parameters
+| Name | Type | Description | Default value |
+|---|---|---|---|
+| `domain` | `NetworkDomain` | Network domain for the allocations | |
+| `wallet` | `ActiveWallet` | Active wallet details | |
+
+#### Return Type
+```typescript
+Promise<Allocation[]>
+```
+
+#### Example
+```typescript
+import { listAllocations } from '@zerochain/sdk'
+
+const allocations = await listAllocations({
+  domain: 'mainnet.zus.network',
+  wallet: activeWallet
+})
+```
+
+### getAllocation
+Gets allocation details using `allocationId` from cache. If not found in cache, it fetches from the blockchain and stores in cache.
+
+#### Parameters
+| Name | Type | Description | Default value |
+|---|---|---|---|
+| `domain` | `NetworkDomain` | Network domain for the allocation | |
+| `wallet` | `ActiveWallet` | Active wallet details | |
+| `allocationId` | `string` | ID of the allocation to fetch | |
+
+#### Return Type
+```typescript
+Promise<Allocation>
+```
+
+#### Example
+```typescript
+import { getAllocation } from '@zerochain/sdk'
+
+const allocation = await getAllocation({
+  domain: 'mainnet.zus.network',
+  wallet: activeWallet,
+  allocationId: '8695f8af52cdfc1e66d879407a5278703579d31de7ce0e2cf1707fdec9cc14c3'
+})
+```

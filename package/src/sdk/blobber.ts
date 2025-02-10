@@ -517,6 +517,8 @@ export const getFileStats = async ({
   return fileStats
 }
 
+// TODO: improve docs details
+/** Updates the settings for a blobber. */
 export const updateBlobberSettings = async ({
   wallet,
   domain,

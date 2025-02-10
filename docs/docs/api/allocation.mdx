@@ -31,7 +31,7 @@ Creates an allocation with the specified allocation terms and preferred blobber 
 | `maxReadPrice` | `number` | Maximum read price | |
 | `minWritePrice` | `number` | Minimum write price | |
 | `maxWritePrice` | `number` | Maximum write price | |
-| `lock` | `number` | Lock value to add to the allocation | |
+| `lock` | `number` | Lock value to add to the allocation. Use `getAllocationMinLock` to calculate this value | |
 | `blobberIds` | `string[]` | List of blobber IDs of your preferred blobbers for the allocation | `[]` |
 | `blobberAuthTickets` | `string[]` | List of blobber auth tickets in case of using restricted blobbers | |
 | `setThirdPartyExtendable` | `boolean` | Determines whether third-parties are allowed to update the allocation's size and expiration property. When `true`, third-parties (e.g., 0box) can modify the allocation. | |
@@ -63,9 +63,9 @@ const allocation = await createAllocation({
   size: 2147483648, // 2 GB
   minReadPrice: 0,
   maxReadPrice: 100,
-  minWritePrice: 0,
+  minWritePrice: 0.001,
   maxWritePrice: 100,
-  lock: 10,
+  lock: minLock,
   blobberIds: ['blobber1', 'blobber2'],
   blobberAuthTickets: ['ticket1', 'ticket2'],
   setThirdPartyExtendable: true,
@@ -76,7 +76,7 @@ const allocation = await createAllocation({
 
 ### getAllocationMinLock
 Retrieves the minimum lock value for the allocation creation. The lock value is the amount of tokens that the client needs to lock in the allocation's write pool to be able to pay for the write operations.
-
+{/* is ZCN or SAS and update code docs too // DOTODO */}
 #### Parameters
 | Name | Type | Description |
 |---|---|---|
@@ -159,3 +159,546 @@ const allocation = await getAllocation({
   allocationId: '8695f8af52cdfc1e66d879407a5278703579d31de7ce0e2cf1707fdec9cc14c3'
 })
 ```
+
+### reloadAllocation
+Reloads allocation details using `allocationId` from the blockchain and updates the cache.
+
+#### Parameters
+| Name | Type | Description | Default value |
+|---|---|---|---|
+| `domain` | `NetworkDomain` | Network domain for the allocation | |
+| `wallet` | `ActiveWallet` | Active Wallet details | |
+| `allocationId` | `string` | ID of the allocation to reload | |
+
+#### Return Type
+```typescript
+Promise<Allocation>
+```
+
+#### Example
+```typescript
+import { reloadAllocation } from '@zerochain/sdk'
+
+const allocation = await reloadAllocation({
+  domain: 'mainnet.zus.network',
+  wallet: activeWallet,
+  allocationId: '8695f8af52cdfc1e66d879407a5278703579d31de7ce0e2cf1707fdec9cc14c3'
+})
+```
+
+### getAllocationWith
+Retrieves the information of a free allocation or a shared allocation given the auth ticket.
+
+- **Free allocation**: An allocation created for the user using the Vult app for the first time with no fees.
+- **Shared allocation**: An allocation that has shared files. The user accessing these files needs to read the allocation information using an auth ticket.
+
+#### Parameters
+| Name | Type | Description | Default value |
+|---|---|---|---|
+| `domain` | `NetworkDomain` | Network domain for the allocation | |
+| `wallet` | `ActiveWallet` | Active Wallet details | |
+| `authTicket` | `string` | Auth ticket, used by a non-owner to access shared files | |
+
+#### Return Type
+```typescript
+Promise<Allocation>
+```
+
+#### Example
+```typescript
+import { getAllocationWith } from '@zerochain/sdk'
+
+const allocation = await getAllocationWith({
+  domain: 'mainnet.zus.network',
+  wallet: activeWallet,
+  authTicket: sharedFilesAuthTicket
+})
+```
+
+### freezeAllocation
+Freezes one of the client's allocations, given its ID. Freezing the allocation will forbid all operations on the files in the allocation. Allocation will be read-only
+
+#### Parameters
+| Name | Type | Description | Default value |
+|---|---|---|---|
+| `domain` | `NetworkDomain` | Network domain for the allocation | |
+| `wallet` | `ActiveWallet` | Active Wallet details | |
+| `allocationId` | `string` | Allocation ID to freeze | |
+
+#### Return Type
+```typescript
+Promise<string>
+```
+
+#### Example
+```typescript
+import { freezeAllocation } from '@zerochain/sdk'
+
+const txnHash = await freezeAllocation({
+  domain: 'mainnet.zus.network',
+  wallet: activeWallet,
+  allocationId: '8695f8af52cdfc1e66d879407a5278703579d31de7ce0e2cf1707fdec9cc14c3'
+})
+```
+
+### cancelAllocation
+Cancels an allocation using `allocationId`.
+
+#### Parameters
+| Name | Type | Description | Default value |
+|---|---|---|---|
+| `domain` | `NetworkDomain` | Network domain for the allocation | |
+| `wallet` | `ActiveWallet` | Active wallet to authorize the cancellation | |
+| `allocationId` | `string` | Allocation ID to cancel | |
+
+#### Return Type
+```typescript
+Promise<string>
+```
+
+#### Example
+```typescript
+import { cancelAllocation } from '@zerochain/sdk'
+
+const txnHash = await cancelAllocation({
+  domain: 'mainnet.zus.network',
+  wallet: activeWallet,
+  allocationId: allocId
+})
+```
+
+### updateAllocation  
+Updates the allocation settings.
+
+#### Parameters  
+| Name | Type | Description | Default value |  
+|---|---|---|---|  
+| `domain` | `NetworkDomain` | Network domain for the allocation | |  
+| `wallet` | `ActiveWallet` | Active Wallet details | |  
+| `allocationId` | `string` | Allocation ID to update | |  
+| `size` | `number` | New size of the allocation in bytes | |  
+| `extend` | `boolean` | Whether to extend the allocation's expiration date. Use the same `extend` value as when calling [`getUpdateAllocationMinLock`](#getupdateallocationminlock) | |  
+| `lock` | `number` | Lock value to add to the allocation. Use [`getUpdateAllocationMinLock`](#getupdateallocationminlock) to calculate this value. | |
+| `addBlobberId` | `string` | Blobber ID to add to the allocation | `""` |  
+| `addBlobberAuthTicket` | `string` | Blobber auth ticket to add, in case of restricted blobbers | `""` |  
+| `removeBlobberId` | `string` | Blobber ID to remove from the allocation | `""` |  
+| `ownerSigningPublicKey` | `string` \| `undefined` | Optional ECDSA Public key of the user who created that allocation. It’s used for signature verification. If not provided, GoSDK will generate one | `""` |  
+| `setThirdPartyExtendable` | `boolean` | If true, a non-owner client can extend the allocation (in terms of size). When set to `true`, third-parties / a non-owner client (e.g., 0box) can update / modify the allocation | |  
+
+#### Returns  
+```ts  
+Promise<string>  
+```
+
+#### Example  
+```ts  
+const txnHash = await updateAllocation({  
+  domain,  
+  wallet,  
+  allocationId: allocationId,  
+  size: sizeOfChosenStoragePlan,  
+  extend: true,  
+  lock: zcnAmountOfStoragePlan,  
+  addBlobberId: addBlobberId,  
+  addBlobberAuthTicket: addBlobberAuthTicket,
+  removeBlobberId: removeBlobberId,
+  setThirdPartyExtendable: false,  
+})  
+```
+
+### updateAllocationWithRepair
+Updates your allocation settings and repairs the allocation if any blobber was replaced or added to the allocation.
+#### Parameters
+| Name | Type | Description | Default value |
+|---|---|---|---|
+| `domain` | `NetworkDomain` | Network domain for the allocation | |
+| `wallet` | `ActiveWallet` | Active Wallet details | |
+| `allocationId` | `string` | Allocation ID to update | |
+| `size` | `number` | New size of the allocation in bytes | |
+| `extend` | `boolean` | Extend flag, whether to extend the allocation's expiration date. Use the same `extend` value as when calling [`getUpdateAllocationMinLock`](#getupdateallocationminlock) | `false` |
+| `lock` | `number` | Lock value to add to the allocation. Use [`getUpdateAllocationMinLock`](#getupdateallocationminlock) to calculate this value. | |
+| `addBlobberId` | `string` | Blobber ID to add to the allocation | `""` |
+| `addBlobberAuthTicket` | `string` | Blobber auth ticket to add to the allocation, in case of restricted blobbers | `""` |
+| `removeBlobberId` | `string` | Blobber ID to remove from the allocation | `""` |
+| `ownerSigningPublicKey` | `string` | Optional ECDSA Public key of the user who created the allocation. Used for signature verification. If not provided, GoSDK will generate one. | `""` |
+| `updateAllocTicket` | `string` | Optional update allocation ticket. Refer to [`getUpdateAllocTicket`](#getupdateallocticket) | `""` |
+| `callback` | `(totalBytes: number, completedBytes: number, fileName: string, blobURL: string, error: string) => void` | Callback function invoked with repair progress updates | |
+{/* verify `updateAllocTicket` and update code docs too // DOTODO: https://0chain.slack.com/archives/G01EXH6EYC9/p1739211149256589?thread_ts=1739207987.312999&cid=G01EXH6EYC9 */}
+
+#### Return Type
+```typescript
+Promise<string>
+```
+
+#### Callback Parameters
+| Name | Type | Description |
+|---|---|---|
+| `totalBytes` | `number` | Total bytes to repair |
+| `completedBytes` | `number` | Bytes repaired so far |
+| `fileName` | `string` | Name of the file being repaired |
+| `blobURL` | `string` | URL of the blobber being used for repair |
+| `error` | `string` | Error message, if any |
+
+#### Example
+```typescript
+import { updateAllocationWithRepair } from '@zerochain/sdk'
+
+const txnHash = await updateAllocationWithRepair({
+  domain: 'mainnet.zus.network',
+  wallet: activeWallet,
+  allocationId: '8695f8af52cdfc1e66d879407a5278703579d31de7ce0e2cf1707fdec9cc14c3',
+  size: desiredSize,
+  extend: shouldExtendExpiry,
+  lock: minLock,
+  addBlobberId: addBlobberId,
+  addBlobberAuthTicket: addBlobberAuthTicket,
+  removeBlobberId: removeBlobberId,
+  updateAllocTicket: updateAllocTicket,
+  callback: (totalBytes, completedBytes, fileName, blobURL, error) => {
+    console.log(`Repair progress: ${completedBytes}/${totalBytes} bytes`);
+    if (error) {
+      console.error(`Error: ${error}`);
+    }
+  }
+})
+```
+
+### getUpdateAllocationMinLock
+Retrieves the minimum lock value for the allocation after an update, as calculated by the network based on the update parameters. The lock value is the amount of tokens that the client needs to lock in the allocation's write pool to be able to pay for the write operations.
+{/* ZCN or SAS and update code docs too // DOTODO: https://0chain.slack.com/archives/D06680GNC49/p1739211606792009  */}
+#### Parameters
+| Name | Type | Description | Default value |
+|---|---|---|---|
+| `domain` | `NetworkDomain` | Network domain for the allocation | |
+| `wallet` | `ActiveWallet` | Active Wallet details | |
+| `allocationId` | `string` | Allocation ID to update | |
+| `size` | `number` | New size of the allocation in bytes | |
+| `extend` | `boolean` | Extend flag, whether to extend the allocation's expiration date | |
+| `addBlobberId` | `string` | Blobber ID to add to the allocation | |
+| `removeBlobberId` | `string` | Blobber ID to remove from the allocation | |
+
+#### Return Type
+```typescript
+Promise<number>
+```
+
+#### Example
+```typescript
+import { getUpdateAllocationMinLock } from '@zerochain/sdk'
+
+const minLock = await getUpdateAllocationMinLock({
+  domain: 'mainnet.zus.network',
+  wallet: activeWallet,
+  allocationId: '8695f8af52cdfc1e66d879407a5278703579d31de7ce0e2cf1707fdec9cc14c3',
+  size: 2147483648, // 2 GB
+  extend: shouldExtendExpiry,
+  addBlobberId: 'blobber1',
+  removeBlobberId: 'blobber2'
+})
+```
+
+### updateForbidAllocation
+Updates the permissions of an allocation.
+
+#### Parameters
+| Name | Type | Description | Default value |
+|---|---|---|---|
+| `wallet` | `ActiveWallet` | Active Wallet details | |
+| `domain` | `NetworkDomain` | Network domain for the allocation | |
+| `allocationId` | `string` | Allocation ID to update | |
+| `forbidUpload` | `boolean` | If `true`, uploading files to the allocation is forbidden | |
+| `forbidDelete` | `boolean` | If `true`, deleting files from the allocation is forbidden | |
+| `forbidUpdate` | `boolean` | If `true`, updating files in the allocation is forbidden | |
+| `forbidMove` | `boolean` | If `true`, moving files in the allocation is forbidden | |
+| `forbidCopy` | `boolean` | If `true`, copying files in the allocation is forbidden | |
+| `forbidRename` | `boolean` | If `true`, renaming files in the allocation is forbidden | |
+
+#### Return Type
+```typescript
+Promise<string>
+```
+
+#### Example
+```typescript
+import { updateForbidAllocation } from '@zerochain/sdk'
+
+const txnHash = await updateForbidAllocation({
+  wallet: activeWallet,
+  domain: 'mainnet.zus.network',
+  allocationId: '8695f8af52cdfc1e66d879407a5278703579d31de7ce0e2cf1707fdec9cc14c3',
+  forbidUpload: true,
+  forbidDelete: false,
+  forbidUpdate: false,
+  forbidMove: true,
+  forbidCopy: false,
+  forbidRename: true
+})
+```
+
+### getUpdateAllocTicket
+Signs an "Update Allocation ticket," which is needed to allow someone else to run an update transaction for your allocation on your terms.
+{/* Get details of params and update code docs too // DOTODO: https://0chain.slack.com/archives/D06680GNC49/p1739215304759299 */}
+#### Parameters
+| Name | Type | Description | Default value |
+|---|---|---|---|
+| `domain` | `NetworkDomain` | Network domain for the allocation | |
+| `wallet` | `ActiveWallet` | Active Wallet details | |
+| `allocationId` | `string` | Allocation ID to update | |
+| `userId` | `string` | Wallet ID of the user updating the allocation. | |
+| `operationType` | `string` | Type of operation | |
+| `roundExpiry` | `number` | Expiry round for the ticket | |
+
+#### Return Type
+```typescript
+Promise<string>
+```
+
+#### Example
+```typescript
+import { getUpdateAllocTicket } from '@zerochain/sdk'
+
+const authTicket = await getUpdateAllocTicket({
+  domain: 'mainnet.zus.network',
+  wallet: activeWallet,
+  allocationId: '8695f8af52cdfc1e66d879407a5278703579d31de7ce0e2cf1707fdec9cc14c3',
+  userId: actorWalletId,
+  operationType: 'add_blobber',
+  roundExpiry: 1000
+})
+```
+
+### transferAllocation
+Transfers the ownership of an allocation to a new owner.
+{/* verify and update code docs too // DOTODO: https://0chain.slack.com/archives/D06680GNC49/p1739216420958469 */}
+#### Parameters
+| Name | Type | Description | Default value |
+|---|---|---|---|
+| `domain` | `NetworkDomain` | Network domain for the allocation | |
+| `wallet` | `ActiveWallet` | Active Wallet details | |
+| `allocationId` | `string` | Allocation ID to transfer | |
+| `newOwnerId` | `string` | New owner's wallet ID | |
+| `newOwnerPublicKey` | `string` | New owner's wallet public key | |
+
+#### Return Type
+```typescript
+Promise<void>
+```
+
+#### Example
+```typescript
+import { transferAllocation } from '@zerochain/sdk'
+
+await transferAllocation({
+  domain: 'mainnet.zus.network',
+  wallet: activeWallet,
+  allocationId: '8695f8af52cdfc1e66d879407a5278703579d31de7ce0e2cf1707fdec9cc14c3',
+  newOwnerId: walledIdOfNewOwner,
+  newOwnerPublicKey: walletPublicKeyOfNewOwner
+})
+```
+
+### checkAllocStatus
+Checks the health status of the allocation.
+
+#### Parameters
+| Name | Type | Description | Default value |
+|---|---|---|---|
+| `wallet` | `ActiveWallet` | Active Wallet details | |
+| `domain` | `NetworkDomain` | Network domain for the allocation | |
+| `allocationId` | `string` | ID of the allocation to check the health status for. | |
+
+#### Return Type
+```typescript
+Promise<AllocStatus>
+```
+
+#### AllocStatus Type
+```typescript
+type AllocStatus = {
+  /**
+   * The health `status` of the allocation has one of the following values:
+   * - `ok`: The allocation is healthy and fully functional.
+   * - `repair`: The allocation needs to be repaired. Repair using the `repairAllocation` method.
+   * - `broken`: The allocation is broken (missing data blocks) and it cannot be repaired anymore.
+   */
+  status: 'ok' | 'repair' | 'broken'
+  blobberStatus: {
+    ID: string
+    Status: 'available' | 'unavailable'
+  }[]
+  error: string
+}
+```
+
+#### Example
+```typescript
+import { checkAllocStatus } from '@zerochain/sdk'
+
+const allocStatus = await checkAllocStatus({
+  wallet: activeWallet,
+  domain: 'mainnet.zus.network',
+  allocationId: '8695f8af52cdfc1e66d879407a5278703579d31de7ce0e2cf1707fdec9cc14c3'
+})
+
+console.log(allocStatus.status); // 'ok', 'repair', or 'broken'
+```
+
+### skipStatusCheck
+Skips the health status check of the allocation.
+
+#### Parameters
+| Name | Type | Description | Default value |
+|---|---|---|---|
+| `wallet` | `ActiveWallet` | Active Wallet details | |
+| `domain` | `NetworkDomain` | Network domain for the allocation | |
+| `allocationId` | `string` | Allocation ID to skip status check for | |
+| `checkStatus` | `boolean` | Flag to enable or disable status check | |
+
+#### Return Type
+```typescript
+Promise<void>
+```
+
+#### Example
+```typescript
+import { skipStatusCheck } from '@zerochain/sdk'
+
+await skipStatusCheck({
+  wallet: activeWallet,
+  domain: 'mainnet.zus.network',
+  allocationId: '8695f8af52cdfc1e66d879407a5278703579d31de7ce0e2cf1707fdec9cc14c3',
+  checkStatus: false // Disable status check
+})
+```
+
+### repairAllocation
+Repairs the allocation by re-uploading missing blocks to its blobbers. Allocation repair is a process to ensure the integrity and availability of files in the allocation.
+
+#### Parameters
+| Name | Type | Description | Default value |
+|---|---|---|---|
+| `wallet` | `ActiveWallet` | Active Wallet details | |
+| `domain` | `NetworkDomain` | Network domain for the allocation | |
+| `allocationId` | `string` | Allocation ID to repair | |
+| `callback` | `(totalBytes: number, completedBytes: number, fileName: string, blobURL: string, error: string) => void` | Callback function invoked with repair progress updates | |
+
+#### Callback Parameters
+| Name | Type | Description |
+|---|---|---|
+| `totalBytes` | `number` | Total bytes to repair |
+| `completedBytes` | `number` | Bytes repaired so far |
+| `fileName` | `string` | Name of the file being repaired |
+| `blobURL` | `string` | URL of the blobber being used for repair |
+| `error` | `string` | Error message, if any |
+
+#### Return Type
+```typescript
+Promise<void>
+```
+
+#### Example
+```typescript
+import { repairAllocation } from '@zerochain/sdk'
+
+await repairAllocation({
+  wallet: activeWallet,
+  domain: 'mainnet.zus.network',
+  allocationId: '8695f8af52cdfc1e66d879407a5278703579d31de7ce0e2cf1707fdec9cc14c3',
+  callback: (totalBytes, completedBytes, fileName, blobURL, error) => {
+    console.log(`Repair progress: ${completedBytes}/${totalBytes} bytes`);
+    if (error) {
+      console.error(`Error: ${error}`);
+    }
+  }
+})
+```
+
+### repairSize
+Retrieves the repair size for a specific path in an allocation. The repair size is the size of the data that needs to be repaired in the blobbers of the allocation.
+
+#### Parameters
+| Name | Type | Description | Default value |
+|---|---|---|---|
+| `domain` | `NetworkDomain` | Network domain for the allocation | |
+| `wallet` | `ActiveWallet` | Active Wallet details | |
+| `allocationId` | `string` | Allocation ID to check | |
+| `remotePath` | `string` | Path in the allocation to check for repair size | |
+
+#### Return Type
+```typescript
+Promise<{ upload_size: number; download_size: number }>
+```
+
+#### Example
+```typescript
+import { repairSize } from '@zerochain/sdk'
+
+const repairSizes = await repairSize({
+  domain: 'mainnet.zus.network',
+  wallet: activeWallet,
+  allocationId: '8695f8af52cdfc1e66d879407a5278703579d31de7ce0e2cf1707fdec9cc14c3',
+  remotePath: '/my-folder'
+})
+
+console.log(`Upload size: ${repairSizes.upload_size}, Download size: ${repairSizes.download_size}`);
+```
+
+### createWorkers
+Used to manually create local upload workers for an allocation. These workers are used to handle operations for the allocation. Terminate workers if the allocation is no longer needed using [`terminateWorkers`](#terminateworkers).
+
+#### Parameters
+| Name | Type | Description | Default value |
+|---|---|---|---|
+| `wallet` | `ActiveWallet` | Active Wallet details | |
+| `domain` | `NetworkDomain` | Network domain for the allocation | |
+| `allocationId` | `string` | Allocation ID to create workers for | |
+
+#### Return Type
+```typescript
+Promise<void>
+```
+
+#### Example
+```typescript
+import { createWorkers } from '@zerochain/sdk'
+
+await createWorkers({
+  wallet: activeWallet,
+  domain: 'mainnet.zus.network',
+  allocationId: '8695f8af52cdfc1e66d879407a5278703579d31de7ce0e2cf1707fdec9cc14c3'
+})
+```
+
+:::note
+Ensure to terminate workers using [`terminateWorkers`](#terminateworkers) when the allocation is no longer needed to free up resources.
+:::
+
+### terminateWorkers
+Removes local upload workers for a particular allocation. This is useful when switching between allocations and workers for the old allocation are no longer needed.
+
+#### Parameters
+| Name | Type | Description | Default value |
+|---|---|---|---|
+| `wallet` | `ActiveWallet` | Active Wallet details | |
+| `domain` | `NetworkDomain` | Network domain for the allocation | |
+| `allocationId` | `string` | Allocation ID to terminate workers for | |
+
+#### Return Type
+```typescript
+Promise<void>
+```
+
+#### Example
+```typescript
+import { terminateWorkers } from '@zerochain/sdk'
+
+await terminateWorkers({
+  wallet: activeWallet,
+  domain: 'mainnet.zus.network',
+  allocationId: '8695f8af52cdfc1e66d879407a5278703579d31de7ce0e2cf1707fdec9cc14c3'
+})
+```
+
+:::note
+Use this method to free up resources when switching between allocations when the previously active allocation is no longer needed.
+:::

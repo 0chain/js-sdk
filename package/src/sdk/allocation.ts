@@ -1,4 +1,4 @@
-// TODO: not used in webapps: updateAllocationWithRepair, getUpdateAllocAuthTicket (getUpdateAllocTicket), collectRewards, getStakePoolInfo, lockStakePool, unlockStakePool (not used anywhere:- getAllocationBlobbers, getBlobberIds, reloadAllocation, getStakePoolInfo. lockWritePool, allocationRepair, repairSize)
+// TODO: not used in webapps: updateAllocationWithRepair, getUpdateAllocTicket, collectRewards, getStakePoolInfo, lockStakePool, unlockStakePool (not used anywhere:- getAllocationBlobbers, getBlobberIds, reloadAllocation, getStakePoolInfo. lockWritePool, allocationRepair, repairSize)
 import {
   getProviderTypeId,
   type StakePoolInfo,
@@ -94,9 +94,9 @@ export const createAllocation = async ({
   return transactionData
 }
 
-/** 
+/**
  * Retrieves list of blobber IDs of blobber which match your allocation terms
- * 
+ *
  * To determine `minReadPrice`, `maxReadPrice`, `minWritePrice`, and `maxWritePrice`, use the `makeSCRestAPICall` SDK method to call the `/storage-config` endpoint of the sharder smart contract.
  */
 export const getAllocationBlobbers = async ({
@@ -280,31 +280,35 @@ export const updateAllocation = async ({
   size,
   extend,
   lock,
-  addBlobberId,
-  addBlobberAuthTicket,
-  removeBlobberId,
-  ownerSigningPublicKey,
+  addBlobberId = '',
+  addBlobberAuthTicket = '',
+  removeBlobberId = '',
+  ownerSigningPublicKey = '',
   setThirdPartyExtendable,
 }: {
   domain: NetworkDomain
   wallet: ActiveWallet
   /** Allocation ID to update */
   allocationId: string
-  /** New size of the allocation */
+  /** New size of the allocation in bytes */
   size: number
   /** Extend flag, whether to extend the allocation's expiration date */
   extend: boolean
   /** Lock value to add to the allocation */
   lock: number
   /** Blobber ID to add to the allocation */
-  addBlobberId: string
+  addBlobberId?: string
   /** Blobber auth ticket to add to the allocation, in case of restricted blobbers */
-  addBlobberAuthTicket: string
+  addBlobberAuthTicket?: string
   /** Blobber ID to remove from the allocation */
-  removeBlobberId: string
-  /** Owner ECDSA public key */
+  removeBlobberId?: string
+  /** Optional ECDSA Public key of the user who created that allocation. It’s used for signature verification. If not provided, GoSDK will generate one  */
   ownerSigningPublicKey?: string
-  /** Third party extendable flag, if true, the allocation can be extended (in terms of size) by a non-owner client */
+  /**
+   * setThirdPartyExtendable is a flag that determines whether third-parties are allowed to update the allocation's size and expiration property.
+   *
+   * When set to `true`, third-parties / a non-owner client (e.g., 0box) can update or modify the allocation
+   */
   setThirdPartyExtendable: boolean
 }): Promise<string> => {
   const goWasm = await getWasm({ domain, wallet })
@@ -322,40 +326,44 @@ export const updateAllocation = async ({
   return txnHash
 }
 
+/** Updates your allocation settings and repairs the allocation if any blobber was replaced or added to the allocation  */
 export const updateAllocationWithRepair = async ({
   wallet,
   domain,
   allocationId,
   size,
-  extend,
+  extend = false,
   lock,
-  addBlobberId,
-  addBlobberAuthTicket,
-  removeBlobberId,
-  ownerSigningPublicKey,
-  updateAllocTicket,
+  addBlobberId = '',
+  addBlobberAuthTicket = '',
+  removeBlobberId = '',
+  ownerSigningPublicKey = '',
+  updateAllocTicket = '',
   callback,
 }: {
   domain: NetworkDomain
   wallet: ActiveWallet
   /** Allocation ID to update */
   allocationId: string
-  /** New size of the allocation */
+  /** New size of the allocation in bytes */
   size: number
-  /** Extend flag, whether to extend the allocation's expiration date */
+  /**
+   * Extend flag, whether to extend the allocation's expiration date
+   * @default false
+   */
   extend: boolean
   /** Lock value to add to the allocation */
   lock: number
   /** Blobber ID to add to the allocation */
-  addBlobberId: string
+  addBlobberId?: string
   /** Blobber auth ticket to add to the allocation, in case of restricted blobbers */
-  addBlobberAuthTicket: string
+  addBlobberAuthTicket?: string
   /** Blobber ID to remove from the allocation */
-  removeBlobberId: string
-  /** Owner ECDSA public key */
-  ownerSigningPublicKey: string
+  removeBlobberId?: string
+  /** Optional ECDSA Public key of the user who created that allocation. It’s used for signature verification. If not provided, GoSDK will generate one  */
+  ownerSigningPublicKey?: string
   /** Update allocation ticket */
-  updateAllocTicket: string
+  updateAllocTicket?: string
   /** Callback function will be invoked with repair progress updates */
   callback?: (
     totalBytes: number,
@@ -393,14 +401,14 @@ export const updateAllocationWithRepair = async ({
   }
 }
 
-/** 
+/**
  * getAllocationMinLock retrieves the minimum lock value for the allocation creation
  *
  * Lock value is the amount of tokens that the client needs to lock in the allocation's write pool to be able to pay for the write operations.
- * 
+ *
  * To determine `maxWritePrice`, use the `makeSCRestAPICall` SDK method to call the `/storage-config` endpoint of the sharder smart contract.
  *
- * @returns the minimum lock value (in SAS)
+ * @returns the minimum lock value (in ZCN)
  */
 export const getAllocationMinLock = async ({
   domain,
@@ -436,7 +444,7 @@ export const getAllocationMinLock = async ({
  *
  * Lock value is the amount of tokens that the client needs to lock in the allocation's write pool to be able to pay for the write operations.
  *
- * @returns the minimum lock value
+ * @returns the minimum lock value (in ZCN)
  */
 export const getUpdateAllocationMinLock = async ({
   domain,
@@ -456,9 +464,9 @@ export const getUpdateAllocationMinLock = async ({
   /** Extend flag, whether to extend the allocation's expiration date */
   extend: boolean
   /** Blobber ID to add to the allocation */
-  addBlobberId: string
+  addBlobberId?: string
   /** Blobber ID to remove from the allocation */
-  removeBlobberId: string
+  removeBlobberId?: string
 }): Promise<number> => {
   const goWasm = await getWasm({ domain, wallet })
   const minLockDemand = await goWasm.sdk.getUpdateAllocationMinLock(
@@ -472,7 +480,7 @@ export const getUpdateAllocationMinLock = async ({
 }
 
 /**
- * UpdateForbidAllocation updates the permissions of an allocation, given the permission parameters in a forbid-first manner.
+ * UpdateForbidAllocation updates the permissions of an allocation.
  *
  * @returns The transaction hash
  */
@@ -554,9 +562,9 @@ export const createFreeAllocation = async ({
 }
 
 /**
- * This method is used to sign an "Update Allocation Authticket". This ticket is needed to allow someone else to run update transaction for your allocation on your terms.
+ * This method is used to sign an "Update Allocation ticket". This ticket is needed to allow someone else to run update transaction for your allocation on your terms.
  */
-export const getUpdateAllocAuthTicket = async ({
+export const getUpdateAllocTicket = async ({
   domain,
   wallet,
   allocationId,
@@ -909,7 +917,7 @@ export const skipStatusCheck = async ({
   return goWasm.sdk.skipStatusCheck(allocationId, checkStatus)
 }
 
-/** Remove local workers that sync with the allocation. This is useful when switching between allocations. */
+/** Remove local workers for a particular allocation. This is useful when switching between allocations and we don't need workers for the old allocation. */
 export const terminateWorkers = async ({
   wallet,
   domain,
@@ -923,7 +931,7 @@ export const terminateWorkers = async ({
   return goWasm.sdk.terminateWorkers(allocationId)
 }
 
-/** Create local workers that sync with the allocation. */
+/** Create local workers for an allocation. Terminate workers if the allocation is no longer needed using `terminateWorkers`. */
 export const createWorkers = async ({
   wallet,
   domain,

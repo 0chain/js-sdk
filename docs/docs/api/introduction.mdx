@@ -58,10 +58,10 @@ The allocation storage methods allow you to create, update, and manage allocatio
 | `freezeAllocation` | Freeze an allocation so that the allocation data can no longer be modified. |
 | `cancelAllocation` | Cancel an Allocation |
 | `updateAllocation` | Update the allocation settings |
-| `updateAllocationWithRepair` | Update the allocation settings with repair | {/* // DOTODO */}
-| `updateForbidAllocation` | UpdateForbidAllocation updates the permissions of an allocation, given the permission parameters in a forbid-first manner. |
+| `updateAllocationWithRepair` | Updates your allocation settings and repairs the allocation if any blobber was replaced or added |
 | `getUpdateAllocationMinLock` | Retrieves the minimum lock value for the allocation after update. |
-| `getUpdateAllocAuthTicket` | This method is used to sign an "Update Allocation Authticket". This ticket is needed to allow someone else to run update transaction for your allocation on your terms. |
+| `updateForbidAllocation` | UpdateForbidAllocation updates the permissions of an allocation, given the permission parameters in a forbid-first manner. |
+| `getUpdateAllocTicket` | This method is used to sign an "Update Allocation ticket". This ticket is needed to allow someone else to run update transaction for your allocation on your terms. |
 | `transferAllocation` | Transfer the ownership of an allocation to a new owner |
 | `checkAllocStatus` | Check the health status of the allocation.|
 | `skipStatusCheck` | Skips the `checkAlloctionStatus` health status check of the allocation. |

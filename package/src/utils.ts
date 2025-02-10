@@ -40,11 +40,61 @@ export const sasTokenToZcn = (token = 0): number => {
   return parseFloat(String(zcn))
 }
 
-/** 
- * Converts ZCN to SAS token 
+/**
+ * Converts ZCN to SAS token
  * Note: SAS can never be a float number
-*/
+ */
 export const zcnToSasToken = (zcn = 0): number => {
   const sasToken = zcn * Math.pow(10, 10)
   return parseInt(String(sasToken))
 }
+
+type DecodedAuthTicket = {
+  fileName?: string
+  walletId?: string
+  lookupHash?: string
+  referenceType?: string
+  allocationId?: string
+  isEncrypted?: boolean
+}
+/** decodeAuthTicket decodes the Authticket */
+export const decodeAuthTicket = (authTicket: string): DecodedAuthTicket => {
+  if (!authTicket) return {}
+  try {
+    const file = JSON.parse(decodeURIComponent(escape(atob(authTicket))))
+    return {
+      fileName: file.file_name,
+      walletId: file.owner_id || file.client_id,
+      lookupHash: file.file_path_hash,
+      referenceType: file.reference_type,
+      allocationId: file.allocation_id,
+      isEncrypted: file.encrypted,
+    }
+  } catch (e) {
+    console.error('Failed decoding authticket ', e)
+    return {}
+  }
+}
+
+// type AuthToken = {
+//   recipient_public_key: string
+//   marker: string
+//   tokens: number
+// }
+// /** 
+//  * decodeAuthTicket decodes the auth ticket and returns the recipient public key and the tokens
+//  * @deprecated 
+//  */
+// export const decodeAuthTicket = async ({
+//   domain,
+//   wallet,
+//   authTicket,
+// }: {
+//   domain: NetworkDomain
+//   wallet: ActiveWallet
+//   authTicket: string
+// }): Promise<AuthToken> => {
+//   const goWasm = await getWasm({ domain, wallet })
+//   const resp = await goWasm.sdk.decodeAuthTicket(authTicket)
+//   return resp
+// }

@@ -479,11 +479,6 @@ Transfers the ownership of an allocation to a new owner.
 | `newOwnerId` | `string` | New owner's wallet ID | |
 | `newOwnerPublicKey` | `string` | New owner's wallet public key | |
 
-#### Return Type
-```typescript
-Promise<void>
-```
-
 #### Example
 ```typescript
 import { transferAllocation } from '@zerochain/sdk'
@@ -554,11 +549,6 @@ Skips the health status check of the allocation.
 | `allocationId` | `string` | Allocation ID to skip status check for | |
 | `checkStatus` | `boolean` | Flag to enable or disable status check | |
 
-#### Return Type
-```typescript
-Promise<void>
-```
-
 #### Example
 ```typescript
 import { skipStatusCheck } from '@zerochain/sdk'
@@ -590,11 +580,6 @@ Repairs the allocation by re-uploading missing blocks to its blobbers. Allocatio
 | `fileName` | `string` | Name of the file being repaired |
 | `blobURL` | `string` | URL of the blobber being used for repair |
 | `error` | `string` | Error message, if any |
-
-#### Return Type
-```typescript
-Promise<void>
-```
 
 #### Example
 ```typescript
@@ -653,11 +638,6 @@ Used to manually create local upload workers for an allocation. These workers ar
 | `domain` | `NetworkDomain` | Network domain for the allocation | |
 | `allocationId` | `string` | Allocation ID to create workers for | |
 
-#### Return Type
-```typescript
-Promise<void>
-```
-
 #### Example
 ```typescript
 import { createWorkers } from '@zerochain/sdk'
@@ -682,11 +662,6 @@ Removes local upload workers for a particular allocation. This is useful when sw
 | `wallet` | `ActiveWallet` | Active Wallet details | |
 | `domain` | `NetworkDomain` | Network domain for the allocation | |
 | `allocationId` | `string` | Allocation ID to terminate workers for | |
-
-#### Return Type
-```typescript
-Promise<void>
-```
 
 #### Example
 ```typescript

@@ -1,0 +1,705 @@
+---
+sidebar_position: 6
+---
+
+# File Operations SDK Methods
+
+In this section, we will learn about all the available File Operations methods provided by the SDK.
+
+## Prerequisites
+
+1. Initialize the SDK before using wallet methods. See the [Quick Start Guide](/docs/getting-started/quick-start) for details.
+2. All methods require a `wallet`. Refer to [`createWallet`](/docs/api/wallet#createwallet) for more information.
+3. All methods require a `domain` parameter, which is the network domain where your wallet and providers such as blobbers, sharders, miners, and validators are deployed. GoSDK will send requests to this domain.
+
+## File Operations Methods
+
+The file operation methods allow you to perform various operations on files.
+
+### getLookupHash
+Retrieves the lookup hash for a specific file path in an allocation. The lookup hash is used to uniquely identify a file in the allocation.
+
+#### Parameters
+| Name | Type | Description | Default value |
+|---|---|---|---|
+| `domain` | `NetworkDomain` | Network domain for the allocation | |
+| `allocationId` | `string` | Allocation ID to check | |
+| `filePath` | `string` | Path of the file in the allocation | |
+| `wallet` | `ActiveWallet` | Active Wallet details | |
+
+#### Return Type
+```typescript
+Promise<string>
+```
+
+#### Example
+```typescript
+import { getLookupHash } from '@zerochain/sdk'
+
+const lookupHash = await getLookupHash({
+  domain: 'mainnet.zus.network',
+  allocationId: '8695f8af52cdfc1e66d879407a5278703579d31de7ce0e2cf1707fdec9cc14c3',
+  filePath: '/my-folder/my-file.txt',
+  wallet: activeWallet
+})
+```
+
+### createDir
+Creates a directory on blobbers at the specified remote path.
+
+#### Parameters
+| Name | Type | Description | Default value |
+|---|---|---|---|
+| `domain` | `NetworkDomain` | Network domain for the allocation | |
+| `wallet` | `ActiveWallet` | Active Wallet details | |
+| `allocationId` | `string` | Allocation ID where the directory will be created | |
+| `remotePath` | `string` | The remote path where the directory will be created | |
+
+#### Example
+```typescript
+import { createDir } from '@zerochain/sdk'
+
+await createDir({
+  domain: 'mainnet.zus.network',
+  wallet: activeWallet,
+  allocationId: '8695f8af52cdfc1e66d879407a5278703579d31de7ce0e2cf1707fdec9cc14c3',
+  remotePath: '/my-folder/new-directory'
+})
+```
+
+### setUploadMode
+Sets the upload mode to modify the upload speed and CPU usage. The upload mode determines the trade-off between upload speed and resource consumption.
+
+#### Parameters
+| Name | Type | Description | Default value |
+|---|---|---|---|
+| `domain` | `NetworkDomain` | Network domain for the upload | |
+| `wallet` | `ActiveWallet` | Active Wallet details | |
+| `mode` | `0 \| 1 \| 2` | Upload mode:<br/>- `0`: Low (slow uploads, consumes less CPU & memory)<br/>- `1`: Medium (default)<br/>- `2`: High (high-speed uploads, consumes more CPU & memory) | `1` |
+
+
+#### Example
+```typescript
+import { setUploadMode } from '@zerochain/sdk'
+
+await setUploadMode({
+  domain: 'mainnet.zus.network',
+  wallet: activeWallet,
+  mode: 2 // High speed uploads, but will consume more CPU & memory
+})
+```
+
+### multiUpload
+Uploads multiple files in a batch. This method can also be used to resume a paused upload.
+
+:::warning
+Keep the batch size under 50 files for optimal performance.
+:::
+
+#### Parameters
+| Name | Type | Description | Default value |
+|---|---|---|---|
+| `domain` | `NetworkDomain` | Network domain for the upload | |
+| `wallet` | `ActiveWallet` | Active Wallet details | |
+| `bulkUploadOptions` | `BulkUploadOption[]` | Array of upload options for each file | |
+
+#### BulkUploadOption Type
+```typescript
+type BulkUploadOption = {
+  allocationId: string
+  webstreaming: boolean
+  isUpdate: boolean
+  isRepair: boolean
+  /** Number of blocks to upload per request */
+  numBlocks: number
+  file: File
+  remotePath: string
+  /** Whether to encrypt the file */
+  encrypt: boolean
+  thumbnailBytes: number[]
+  /** Callback function will be invoked with progress updates */
+  callback?: (
+    totalBytes: number,
+    completedBytes: number,
+    fileName: string,
+    blobURL: string,
+    error: string
+  ) => void
+}
+```
+
+#### Callback Parameters
+| Name | Type | Description |
+|---|---|---|
+| `totalBytes` | `number` | Total bytes to upload |
+| `completedBytes` | `number` | Bytes uploaded so far |
+| `fileName` | `string` | Name of the file being uploaded |
+| `blobURL` | `string` | URL of the blobber being used for upload |
+| `error` | `string` | Error message, if any |
+
+#### Return Type
+```typescript
+Promise<{ success?: boolean; error?: string }>
+```
+
+#### Example
+```typescript
+import { multiUpload } from '@zerochain/sdk'
+
+const result = await multiUpload({
+  domain: 'mainnet.zus.network',
+  wallet: activeWallet,
+  bulkUploadOptions: [
+    {
+      allocationId: '8695f8af52cdfc1e66d879407a5278703579d31de7ce0e2cf1707fdec9cc14c3',
+      webstreaming: false,
+      isUpdate: false,
+      isRepair: false,
+      numBlocks: 100,
+      file: new File(['file content'], 'file1.txt'),
+      remotePath: '/my-folder/file1.txt',
+      encrypt: true,
+      thumbnailBytes: [],
+      callback: (totalBytes, completedBytes, fileName, blobURL, error) => {
+        console.log(`Upload progress for ${fileName}: ${completedBytes}/${totalBytes} bytes`);
+        if (error) {
+          console.error(`Error: ${error}`);
+        }
+      }
+    }
+    // Add more files here ...
+  ]
+})
+
+if (result.success) {
+  console.log('Upload completed successfully');
+} else {
+  console.error(`Upload failed: ${result.error}`);
+}
+```
+
+### pauseUpload
+Pauses the upload operation of a file.
+
+To resume the upload, call the [`multiUpload`](#multiupload) method with the same `bulkUploadOptions` parameter again.
+
+#### Parameters
+| Name | Type | Description | Default value |
+|---|---|---|---|
+| `wallet` | `ActiveWallet` | Active Wallet details | |
+| `domain` | `NetworkDomain` | Network domain for the upload | |
+| `allocationId` | `string` | Allocation ID where the file is being uploaded | |
+| `remotePath` | `string` | Remote path of the file to pause | |
+
+#### Example
+```typescript
+import { pauseUpload } from '@zerochain/sdk'
+
+await pauseUpload({
+  wallet: activeWallet,
+  domain: 'mainnet.zus.network',
+  allocationId: '8695f8af52cdfc1e66d879407a5278703579d31de7ce0e2cf1707fdec9cc14c3',
+  remotePath: '/my-folder/file1.txt'
+})
+```
+
+### cancelUpload
+Cancels the upload operation of a file.
+
+#### Parameters
+| Name | Type | Description | Default value |
+|---|---|---|---|
+| `wallet` | `ActiveWallet` | Active Wallet details | |
+| `domain` | `NetworkDomain` | Network domain for the upload | |
+| `allocationId` | `string` | Allocation ID where the file is being uploaded | |
+| `remotePath` | `string` | Remote path of the file to cancel | |
+
+#### Example
+```typescript
+import { cancelUpload } from '@zerochain/sdk'
+
+await cancelUpload({
+  wallet: activeWallet,
+  domain: 'mainnet.zus.network',
+  allocationId: '8695f8af52cdfc1e66d879407a5278703579d31de7ce0e2cf1707fdec9cc14c3',
+  remotePath: '/my-folder/file1.txt'
+})
+```
+
+### getFileStats
+Retrieves details for a file in an allocation.
+
+#### Parameters
+| Name | Type | Description | Default value |
+|---|---|---|---|
+| `domain` | `NetworkDomain` | Network domain for the allocation | |
+| `wallet` | `ActiveWallet` | Active Wallet details | |
+| `allocationId` | `string` | Allocation ID where the file is located | |
+| `remotePath` | `string` | Remote path of the file to retrieve details for | |
+
+#### Return Type
+```typescript
+Promise<FileStats[]>
+```
+
+#### Example
+```typescript
+import { getFileStats } from '@zerochain/sdk'
+
+const fileStats = await getFileStats({
+  domain: 'mainnet.zus.network',
+  wallet: activeWallet,
+  allocationId: '8695f8af52cdfc1e66d879407a5278703579d31de7ce0e2cf1707fdec9cc14c3',
+  remotePath: '/my-folder/file1.txt'
+})
+```
+
+### listObjects
+Lists the files for a given allocation ID and remote path.
+
+#### Parameters
+| Name | Type | Description | Default value |
+|---|---|---|---|
+| `domain` | `NetworkDomain` | Network domain for the allocation | |
+| `wallet` | `ActiveWallet` | Active Wallet details | |
+| `allocationId` | `string` | Allocation ID to list files from | |
+| `remotePath` | `string` | Remote path of the directory to list | |
+| `offset` | `number` | Pagination offset for the list. Use `0` to turn off pagination. | `0` |
+| `pageLimit` | `number` | Number of items per page. Use `-1` to turn off pagination. | `-1` |
+
+#### Return Type
+```typescript
+Promise<ListResult>
+```
+
+#### Example
+```typescript
+import { listObjects } from '@zerochain/sdk'
+
+// list all files in a directory `/my-folder` without pagination
+const listResult = await listObjects({
+  domain: 'mainnet.zus.network',
+  wallet: activeWallet,
+  allocationId: '8695f8af52cdfc1e66d879407a5278703579d31de7ce0e2cf1707fdec9cc14c3',
+  remotePath: '/my-folder',
+})
+
+```
+
+### getFileMetaByName
+Retrieves file metadata by name (file search). This method allows you to search for files within an allocation by their name and optionally modify the returned file references.
+
+#### Parameters
+| Name | Type | Description | Default value |
+|---|---|---|---|
+| `wallet` | `ActiveWallet` | Active Wallet details | |
+| `domain` | `NetworkDomain` | Network domain for the allocation | |
+| `allocationId` | `string` | Allocation ID to search within | |
+| `fileName` | `string` | Name of the file to search for | |
+| `modifyFileRef` | `(file: FileRefByName) => T` | Optional function to modify the returned file references | |
+
+#### Return Type
+```typescript
+Promise<T[] | FileRefByName[]>
+```
+
+#### Example
+```typescript
+import { getFileMetaByName } from '@zerochain/sdk'
+
+const fileMetadata = await getFileMetaByName({
+  wallet: activeWallet,
+  domain: 'mainnet.zus.network',
+  allocationId: '8695f8af52cdfc1e66d879407a5278703579d31de7ce0e2cf1707fdec9cc14c3',
+  fileName: 'file1.txt',
+  modifyFileRef: (file) => ({
+    ...file,
+    customField: 'customValue' // Add custom fields if needed
+  })
+})
+```
+
+### multiDownload
+Downloads multiple files in parallel in a batch. This method supports downloading files directly to disk (if supported by the browser) and provides progress updates via a callback function.
+
+#### Parameters
+| Name | Type | Description | Default value |
+|---|---|---|---|
+| `domain` | `NetworkDomain` | Network domain for the download | |
+| `wallet` | `ActiveWallet` | Active Wallet details | |
+| `allocationId` | `string` | Allocation ID where the files are located | |
+| `authTicket` | `string` | Required only for downloading shared files (non-owner) | `''` |
+| `multiDownloadOptions` | `MultiDownloadOption[]` | Array of download options for each file | |
+| `callback` | `(totalBytes: number, completedBytes: number, fileName: string, blobURL: string, error?: string) => void` | Callback function invoked with progress updates | |
+
+#### MultiDownloadOption Type
+```typescript
+type MultiDownloadOption = {
+  /** Remote path of the file to be downloaded */
+  remotePath: string
+  /** Local path where the file should be stored (optional) */
+  localPath?: string
+  /** Download operation type */
+  downloadType: 'file' | 'thumbnail'
+  /** Number of blocks to download per request */
+  numBlocks?: number
+  /** Required only for file download with an auth ticket */
+  remoteFileName: string
+  /** Lookup hash for remote file, required for auth ticket downloads */
+  remoteLookupHash?: string
+  /** Whether to download the file directly to disk (not supported on Safari) */
+  downloadToDisk: boolean
+  /** Suggested name for the file when downloading to disk (optional) */
+  suggestedName?: string
+}
+```
+
+#### Callback Parameters
+| Name | Type | Description |
+|---|---|---|
+| `totalBytes` | `number` | Total bytes to download |
+| `completedBytes` | `number` | Bytes downloaded so far |
+| `fileName` | `string` | Name of the file being downloaded |
+| `blobURL` | `string` | URL of the downloaded file |
+| `error` | `string` | Error message, if any |
+
+#### Return Type
+```typescript
+Promise<DownloadCommandResponse[]>
+```
+
+#### DownloadCommandResponse Type
+```typescript
+type DownloadCommandResponse = {
+  commandSuccess: boolean
+  error?: string
+  /** Name of the downloaded file */
+  fileName?: string
+  /** Blob URL of the downloaded file */
+  url?: string
+}
+```
+
+#### Example
+```typescript
+import { multiDownload } from '@zerochain/sdk'
+
+const downloadResponses = await multiDownload({
+  domain: 'mainnet.zus.network',
+  wallet: activeWallet,
+  allocationId: '8695f8af52cdfc1e66d879407a5278703579d31de7ce0e2cf1707fdec9cc14c3',
+  multiDownloadOptions: [
+    {
+      remotePath: '/my-folder/file1.txt',
+      downloadType: 'file',
+      numBlocks: 100,
+      remoteFileName: 'file1.txt',
+      downloadToDisk: true,
+      suggestedName: 'file1.txt'
+    }
+    // Add more download options as needed
+  ],
+  callback: (totalBytes, completedBytes, fileName, blobURL, error) => {
+    console.log(`Download progress for ${fileName}: ${completedBytes}/${totalBytes} bytes`);
+    if (error) {
+      console.error(`Error: ${error}`);
+    }
+  }
+})
+```
+
+### downloadBlocks
+Downloads a specified range of blocks from a file. This method is useful for downloading specific parts of a file, such as for resuming downloads or streaming.
+
+#### Parameters
+| Name | Type | Description | Default value |
+|---|---|---|---|
+| `domain` | `NetworkDomain` | Network domain for the download | |
+| `wallet` | `ActiveWallet` | Active Wallet details | |
+| `allocationId` | `string` | Allocation ID where the file is located | |
+| `remotePath` | `string` | Remote path of the file to download | |
+| `authTicket` | `string` | Required only for downloading shared files (non-owner) | `''` |
+| `lookupHash` | `string` | Lookup hash of the file, used to locate the file if `remotePath` and `allocationId` are not provided | |
+| `writeChunkFunc` | `(lookupHash: string, chunk: Uint8Array, offset: number) => void` | Function to handle downloaded chunks | |
+| `startBlock` | `number` | Starting block number to download | |
+| `endBlock` | `number` | Ending block number to download | |
+
+#### Return Type
+```typescript
+Promise<Uint8Array>
+```
+
+#### Example
+```typescript
+import { downloadBlocks } from '@zerochain/sdk'
+
+const writeChunkFunc = (lookupHash: string, chunk: Uint8Array, offset: number) => {
+  console.log(`Received chunk for ${lookupHash} at offset ${offset}`);
+  // Handle the chunk (e.g., save to disk or process further)
+}
+
+const downloadedBlocks = await downloadBlocks({
+  domain: 'mainnet.zus.network',
+  wallet: activeWallet,
+  allocationId: '8695f8af52cdfc1e66d879407a5278703579d31de7ce0e2cf1707fdec9cc14c3',
+  remotePath: '/my-folder/file1.txt',
+  writeChunkFunc,
+  startBlock: 0,
+  endBlock: 10
+})
+
+console.log('Downloaded blocks:', downloadedBlocks);
+```
+
+### cancelDownloadBlocks
+Cancels the download of a specified range of blocks from a file. This method is used to stop an ongoing block download initiated by the [`downloadBlocks`](#downloadblocks) method.
+
+#### Parameters
+| Name | Type | Description | Default value |
+|---|---|---|---|
+| `domain` | `NetworkDomain` | Network domain for the download | |
+| `wallet` | `ActiveWallet` | Active Wallet details | |
+| `allocationId` | `string` | Allocation ID associated with the file | |
+| `remotePath` | `string` | Remote path where the file is located | |
+| `start` | `number` | Start block number previously used in the [`downloadBlocks`](#downloadblocks) call | |
+| `end` | `number` | End block number previously used in the [`downloadBlocks`](#downloadblocks) call | |
+
+#### Example
+```typescript
+import { cancelDownloadBlocks } from '@zerochain/sdk'
+
+await cancelDownloadBlocks({
+  domain: 'mainnet.zus.network',
+  wallet: activeWallet,
+  allocationId: '8695f8af52cdfc1e66d879407a5278703579d31de7ce0e2cf1707fdec9cc14c3',
+  remotePath: '/my-folder/file1.txt',
+  start: 0,
+  end: 10
+})
+```
+
+### downloadDirectory
+Downloads files in a directory (non-recursive). This method supports downloading all files in a specified directory and provides progress updates via a callback function.
+{/* confirm non recursive fact // DOTODO: https://0chain.slack.com/archives/D06ADNR2P4L/p1739223347776269 */}
+#### Parameters
+| Name | Type | Description | Default value |
+|---|---|---|---|
+| `domain` | `NetworkDomain` | Network domain for the download | |
+| `wallet` | `ActiveWallet` | Active Wallet details | |
+| `allocationId` | `string` | Allocation ID where the directory is located | |
+| `authTicket` | `string` | Required only for downloading shared directories (non-owner) | `''` |
+| `remotePath` | `string` | Remote path of the directory to download | |
+| `callback` | `(totalBytes: number, completedBytes: number, fileName: string, blobURL: string, error?: string) => void` | Callback function invoked with progress updates | |
+
+#### Callback Parameters
+| Name | Type | Description |
+|---|---|---|
+| `totalBytes` | `number` | Total bytes to download |
+| `completedBytes` | `number` | Bytes downloaded so far |
+| `fileName` | `string` | Name of the file being downloaded |
+| `blobURL` | `string` | URL of the downloaded file |
+| `error` | `string` | Error message, if any |
+
+#### Example
+```typescript
+import { downloadDirectory } from '@zerochain/sdk'
+
+await downloadDirectory({
+  domain: 'mainnet.zus.network',
+  wallet: activeWallet,
+  allocationId: '8695f8af52cdfc1e66d879407a5278703579d31de7ce0e2cf1707fdec9cc14c3',
+  remotePath: '/my-folder',
+  callback: (totalBytes, completedBytes, fileName, blobURL, error) => {
+    console.log(`Download progress for ${fileName}: ${completedBytes}/${totalBytes} bytes`);
+    if (error) {
+      console.error(`Error: ${error}`);
+    }
+  }
+})
+```
+
+### cancelDownloadDirectory
+Cancels the download of a directory initiated by [`downloadDirectory`](#downloaddirectory).
+
+#### Parameters
+| Name | Type | Description | Default value |
+|---|---|---|---|
+| `domain` | `NetworkDomain` | Network domain for the download | |
+| `wallet` | `ActiveWallet` | Active Wallet details | |
+| `remotePath` | `string` | Remote path of the directory to cancel | |
+
+#### Example
+```typescript
+import { cancelDownloadDirectory } from '@zerochain/sdk'
+
+await cancelDownloadDirectory({
+  domain: 'mainnet.zus.network',
+  wallet: activeWallet,
+  remotePath: '/my-folder'
+})
+```
+
+### multiOperation
+Performs multiple operations (copy, move, delete, create directory) together in a single batch.
+
+#### Parameters
+| Name | Type | Description | Default value |
+|---|---|---|---|
+| `domain` | `NetworkDomain` | Network domain for the operations | |
+| `wallet` | `ActiveWallet` | Active Wallet details | |
+| `allocationId` | `string` | Allocation ID where the operations will be performed | |
+| `operations` | `MultiOperationOption[]` | Array of operations to perform | |
+
+#### MultiOperationOption Type
+```typescript
+type MultiOperationOption = {
+  /** Type of operation: 'copy', 'move', 'delete', or 'createdir' */
+  operationType: 'copy' | 'move' | 'delete' | 'createdir'
+  /** Remote path of the file/directory */
+  remotePath: string
+  /** Destination name (only for rename operation) */
+  destName?: string
+  /** Destination path (required for copy and move operations) */
+  destPath?: string
+}
+```
+
+#### Example
+```typescript
+import { multiOperation } from '@zerochain/sdk'
+
+await multiOperation({
+  domain: 'mainnet.zus.network',
+  wallet: activeWallet,
+  allocationId: '8695f8af52cdfc1e66d879407a5278703579d31de7ce0e2cf1707fdec9cc14c3',
+  operations: [
+    {
+      operationType: 'copy',
+      remotePath: '/my-folder/file1.txt',
+      destPath: '/my-folder/copy-file1.txt'
+    },
+    {
+      operationType: 'delete',
+      remotePath: '/my-folder/file2.txt'
+    },
+    {
+      operationType: 'createdir',
+      remotePath: '/my-folder/new-directory'
+    }
+  ]
+})
+```
+
+### deleteFile
+Deletes a file from an allocation. Only the owner of the allocation can delete a file.
+
+:::note
+To perform multiple deletions in a single call, use the [`multiOperation`](#multioperation) method instead.
+:::
+
+#### Parameters
+| Name | Type | Description | Default value |
+|---|---|---|---|
+| `domain` | `NetworkDomain` | Network domain for the operation | |
+| `wallet` | `ActiveWallet` | Active Wallet details | |
+| `allocationId` | `string` | Allocation ID where the file is located | |
+| `remotePath` | `string` | Remote path of the file to delete | |
+
+#### Return Type
+```typescript
+Promise<{ commandSuccess: boolean; error: string }>
+```
+
+#### Example
+```typescript
+import { deleteFile } from '@zerochain/sdk'
+
+const result = await deleteFile({
+  domain: 'mainnet.zus.network',
+  wallet: activeWallet,
+  allocationId: '8695f8af52cdfc1e66d879407a5278703579d31de7ce0e2cf1707fdec9cc14c3',
+  remotePath: '/my-folder/file1.txt'
+})
+
+if (result.commandSuccess) {
+  console.log('File deleted successfully');
+} else {
+  console.error(`Error: ${result.error}`);
+}
+```
+
+### share
+Generates an `authTicket` that provides authorization to the holder to access the specified file on the remote path. This method is used to share files with other users.
+
+#### Parameters
+| Name | Type | Description | Default value |
+|---|---|---|---|
+| `domain` | `NetworkDomain` | Network domain for the operation | |
+| `wallet` | `ActiveWallet` | Active Wallet details | |
+| `allocationId` | `string` | Allocation ID where the file is located | |
+| `remotePath` | `string` | Remote path of the file to be shared | |
+| `clientId` | `string` | Client ID / wallet ID of the recipient (for private sharing) | `""` |
+| `encryptionPublicKey` | `string` | Encryption public key of the recipient (for private sharing) | `""` |
+| `expiration` | `number` | Expiration time of the auth ticket. Defaults to 0 (no expiration) | `0` |
+| `revoke` | `boolean` | Whether to revoke the share. (for private sharing) | `false` |
+| `availableAfter` | `string` | Time after which the share becomes available. Possible formats:<br/>1. **Relative time with duration format** (local timezone):<br/>   - `+1h5m` → Now + 1 hour 5 minutes<br/>   - `+30s` → Now + 30 seconds<br/>   - `+2h` → Now + 2 hours<br/>2. **Relative time with total seconds** (local timezone):<br/>   - `+3900` → Now + 3900 seconds (1 hour 5 minutes)<br/>   - `+86400` → Now + 1 day (24 hours)<br/>3. **Unix timestamp (UTC-based):**<br/>   - `1647858200` → Parses as a Unix timestamp<br/>4. **Absolute UTC datetime** (`YYYY-MM-DD HH:mm:ss`):<br/>   - `2022-03-21 10:21:38` → Parses as `March 21, 2022, 10:21:38 UTC` | `""` |
+{/* expiration unit // DOTODO: https://0chain.slack.com/archives/D06ADNR2P4L/p1739226063557459 */}
+#### Return Type
+```typescript
+Promise<string>
+```
+
+#### Example
+```typescript
+import { share } from '@zerochain/sdk'
+
+// Public share
+const authTicket = await share({
+  domain: 'mainnet.zus.network',
+  wallet: activeWallet,
+  allocationId: '8695f8af52cdfc1e66d879407a5278703579d31de7ce0e2cf1707fdec9cc14c3',
+  remotePath: '/my-folder/file1.txt',
+})
+
+// Private share
+await share({
+  domain: 'mainnet.zus.network',
+  wallet: activeWallet,
+  allocationId: '8695f8af52cdfc1e66d879407a5278703579d31de7ce0e2cf1707fdec9cc14c3',
+  remotePath: '/my-folder/file1.txt',
+  clientId: recipientWalletId,
+  encryptionPublicKey: recipientEncryptionPublicKey,
+})
+```
+
+### listObjectsFromAuthTicket
+Lists objects from an auth ticket. This method is useful for accessing a shared source by a non-owner.
+
+#### Parameters
+| Name | Type | Description | Default value |
+|---|---|---|---|
+| `domain` | `NetworkDomain` | Network domain for the operation | |
+| `wallet` | `ActiveWallet` | Active Wallet details | |
+| `allocationId` | `string` | Allocation ID where the shared source is located | |
+| `authTicket` | `string` | Auth ticket provided by a non-owner to access a shared source | |
+| `lookupHash` | `string` | Lookup hash for the file | |
+| `offset` | `number` | Pagination offset for the list. Use `0` to turn off pagination. | `0` |
+| `pageLimit` | `number` | Number of items per page. Use `-1` to turn off pagination. | `-1` |
+
+#### Return Type
+```typescript
+Promise<ListResult>
+```
+
+#### Example
+```typescript
+import { listObjectsFromAuthTicket } from '@zerochain/sdk'
+
+const listResult = await listObjectsFromAuthTicket({
+  domain: 'mainnet.zus.network',
+  wallet: activeWallet,
+  allocationId: '8695f8af52cdfc1e66d879407a5278703579d31de7ce0e2cf1707fdec9cc14c3',
+  authTicket: authTicketOfTheSharedFileOrFolder,
+  lookupHash: lookupHashOfTheSharedFileOrFolder,
+})
+```

@@ -104,11 +104,10 @@ The file operation methods allow you to perform various operations on files.
 | `downloadBlocks` | Downloads a specified range of blocks from a file. |
 | `cancelDownloadBlocks` | Cancels the download of a specified range of blocks from a file. |
 | `downloadDirectory` | Download files in a directory. |
-| `cancelDownloadDirectory` | Cancel the download of a directory recursively. |
+| `cancelDownloadDirectory` | Cancel the download of a directory. |
 | `multiOperation` | Perform multiple file operations (copy, move, delete, create directory) together |
 | `deleteFile` | Deletes a file from an allocation. Only the owner of the allocation can delete a file. Prefer `multiOperation` for deleting multiple files. |
 | `share` | Generate an authToken that provides the authorization to the holder to the specified file on the remotepath. |
-| `decodeAuthTicket` | Decode the AuthTicket of a shared file |
 | `listObjectsFromAuthTicket` | List objects from an auth ticket. It's useful for accessing a shared resource by a non-owner |
 
 ### Smart Contract Methods
@@ -127,6 +126,9 @@ The smart contract methods allow you to interact with smart contracts.
 
 | Method | Description |
 | --- | --- |
+| `decodeAuthTicket` | Decode the AuthTicket of a shared file |
 | `getGosdkVersion` | Retrieves the version of the initialized GoSDK WASM. |
 | `getWasmType` | Returns the type of the GoSDK WASM file (standard or enterprise). |
 | `collectRewards` | Collect all rewards for a given delegate and provider pair. |
+| `sasTokenToZcn` | Returns SAS token value in ZCN |
+| `zcnToSasToken` | Returns ZCN value in SAS token |

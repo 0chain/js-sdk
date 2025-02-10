@@ -46,27 +46,30 @@ export const share = async ({
   domain,
   allocationId,
   remotePath,
-  clientId,
-  encryptionPublicKey,
-  expiration,
-  revoke,
-  availableAfter,
+  clientId = '',
+  encryptionPublicKey = '',
+  expiration = 0,
+  revoke = false,
+  availableAfter = '',
 }: {
   domain: NetworkDomain
   wallet: ActiveWallet
   allocationId: string
   /** Remote path of the file to be shared */
   remotePath: string
-  /** Client ID / wallet ID of the recipient */
-  clientId: string
+  /** Client ID / wallet ID of the recipient (for public sharing) */
+  clientId?: string
   /** Encryption public key of the recipient (for private sharing) */
-  encryptionPublicKey: string
-  /** Expiration time of the auth ticket */
-  expiration: number
-  /** Whether to revoke the share */
-  revoke: boolean
+  encryptionPublicKey?: string
+  /** 
+   * Expiration time of the auth ticket
+   * @default 0 (no expiration)
+   */
+  expiration?: number
+  /** Whether to revoke the share. Only applicable for private sharing */
+  revoke?: boolean
   /** Time after which the share becomes available */
-  availableAfter: string
+  availableAfter?: string
 }): Promise<string> => {
   const goWasm = await getWasm({ domain, wallet })
   try {
@@ -117,6 +120,7 @@ type DownloadCommandResponse = {
   url?: string
 }
 
+/** Downloads multiple files in parallel in a batch. This method supports downloading files directly to disk (if supported by the browser) and provides progress updates via a callback function. */
 export const multiDownload = async ({
   wallet,
   domain,
@@ -345,6 +349,7 @@ export const multiOperation = async ({
   }
 }
 
+/** List the files for a given allocation ID and remote path */
 export const listObjects = async ({
   wallet,
   domain,
@@ -501,6 +506,7 @@ type FileStats = {
   write_marker_txn: string
 }
 
+/** Fetches the file details */
 export const getFileStats = async ({
   wallet,
   domain,
@@ -821,6 +827,7 @@ export const getFileMetaByName = async <T extends FileRefByName>({
   }
 }
 
+/**  Download files in a directory. */
 export const downloadDirectory = async ({
   wallet,
   domain,
@@ -868,6 +875,7 @@ export const downloadDirectory = async ({
   }
 }
 
+/** Cancel the download of a directory. */
 export const cancelDownloadDirectory = async ({
   wallet,
   domain,

@@ -730,54 +730,6 @@ export const lockWritePool = async ({
 // Other sdk methods
 // ----------------------------------------
 
-// type AuthToken = {
-//   recipient_public_key: string
-//   marker: string
-//   tokens: number
-// }
-/** TODO check usecase of wasm decodeAuthTicket */
-// /** decodeAuthTicket decodes the auth ticket and returns the recipient public key and the tokens */
-// export const decodeAuthTicket = async ({
-//   domain,
-//   wallet,
-//   authTicket,
-// }: {
-//   domain: NetworkDomain
-//   wallet: ActiveWallet
-//   authTicket: string
-// }): Promise<AuthToken> => {
-//   const goWasm = await getWasm({ domain, wallet })
-//   const resp = await goWasm.sdk.decodeAuthTicket(authTicket)
-//   return resp
-// }
-
-type DecodedAuthTicket = {
-  fileName?: string
-  walletId?: string
-  lookupHash?: string
-  referenceType?: string
-  allocationId?: string
-  isEncrypted?: boolean
-}
-/** decodeAuthTicket decodes the Authticket */
-export const decodeAuthTicket = (authTicket: string): DecodedAuthTicket => {
-  if (!authTicket) return {}
-  try {
-    const file = JSON.parse(decodeURIComponent(escape(atob(authTicket))))
-    return {
-      fileName: file.file_name,
-      walletId: file.owner_id || file.client_id,
-      lookupHash: file.file_path_hash,
-      referenceType: file.reference_type,
-      allocationId: file.allocation_id,
-      isEncrypted: file.encrypted,
-    }
-  } catch (e) {
-    console.error('Failed decoding authticket ', e)
-    return {}
-  }
-}
-
 /**
  * Issues the repair process for an allocation, *starting from a specific path*.
  *

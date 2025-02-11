@@ -1,5 +1,11 @@
 # @zerochain/sdk
 
+## 1.1.1
+
+### Patch Changes
+
+- c19cd46: Added TS type fixes with better Documentation
+
 ## 1.1.0
 
 ### Minor Changes

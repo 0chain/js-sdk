@@ -234,7 +234,7 @@ Promise<string>
 ```typescript
 import { freezeAllocation } from '@zerochain/sdk'
 
-const txnHash = await freezeAllocation({
+const transactionHash = await freezeAllocation({
   domain: 'mainnet.zus.network',
   wallet: activeWallet,
   allocationId: '8695f8af52cdfc1e66d879407a5278703579d31de7ce0e2cf1707fdec9cc14c3'
@@ -260,7 +260,7 @@ Promise<string>
 ```typescript
 import { cancelAllocation } from '@zerochain/sdk'
 
-const txnHash = await cancelAllocation({
+const transactionHash = await cancelAllocation({
   domain: 'mainnet.zus.network',
   wallet: activeWallet,
   allocationId: allocId
@@ -292,7 +292,7 @@ Promise<string>
 
 #### Example  
 ```ts  
-const txnHash = await updateAllocation({  
+const transactionHash = await updateAllocation({  
   domain,  
   wallet,  
   allocationId: allocationId,  
@@ -343,7 +343,7 @@ Promise<string>
 ```typescript
 import { updateAllocationWithRepair } from '@zerochain/sdk'
 
-const txnHash = await updateAllocationWithRepair({
+const transactionHash = await updateAllocationWithRepair({
   domain: 'mainnet.zus.network',
   wallet: activeWallet,
   allocationId: '8695f8af52cdfc1e66d879407a5278703579d31de7ce0e2cf1707fdec9cc14c3',
@@ -422,7 +422,7 @@ Promise<string>
 ```typescript
 import { updateForbidAllocation } from '@zerochain/sdk'
 
-const txnHash = await updateForbidAllocation({
+const transactionHash = await updateForbidAllocation({
   wallet: activeWallet,
   domain: 'mainnet.zus.network',
   allocationId: '8695f8af52cdfc1e66d879407a5278703579d31de7ce0e2cf1707fdec9cc14c3',

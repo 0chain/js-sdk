@@ -94,7 +94,7 @@ Promise<string>
 ```typescript
 import { lockWritePool } from '@zerochain/sdk'
 
-const txnHash = await lockWritePool({
+const transactionHash = await lockWritePool({
   domain: 'mainnet.zus.network',
   wallet: activeWallet,
   allocationId: '8695f8af52cdfc1e66d879407a5278703579d31de7ce0e2cf1707fdec9cc14c3',
@@ -125,7 +125,7 @@ Promise<string>
 ```typescript
 import { lockStakePool } from '@zerochain/sdk'
 
-const txnHash = await lockStakePool({
+const transactionHash = await lockStakePool({
   domain: 'mainnet.zus.network',
   wallet: activeWallet,
   providerType: 'blobber',
@@ -157,7 +157,7 @@ Promise<string>
 ```typescript
 import { unlockStakePool } from '@zerochain/sdk'
 
-const txnHash = await unlockStakePool({
+const transactionHash = await unlockStakePool({
   domain: 'mainnet.zus.network',
   wallet: activeWallet,
   providerType: 'blobber',
@@ -187,7 +187,7 @@ Promise<string>
 ```typescript
 import { collectRewards } from '@zerochain/sdk'
 
-const txnHash = await collectRewards({
+const transactionHash = await collectRewards({
   domain: 'mainnet.zus.network',
   wallet: activeWallet,
   providerType: 'blobber',

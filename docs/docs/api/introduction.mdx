@@ -132,7 +132,8 @@ The smart contract methods allow you to interact with smart contracts.
 | `getWasmType` | Returns the type of the GoSDK WASM file (standard or enterprise). |
 | `sasTokenToZcn` | Converts SAS token value in ZCN |
 | `zcnToSasToken` | Converts ZCN value in SAS token |
-| `checkIfWasmLoaded` | Checks if the GoSDK WASM is initialized. Returns `true` if the WASM is loaded, `false` otherwise. |
+| `checkIfWasmLoaded` | Waits until the "desired mode" GoSDK WASM is loaded and initialized. |
+| `awaitWasmLoad` | Waits until the GoSDK WASM is loaded and initialized. |
 | `updateWasmMode` | Updates the desired mode of the GoSDK WASM. |
 | `getDesiredMode` | Returns the desired mode of the GoSDK WASM. |
 | `isDesiredWasmInitialized` | Checks if the desired GoSDK WASM mode is initialized. Returns `true` if the WASM is initialized, `false` otherwise. |

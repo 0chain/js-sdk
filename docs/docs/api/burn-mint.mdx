@@ -70,7 +70,7 @@ Promise<string>
 ```typescript
 import { burnZCN } from '@zerochain/sdk'
 
-const txnHash = await burnZCN({
+const transactionHash = await burnZCN({
   domain: 'mainnet.zus.network',
   wallet: activeWallet,
   amount: 100
@@ -101,7 +101,7 @@ Promise<string>
 ```typescript
 import { mintZCN } from '@zerochain/sdk'
 
-const txnHash = await mintZCN({
+const transactionHash = await mintZCN({
   domain: 'mainnet.zus.network',
   wallet: activeWallet,
   burnTxnHash: '0x1234567890123456789012345678901234567890123456789012345678901234',

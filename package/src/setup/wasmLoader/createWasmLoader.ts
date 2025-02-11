@@ -99,6 +99,15 @@ export const createWasmLoader = ({
 // Utils
 // ----------------------------------------
 
+/** Updates the "desired mode" value of the GoSDK WASM. */
+export const updateWasmMode = (desiredAllocationType: WasmType): void => {
+  resetGoWasm()
+
+  if (desiredAllocationType === 'enterprise') {
+    localStorage.setItem('enterpriseAlloc', 'enabled')
+  } else localStorage.removeItem('enterpriseAlloc')
+}
+
 /** Returns the "desired mode" value of the GoSDK WASM. */
 export const getDesiredMode = (): WasmType => {
   const isEnterpriseModeDesired =
@@ -131,7 +140,7 @@ export const isDesiredWasmInitialized = (onLog?: OnLog): boolean => {
 
 /**
  * Waits until the GoSDK WASM is loaded and initialized.
- * 
+ *
  * Unlike `checkIfWasmLoaded` method, this method doesn't check if the desired WASM mode is initialized. It just returns a promise that will only resolve once the GoSDK WASM is loaded and initialized.
  *
  * @param onLog Optional logger, e.g., console.log

@@ -16,7 +16,7 @@ In this section, we will learn about all the available Smart Contract methods pr
 
 The smart contract methods allow you to interact with smart contracts of the network.
 
-### makeSCRestAPICall
+### `makeSCRestAPICall`
 Issues a request to the public API of one of the smart contracts. This method is used to interact with smart contract endpoints.
 
 #### Parameters
@@ -45,7 +45,7 @@ const jsonResponse = await makeSCRestAPICall({
 })
 ```
 
-### getStakePoolInfo
+### `getStakePoolInfo`
 Retrieves information about the stake pool for the allocation.
 
 #### Parameters
@@ -73,7 +73,7 @@ const stakePoolInfo = await getStakePoolInfo({
 })
 ```
 
-### lockWritePool
+### `lockWritePool`
 Locks a given number of tokens for a specified duration in the write pool.
 
 #### Parameters
@@ -103,7 +103,7 @@ const transactionHash = await lockWritePool({
 })
 ```
 
-### lockStakePool
+### `lockStakePool`
 Stakes a given number of tokens for a specific provider (e.g., blobber, validator) by its type and ID.
 
 #### Parameters
@@ -135,7 +135,7 @@ const transactionHash = await lockStakePool({
 })
 ```
 
-### unlockStakePool
+### `unlockStakePool`
 Unlocks the stake pool for a specific provider by its type and ID.
 
 #### Parameters
@@ -167,7 +167,7 @@ const transactionHash = await unlockStakePool({
 })
 ```
 
-### collectRewards
+### `collectRewards`
 Collects all rewards available for a delegate and provider pair. This method triggers the `storagesc.collect_reward` transaction.
 
 #### Parameters

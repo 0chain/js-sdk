@@ -8,7 +8,7 @@ In this section, we will learn about all the available utility methods provided 
 
 ## Utility Methods
 
-### decodeAuthTicket
+### `decodeAuthTicket`
 Decodes an auth ticket to extract its details.
 
 #### Parameters
@@ -35,7 +35,7 @@ import { decodeAuthTicket } from '@zerochain/sdk'
 const decodedTicket = decodeAuthTicket(authTicket)
 ```
 
-### getGosdkVersion
+### `getGosdkVersion`
 Retrieves the version of the GoSDK.
 
 :::warning
@@ -54,7 +54,7 @@ import { getGosdkVersion } from '@zerochain/sdk'
 const wasmVersion = await getGosdkVersion()
 ```
 
-### getWasmType
+### `getWasmType`
 Retrieves the type of GoSDK WASM being used by the SDK. If the WASM is not initialized, it returns `undefined`.
 
 #### Return Type
@@ -74,7 +74,7 @@ if (wasmType) {
 }
 ```
 
-### sasTokenToZcn
+### `sasTokenToZcn`
 Converts SAS tokens value to ZCN (the main token unit).
 
 #### Parameters
@@ -95,7 +95,7 @@ const zcnAmount = sasTokenToZcn(10000000000) // 10000000000 SAS = 1 ZCN
 console.log('ZCN amount:', zcnAmount); // Output: 1
 ```
 
-### zcnToSasToken
+### `zcnToSasToken`
 Converts ZCN value to SAS tokens.
 
 :::note
@@ -121,7 +121,7 @@ const sasTokenAmount = zcnToSasToken(1) // 1 ZCN = 10000000000 SAS
 console.log('SAS token amount:', sasTokenAmount); // Output: 10000000000
 ```
 
-### checkIfWasmLoaded
+### `checkIfWasmLoaded`
 
 Waits until the "desired mode" GoSDK WASM is loaded and initialized. 
 
@@ -139,7 +139,7 @@ import { checkIfWasmLoaded } from '@zerochain/sdk'
 const isLoaded = await checkIfWasmLoaded()
 ```
 
-### awaitWasmLoad
+### `awaitWasmLoad`
 Waits until the GoSDK WASM is loaded and initialized. 
 
 :::info
@@ -158,7 +158,7 @@ import { awaitWasmLoad } from '@zerochain/sdk'
 await awaitWasmLoad(console.log)
 ```
 
-### updateWasmMode
+### `updateWasmMode`
 Updates the "desired mode" value of the GoSDK WASM.
 
 #### Parameters
@@ -173,7 +173,7 @@ import { updateWasmMode } from '@zerochain/sdk'
 updateWasmMode('enterprise')
 ```
 
-### getDesiredMode
+### `getDesiredMode`
 Returns the "desired mode" value of the GoSDK WASM.
 
 #### Return Type
@@ -188,7 +188,7 @@ import { getDesiredMode } from '@zerochain/sdk'
 const mode = getDesiredMode()
 ```
 
-### isDesiredWasmInitialized
+### `isDesiredWasmInitialized`
 Checks if the desired GoSDK WASM mode is initialized.
 
 #### Parameters

@@ -818,7 +818,7 @@ type AllocStatus = {
    * The health `status` of the allocation has one of the following values:
    * - `ok`: The allocation is healthy and fully functional.
    * - `repair`: The allocation needs to be repaired. Repair using the `repairAllocation` method.
-   * - `broken`: The allocation is broken and it cannot be repaired anymore.
+   * - `broken`: The allocation is irreparably broken. This occurs when critical data blocks are missing or when blobbers are offline, making recovery impossible.
    */
   status: 'ok' | 'repair' | 'broken'
   blobberStatus: {

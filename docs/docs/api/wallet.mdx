@@ -16,7 +16,7 @@ In this section, we will learn about all the available Wallet methods provided b
 
 The wallet methods allow you to create and manage wallets, set the wallet, and get wallet information.
 
-### createWallet
+### `createWallet`
 
 Creates a new wallet. It also helps to recover a wallet using its mnemonic phrase.
 
@@ -52,7 +52,7 @@ const wallet = await createWallet({
 })
 ```
 
-### createWalletKeys
+### `createWalletKeys`
 Creates wallet keys including wallet ID, public key, and private key using BLS (Boneh-Lynn-Shacham) cryptography.
 
 #### Parameters
@@ -81,15 +81,20 @@ The function generates a new random mnemonic if `customBip39Mnemonic` is not pro
 import { createWalletKeys } from '@zerochain/sdk'
 
 // Create new wallet keys with random mnemonic
-const { keys, mnemonic } = await createWalletKeys()
+const newWallet = await createWalletKeys()
+const { keys, mnemonic } = newWallet
 
-// Create wallet keys using existing mnemonic
+// Create wallet keys using existing mnemonic (wallet recovery)
 const existingMnemonic = 'word1 word2 ... word24' // 24 word BIP39 mnemonic
 const recoveredWallet = await createWalletKeys(existingMnemonic)
 ```
 
-### getPublicEncryptionKey
+### `getPublicEncryptionKey`
 Retrieves the public encryption key for a wallet.
+
+:::info
+The `publicEncryptionKey` is essential for private file sharing. In [private file sharing](/docs/api/file#share), files are encrypted and can only be shared with a specific group of recipients. To enable this, you need the public encryption keys of the intended recipients.
+:::
 
 #### Parameters
 | Name | Type | Description |
@@ -118,7 +123,7 @@ const publicEncryptionKey = await getPublicEncryptionKey({
 })
 ```
 
-### isWalletId
+### `isWalletId`
 Validates if a string is a valid wallet ID.
 
 #### Parameters
@@ -136,13 +141,13 @@ boolean
 import { isWalletId } from '@zerochain/sdk'
 
 const isValid = isWalletId('8695f8af52cdfc1e66d879407a5278703579d31de7ce0e2cf1707fdec9cc14c3')
-// Returns: true
+console.log(isValid) // Output: true
 
-const isInvalid = isWalletId('invalid-wallet-id')
-// Returns: false
+const isValid = isWalletId('invalid-wallet-id')
+console.log(isValid) // Output: false
 ```
 
-### send
+### `send`
 Sends tokens to a specified client ID / wallet ID.
 
 #### Parameters
@@ -169,12 +174,12 @@ const transactionHash = await send({
   domain: 'mainnet.zus.network',
   toClientId: '8695f8af52cdfc1e66d879407a5278703579d31de7ce0e2cf1707fdec9cc14c3',
   tokens: 100,
-  fee: 0.1,
+  fee: txnFee,
   desc: 'Payment for services'
 })
 ```
 
-### getWalletBalance
+### `getWalletBalance`
 Retrieves the wallet balance of the client from the network.
 
 #### Parameters
@@ -207,7 +212,7 @@ const balance = await getWalletBalance({
 })
 ```
 
-### getUSDRate
+### `getUSDRate`
 Retrieves the USD rate for a given token symbol.
 
 #### Parameters

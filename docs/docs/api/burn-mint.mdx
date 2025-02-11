@@ -16,7 +16,7 @@ In this section, we will learn about all the available Burn & Mint tokens method
 
 The [`initBridge`](#initbridge) method must be called to initialize the bridge client before using the any of the burn and mint methods.
 
-### initBridge
+### `initBridge`
 Initializes the bridge client.
 
 #### Parameters
@@ -30,8 +30,8 @@ Initializes the bridge client.
 | `tokenAddress` | `string` | Address of the token contract on the Ethereum network | |
 | `ethereumNodeURL` | `string` | URL of the Ethereum node | |
 | `gasLimit` | `number` | Gas limit for the transactions | |
-| `value` | `number` | Value to be sent with the transaction (unused) | |
 | `consensusThreshold` | `number` | Consensus threshold for the transactions | |
+{/* | `value` | `number` | Value to be sent with the transaction (unused) | `0` | // DOTODO: check if this can be removed from gosdk because its unused*/}
 
 #### Example
 ```typescript
@@ -46,12 +46,11 @@ await initBridge({
   tokenAddress: '0xb9EF770B6A5e12E45983C5D80545258aA38F3B78',
   ethereumNodeURL: 'https://virtual.mainnet.rpc.tenderly.co/039fdd4f-053c-4a81-9c76-db6b944c7414',
   gasLimit: 3000000,
-  value: 0,
   consensusThreshold: 75.0
 })
 ```
 
-### burnZCN
+### `burnZCN`
 Burns ZCN tokens.
 
 #### Parameters
@@ -77,7 +76,7 @@ const transactionHash = await burnZCN({
 })
 ```
 
-### mintZCN
+### `mintZCN`
 Mints ZCN tokens.
 
 #### Parameters
@@ -108,7 +107,7 @@ const transactionHash = await mintZCN({
 })
 ```
 
-### getMintWZCNPayload
+### `getMintWZCNPayload`
 Returns the *Mint WZCN Payload* for the given burn transaction hash.
 
 #### Parameters
@@ -148,7 +147,40 @@ const mintPayload = await getMintWZCNPayload({
 })
 ```
 
-### getProcessedZCNBurnTickets
+### `getUnprocessedWZCNBurnEvents`
+Returns all unprocessed WZCN burn events from the Ethereum network.
+
+#### Parameters
+| Name | Type | Description | Default value |
+|---|---|---|---|
+| `domain` | `NetworkDomain` | Network domain for the request | |
+| `wallet` | `ActiveWallet` | Active Wallet details | |
+
+#### Return Type
+```typescript
+Promise<BurnEvent[]>
+```
+
+#### BurnEvent Type
+```typescript
+type BurnEvent = {
+  nonce: number
+  amount: number
+  hash: string
+}
+```
+
+#### Example
+```typescript
+import { getUnprocessedWZCNBurnEvents } from '@zerochain/sdk'
+
+const burnEvents = await getUnprocessedWZCNBurnEvents({
+  domain: 'mainnet.zus.network',
+  wallet: activeWallet
+})
+```
+
+### `getProcessedZCNBurnTickets`
 Returns all processed ZCN burn tickets burned for a certain Ethereum address.
 
 #### Parameters
@@ -181,7 +213,7 @@ const burnTickets = await getProcessedZCNBurnTickets({
 })
 ```
 
-### estimateMintWZCNGasAmount
+### `estimateMintWZCNGasAmount`
 Performs gas amount estimation for the given Mint WZCN transaction.
 
 #### Parameters
@@ -192,7 +224,7 @@ Performs gas amount estimation for the given Mint WZCN transaction.
 | `from` | `string` | Address of the sender | |
 | `to` | `string` | Address of the receiver | |
 | `zcnTransaction` | `string` | Hash of the ZCN transaction | |
-| `amountToken` | `string` | Amount of tokens to mint (as a string) | |
+| `amountToken` | `number` | Amount of tokens to mint (as a string) | |
 | `nonce` | `number` | Nonce of the transaction | |
 | `signaturesRaw` | `string[]` | Encoded format (base-64) of the burn signatures received from the authorizers | |
 
@@ -211,13 +243,13 @@ const gasAmount = await estimateMintWZCNGasAmount({
   from: '0x1234567890123456789012345678901234567890',
   to: '0x0987654321098765432109876543210987654321',
   zcnTransaction: '0x1234567890123456789012345678901234567890123456789012345678901234',
-  amountToken: '10000',
+  amountToken: 10000000000,
   nonce: 1,
   signaturesRaw: ['signature1', 'signature2', 'signature3']
 })
 ```
 
-### estimateBurnWZCNGasAmount
+### `estimateBurnWZCNGasAmount`
 Performs gas amount estimation for the given burn WZCN transaction.
 
 #### Parameters
@@ -227,7 +259,7 @@ Performs gas amount estimation for the given burn WZCN transaction.
 | `wallet` | `ActiveWallet` | Active wallet details | |
 | `from` | `string` | Address of the sender | |
 | `to` | `string` | Address of the receiver | |
-| `amountTokens` | `string` | Amount of tokens to burn (as a string) | |
+| `amountTokens` | `number` | Amount of tokens to burn | |
 
 #### Return Type
 ```typescript
@@ -243,11 +275,11 @@ const gasAmount = await estimateBurnWZCNGasAmount({
   wallet: activeWallet,
   from: '0x1234567890123456789012345678901234567890',
   to: '0x0987654321098765432109876543210987654321',
-  amountTokens: '1000000000000000000'
+  amountTokens: 10000000000
 })
 ```
 
-### estimateGasPrice
+### `estimateGasPrice`
 Performs gas estimation for the given transaction using Alchemy enhanced API, returning the approximate final gas fee.
 
 #### Parameters

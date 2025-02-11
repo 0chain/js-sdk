@@ -16,7 +16,7 @@ In this section, we will learn about all the available File Operations methods p
 
 The file operation methods allow you to perform various operations on files.
 
-### getLookupHash
+### `getLookupHash`
 Retrieves the lookup hash for a specific file path in an allocation. The lookup hash is used to uniquely identify a file in the allocation.
 
 #### Parameters
@@ -38,13 +38,13 @@ import { getLookupHash } from '@zerochain/sdk'
 
 const lookupHash = await getLookupHash({
   domain: 'mainnet.zus.network',
+  wallet: activeWallet
   allocationId: '8695f8af52cdfc1e66d879407a5278703579d31de7ce0e2cf1707fdec9cc14c3',
   filePath: '/my-folder/my-file.txt',
-  wallet: activeWallet
 })
 ```
 
-### createDir
+### `createDir`
 Creates a directory on blobbers at the specified remote path.
 
 #### Parameters
@@ -67,7 +67,7 @@ await createDir({
 })
 ```
 
-### setUploadMode
+### `setUploadMode`
 Sets the upload mode to modify the upload speed and CPU usage. The upload mode determines the trade-off between upload speed and resource consumption.
 
 #### Parameters
@@ -89,11 +89,14 @@ await setUploadMode({
 })
 ```
 
-### multiUpload
-Uploads multiple files in a batch. This method can also be used to resume a paused upload.
+### `multiUpload`
+Uploads multiple files in a batch. Files within a batch are uploaded in parallel. A single batch can handle up to **50 files** at once. If you need to upload more than 50 files, the GoSDK will automatically create and manage multiple batches for you.
+
+This method also supports resuming a paused upload. To resume, use the **exact same `bulkUploadOptions` parameters** that were initially used to start the upload. Only these original parameters should be provided when resuming the operation.
 
 :::warning
-Keep the batch size under 50 files for optimal performance.
+1. Always ensure you do not exceed the batch size limit of 50 files. This is strongly advised because, in an upcoming GoSDK versions, the methods like [`cancelUpload`](#cancelupload) and [`pauseUpload`](#pauseupload) will rely on the `batchId` of the 50-file batch to perform their operations.
+2. Only one batch upload can be in progress at a time.
 :::
 
 #### Parameters
@@ -178,7 +181,7 @@ if (result.success) {
 }
 ```
 
-### pauseUpload
+### `pauseUpload`
 Pauses the upload operation of a file.
 
 To resume the upload, call the [`multiUpload`](#multiupload) method with the same `bulkUploadOptions` parameter again.
@@ -203,7 +206,7 @@ await pauseUpload({
 })
 ```
 
-### cancelUpload
+### `cancelUpload`
 Cancels the upload operation of a file.
 
 #### Parameters
@@ -226,7 +229,7 @@ await cancelUpload({
 })
 ```
 
-### getFileStats
+### `getFileStats`
 Retrieves details for a file in an allocation.
 
 #### Parameters
@@ -254,7 +257,7 @@ const fileStats = await getFileStats({
 })
 ```
 
-### listObjects
+### `listObjects`
 Lists the files for a given allocation ID and remote path.
 
 #### Parameters
@@ -286,7 +289,7 @@ const listResult = await listObjects({
 
 ```
 
-### getFileMetaByName
+### `getFileMetaByName`
 Retrieves file metadata by name (file search). This method allows you to search for files within an allocation by their name and optionally modify the returned file references.
 
 #### Parameters
@@ -319,7 +322,7 @@ const fileMetadata = await getFileMetaByName({
 })
 ```
 
-### multiDownload
+### `multiDownload`
 Downloads multiple files in parallel in a batch. This method supports downloading files directly to disk (if supported by the browser) and provides progress updates via a callback function.
 
 #### Parameters
@@ -408,7 +411,7 @@ const downloadResponses = await multiDownload({
 })
 ```
 
-### downloadBlocks
+### `downloadBlocks`
 Downloads a specified range of blocks from a file. This method is useful for downloading specific parts of a file, such as for resuming downloads or streaming.
 
 #### Parameters
@@ -451,7 +454,7 @@ const downloadedBlocks = await downloadBlocks({
 console.log('Downloaded blocks:', downloadedBlocks);
 ```
 
-### cancelDownloadBlocks
+### `cancelDownloadBlocks`
 Cancels the download of a specified range of blocks from a file. This method is used to stop an ongoing block download initiated by the [`downloadBlocks`](#downloadblocks) method.
 
 #### Parameters
@@ -478,9 +481,9 @@ await cancelDownloadBlocks({
 })
 ```
 
-### downloadDirectory
-Downloads files in a directory (non-recursive). This method supports downloading all files in a specified directory and provides progress updates via a callback function.
-{/* confirm non recursive fact // DOTODO: https://0chain.slack.com/archives/D06ADNR2P4L/p1739223347776269 */}
+### `downloadDirectory`
+Downloads files in a directory recursively. This method supports downloading all files/folders in a specified directory and provides progress updates via a callback function.
+
 #### Parameters
 | Name | Type | Description | Default value |
 |---|---|---|---|
@@ -518,7 +521,7 @@ await downloadDirectory({
 })
 ```
 
-### cancelDownloadDirectory
+### `cancelDownloadDirectory`
 Cancels the download of a directory initiated by [`downloadDirectory`](#downloaddirectory).
 
 #### Parameters
@@ -539,7 +542,7 @@ await cancelDownloadDirectory({
 })
 ```
 
-### multiOperation
+### `multiOperation`
 Performs multiple operations (copy, move, delete, create directory) together in a single batch.
 
 #### Parameters
@@ -590,7 +593,7 @@ await multiOperation({
 })
 ```
 
-### deleteFile
+### `deleteFile`
 Deletes a file from an allocation. Only the owner of the allocation can delete a file.
 
 :::note
@@ -628,7 +631,7 @@ if (result.commandSuccess) {
 }
 ```
 
-### share
+### `share`
 Generates an `authTicket` that provides authorization to the holder to access the specified file on the remote path. This method is used to share files with other users.
 
 #### Parameters
@@ -640,10 +643,10 @@ Generates an `authTicket` that provides authorization to the holder to access th
 | `remotePath` | `string` | Remote path of the file to be shared | |
 | `clientId` | `string` | Client ID / wallet ID of the recipient (for private sharing) | `""` |
 | `encryptionPublicKey` | `string` | Encryption public key of the recipient (for private sharing) | `""` |
-| `expiration` | `number` | Expiration time of the auth ticket. Defaults to 0 (no expiration) | `0` |
+| `expiration` | `number` | Expiration time of the auth ticket (in Unix timestamp seconds. e.g. `1647858200`). Defaults to 0 (no expiration) | `0` |
 | `revoke` | `boolean` | Whether to revoke the share. (for private sharing) | `false` |
 | `availableAfter` | `string` | Time after which the share becomes available. Possible formats:<br/>1. **Relative time with duration format** (local timezone):<br/>   - `+1h5m` → Now + 1 hour 5 minutes<br/>   - `+30s` → Now + 30 seconds<br/>   - `+2h` → Now + 2 hours<br/>2. **Relative time with total seconds** (local timezone):<br/>   - `+3900` → Now + 3900 seconds (1 hour 5 minutes)<br/>   - `+86400` → Now + 1 day (24 hours)<br/>3. **Unix timestamp (UTC-based):**<br/>   - `1647858200` → Parses as a Unix timestamp<br/>4. **Absolute UTC datetime** (`YYYY-MM-DD HH:mm:ss`):<br/>   - `2022-03-21 10:21:38` → Parses as `March 21, 2022, 10:21:38 UTC` | `""` |
-{/* expiration unit // DOTODO: https://0chain.slack.com/archives/D06ADNR2P4L/p1739226063557459 */}
+
 #### Return Type
 ```typescript
 Promise<string>
@@ -672,7 +675,7 @@ await share({
 })
 ```
 
-### listObjectsFromAuthTicket
+### `listObjectsFromAuthTicket`
 Lists objects from an auth ticket. This method is useful for accessing a shared source by a non-owner.
 
 #### Parameters

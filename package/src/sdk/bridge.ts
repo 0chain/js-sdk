@@ -14,7 +14,7 @@ export const initBridge = async ({
   tokenAddress,
   ethereumNodeURL,
   gasLimit,
-  value,
+  value = 0,
   consensusThreshold,
 }: {
   domain: NetworkDomain
@@ -31,10 +31,10 @@ export const initBridge = async ({
   ethereumNodeURL: string
   /** Gas limit for the transactions */
   gasLimit: number
-  /** Value to be sent with the transaction (unused) */
-  value: number
   /** Consensus threshold for the transactions */
   consensusThreshold: number
+  /** Value to be sent with the transaction (unused) */
+  value?: number
 }): Promise<void> => {
   const goWasm = await getWasm({ domain, wallet })
   return goWasm.sdk.initBridge(
@@ -180,7 +180,7 @@ export const estimateMintWZCNGasAmount = async ({
   from,
   to,
   zcnTransaction,
-  amountToken,
+  amountTokens,
   nonce,
   signaturesRaw,
 }: {
@@ -192,19 +192,21 @@ export const estimateMintWZCNGasAmount = async ({
   to: string
   /** Hash of the ZCN transaction */
   zcnTransaction: string
-  /** Amount of tokens to mint (as a string) */
-  amountToken: string
+  /** Amount of tokens to mint */
+  amountTokens: number
   /** Nonce of the transaction */
   nonce: number
   /** Encoded format (base-64) of the burn signatures received from the authorizers. */
   signaturesRaw: string[]
 }): Promise<string> => {
   const goWasm = await getWasm({ domain, wallet })
+
+  const amtToken = String(amountTokens)
   const gasAmount = await goWasm.sdk.estimateMintWZCNGasAmount(
     from,
     to,
     zcnTransaction,
-    amountToken,
+    amtToken,
     nonce,
     signaturesRaw
   )
@@ -226,14 +228,16 @@ export const estimateBurnWZCNGasAmount = async ({
   from: string
   /** Address of the receiver */
   to: string
-  /** Amount of tokens to burn (as a string) */
-  amountTokens: string
+  /** Amount of tokens to burn */
+  amountTokens: number
 }): Promise<string> => {
   const goWasm = await getWasm({ domain, wallet })
+
+  const amtToken = String(amountTokens)
   const gasAmount = await goWasm.sdk.estimateBurnWZCNGasAmount(
     from,
     to,
-    amountTokens
+    amtToken
   )
   return gasAmount
 }

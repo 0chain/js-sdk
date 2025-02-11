@@ -61,8 +61,8 @@ export const share = async ({
   clientId?: string
   /** Encryption public key of the recipient (for private sharing) */
   encryptionPublicKey?: string
-  /** 
-   * Expiration time of the auth ticket
+  /**
+   * Expiration time of the auth ticket (in Unix timestamp seconds. e.g. `1647858200`)
    * @default 0 (no expiration)
    */
   expiration?: number
@@ -827,7 +827,7 @@ export const getFileMetaByName = async <T extends FileRefByName>({
   }
 }
 
-/**  Download files in a directory. */
+/**  Download files in a directory recursively. */
 export const downloadDirectory = async ({
   wallet,
   domain,

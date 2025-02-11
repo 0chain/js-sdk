@@ -16,7 +16,7 @@ In this section, we will learn about all the available Allocation Storage method
 
 The allocation storage methods allow you to create, update, and manage allocations.
 
-### createAllocation
+### `createAllocation`
 Creates an allocation with the specified allocation terms and preferred blobber IDs.
 
 #### Parameters
@@ -31,7 +31,7 @@ Creates an allocation with the specified allocation terms and preferred blobber 
 | `maxReadPrice` | `number` | Maximum read price | |
 | `minWritePrice` | `number` | Minimum write price | |
 | `maxWritePrice` | `number` | Maximum write price | |
-| `lock` | `number` | Lock value to add to the allocation. Use `getAllocationMinLock` to calculate this value | |
+| `lock` | `number` | Lock value to add to the allocation. Use [`getAllocationMinLock`](/docs/api/allocation#getallocationminlock) to calculate this value | |
 | `blobberIds` | `string[]` | List of blobber IDs of your preferred blobbers for the allocation | `[]` |
 | `blobberAuthTickets` | `string[]` | List of blobber auth tickets in case of using restricted blobbers | |
 | `setThirdPartyExtendable` | `boolean` | Determines whether third-parties are allowed to update the allocation's size and expiration property. When `true`, third-parties (e.g., 0box) can modify the allocation. | |
@@ -39,7 +39,7 @@ Creates an allocation with the specified allocation terms and preferred blobber 
 | `force` | `boolean` | Determines whether the allocation creation should proceed even if the available blobbers are insufficient to meet the required data + parity conditions. Use with caution as it may reduce fault tolerance. | `false` |
 
 :::note
-To determine `minReadPrice`, `maxReadPrice`, `minWritePrice`, and `maxWritePrice`, use the `makeSCRestAPICall` SDK method to call the `/storage-config` endpoint of the sharder smart contract.
+To determine `minReadPrice`, `maxReadPrice`, `minWritePrice`, and `maxWritePrice`, use the [`makeSCRestAPICall`](/docs/api/smart-contract#makescrestapicall) SDK method to call the `/storage-config` endpoint of the sharder smart contract.
 :::
 
 :::warning
@@ -74,7 +74,7 @@ const allocation = await createAllocation({
 })
 ```
 
-### getAllocationMinLock
+### `getAllocationMinLock`
 Retrieves the minimum lock value for the allocation creation. The lock value is the amount of tokens that the client needs to lock in the allocation's write pool to be able to pay for the write operations.
 {/* is ZCN or SAS and update code docs too // DOTODO */}
 #### Parameters
@@ -88,7 +88,7 @@ Retrieves the minimum lock value for the allocation creation. The lock value is 
 | `maxWritePrice` | `number` | Maximum write price |
 
 :::note
-To determine `maxWritePrice`, use the `makeSCRestAPICall` SDK method to call the `/storage-config` endpoint of the sharder smart contract.
+To determine `maxWritePrice`, use the [`makeSCRestAPICall`](/docs/api/smart-contract#makescrestapicall) SDK method to call the `/storage-config` endpoint of the sharder smart contract.
 :::
 
 #### Return Type
@@ -110,7 +110,7 @@ const minLock = await getAllocationMinLock({
 })
 ```
 
-### listAllocations
+### `listAllocations`
 Lists all the allocations.
 
 #### Parameters
@@ -134,7 +134,7 @@ const allocations = await listAllocations({
 })
 ```
 
-### getAllocation
+### `getAllocation`
 Gets allocation details using `allocationId` from cache. If not found in cache, it fetches from the blockchain and stores in cache.
 
 #### Parameters
@@ -160,7 +160,7 @@ const allocation = await getAllocation({
 })
 ```
 
-### reloadAllocation
+### `reloadAllocation`
 Reloads allocation details using `allocationId` from the blockchain and updates the cache.
 
 #### Parameters
@@ -186,7 +186,7 @@ const allocation = await reloadAllocation({
 })
 ```
 
-### getAllocationWith
+### `getAllocationWith`
 Retrieves the information of a free allocation or a shared allocation given the auth ticket.
 
 - **Free allocation**: An allocation created for the user using the Vult app for the first time with no fees.
@@ -215,7 +215,7 @@ const allocation = await getAllocationWith({
 })
 ```
 
-### freezeAllocation
+### `freezeAllocation`
 Freezes one of the client's allocations, given its ID. Freezing the allocation will forbid all operations on the files in the allocation. Allocation will be read-only
 
 #### Parameters
@@ -241,7 +241,7 @@ const transactionHash = await freezeAllocation({
 })
 ```
 
-### cancelAllocation
+### `cancelAllocation`
 Cancels an allocation using `allocationId`.
 
 #### Parameters
@@ -267,7 +267,7 @@ const transactionHash = await cancelAllocation({
 })
 ```
 
-### updateAllocation  
+### `updateAllocation`  
 Updates the allocation settings.
 
 #### Parameters  
@@ -306,7 +306,7 @@ const transactionHash = await updateAllocation({
 })  
 ```
 
-### updateAllocationWithRepair
+### `updateAllocationWithRepair`
 Updates your allocation settings and repairs the allocation if any blobber was replaced or added to the allocation.
 #### Parameters
 | Name | Type | Description | Default value |
@@ -363,7 +363,7 @@ const transactionHash = await updateAllocationWithRepair({
 })
 ```
 
-### getUpdateAllocationMinLock
+### `getUpdateAllocationMinLock`
 Retrieves the minimum lock value for the allocation after an update, as calculated by the network based on the update parameters. The lock value is the amount of tokens that the client needs to lock in the allocation's write pool to be able to pay for the write operations.
 {/* ZCN or SAS and update code docs too // DOTODO: https://0chain.slack.com/archives/D06680GNC49/p1739211606792009  */}
 #### Parameters
@@ -397,7 +397,7 @@ const minLock = await getUpdateAllocationMinLock({
 })
 ```
 
-### updateForbidAllocation
+### `updateForbidAllocation`
 Updates the permissions of an allocation.
 
 #### Parameters
@@ -435,7 +435,7 @@ const transactionHash = await updateForbidAllocation({
 })
 ```
 
-### getUpdateAllocTicket
+### `getUpdateAllocTicket`
 Signs an "Update Allocation ticket," which is needed to allow someone else to run an update transaction for your allocation on your terms.
 {/* Get details of params and update code docs too // DOTODO: https://0chain.slack.com/archives/D06680GNC49/p1739215304759299 */}
 #### Parameters
@@ -467,7 +467,7 @@ const authTicket = await getUpdateAllocTicket({
 })
 ```
 
-### transferAllocation
+### `transferAllocation`
 Transfers the ownership of an allocation to a new owner.
 {/* verify and update code docs too // DOTODO: https://0chain.slack.com/archives/D06680GNC49/p1739216420958469 */}
 #### Parameters
@@ -492,7 +492,7 @@ await transferAllocation({
 })
 ```
 
-### checkAllocStatus
+### `checkAllocStatus`
 Checks the health status of the allocation.
 
 #### Parameters
@@ -514,7 +514,7 @@ type AllocStatus = {
    * The health `status` of the allocation has one of the following values:
    * - `ok`: The allocation is healthy and fully functional.
    * - `repair`: The allocation needs to be repaired. Repair using the `repairAllocation` method.
-   * - `broken`: The allocation is broken (missing data blocks) and it cannot be repaired anymore.
+   * - `broken`: The allocation is irreparably broken. This occurs when critical data blocks are missing or when blobbers are offline, making recovery impossible.
    */
   status: 'ok' | 'repair' | 'broken'
   blobberStatus: {
@@ -538,7 +538,7 @@ const allocStatus = await checkAllocStatus({
 console.log(allocStatus.status); // 'ok', 'repair', or 'broken'
 ```
 
-### skipStatusCheck
+### `skipStatusCheck`
 Skips the health status check of the allocation.
 
 #### Parameters
@@ -561,7 +561,7 @@ await skipStatusCheck({
 })
 ```
 
-### repairAllocation
+### `repairAllocation`
 Repairs the allocation by re-uploading missing blocks to its blobbers. Allocation repair is a process to ensure the integrity and availability of files in the allocation.
 
 #### Parameters
@@ -598,7 +598,7 @@ await repairAllocation({
 })
 ```
 
-### repairSize
+### `repairSize`
 Retrieves the repair size for a specific path in an allocation. The repair size is the size of the data that needs to be repaired in the blobbers of the allocation.
 
 #### Parameters
@@ -628,8 +628,13 @@ const repairSizes = await repairSize({
 console.log(`Upload size: ${repairSizes.upload_size}, Download size: ${repairSizes.download_size}`);
 ```
 
-### createWorkers
+### `createWorkers`
 Used to manually create local upload workers for an allocation. These workers are used to handle operations for the allocation. Terminate workers if the allocation is no longer needed using [`terminateWorkers`](#terminateworkers).
+
+:::info
+1. There is no need to manually call `createWorkers` as it is automatically invoked when an upload begins.
+2. To free up resources, make sure to call [`terminateWorkers`](#terminateworkers) once the allocation is no longer required.
+:::
 
 #### Parameters
 | Name | Type | Description | Default value |
@@ -649,12 +654,12 @@ await createWorkers({
 })
 ```
 
-:::note
-Ensure to terminate workers using [`terminateWorkers`](#terminateworkers) when the allocation is no longer needed to free up resources.
-:::
+### `terminateWorkers`
+Removes local upload workers for a particular allocation.
 
-### terminateWorkers
-Removes local upload workers for a particular allocation. This is useful when switching between allocations and workers for the old allocation are no longer needed.
+:::note
+Use this method to free up resources when switching between allocations, especially when uploads for the previously active allocation have completed or are no longer in progress.
+:::
 
 #### Parameters
 | Name | Type | Description | Default value |
@@ -674,6 +679,3 @@ await terminateWorkers({
 })
 ```
 
-:::note
-Use this method to free up resources when switching between allocations when the previously active allocation is no longer needed.
-:::

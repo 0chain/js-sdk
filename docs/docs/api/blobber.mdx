@@ -16,7 +16,7 @@ In this section, we will learn about all the available Blobber methods provided 
 
 The blobber methods allow you to retrieve information, manage and interact with blobbers.
 
-### getBlobbers
+### `getBlobbers`
 Gets a list of active blobbers.
 
 #### Parameters
@@ -50,7 +50,7 @@ const stakableBlobbers = await getBlobbers({
 })
 ```
 
-### getBlobberIds
+### `getBlobberIds`
 Retrieves blobber IDs for the given list of blobber URLs.
 
 #### Parameters
@@ -76,7 +76,7 @@ const blobberIds = await getBlobberIds({
 })
 ```
 
-### getAllocationBlobbers
+### `getAllocationBlobbers`
 Retrieves a list of blobber IDs that match your allocation terms.
 
 #### Parameters
@@ -96,7 +96,7 @@ Retrieves a list of blobber IDs that match your allocation terms.
 | `force` | `boolean` | **Deprecated.** For internal use only. | `false` |
 
 :::note
-To determine `minReadPrice`, `maxReadPrice`, `minWritePrice`, and `maxWritePrice`, use the `makeSCRestAPICall` SDK method to call the `/storage-config` endpoint of the sharder smart contract.
+To determine `minReadPrice`, `maxReadPrice`, `minWritePrice`, and `maxWritePrice`, use the [`makeSCRestAPICall`](/docs/api/smart-contract#makescrestapicall) SDK method to call the `/storage-config` endpoint of the sharder smart contract.
 :::
 
 
@@ -128,7 +128,7 @@ const blobberIds = await getAllocationBlobbers({
 })
 ```
 
-### updateBlobberSettings
+### `updateBlobberSettings`
 Updates the settings for a blobber.
 
 #### Parameters
@@ -166,7 +166,7 @@ const updatedBlobber = await updateBlobberSettings({
 })
 ```
 
-### getContainers
+### `getContainers`
 Returns all the running containers in a given domain exposing the `{requestDomain}/endpoints/{endpointID}/docker/containers/json` endpoint. The request is authenticated using the provided username and password by first creating an auth token and then issuing the request.
 
 #### Parameters
@@ -197,7 +197,7 @@ const containers = await getContainers({
 })
 ```
 
-### searchContainer
+### `searchContainer`
 Searches for a container with a given name in a given domain exposing the `{requestDomain}/endpoints/{endpointID}/docker/containers/json` endpoint. The request is authenticated using the provided username and password by first creating an auth token and then issuing the request. The response is a list of containers in JSON format that match the given name.
 
 #### Parameters
@@ -230,7 +230,7 @@ const containers = await searchContainer({
 })
 ```
 
-### updateContainer
+### `updateContainer`
 
 Updates the given container ID with a new image ID in a given domain. The domain should expose the docker API endpoints under `{requestDomain}/endpoints/{endpointID}/docker`. The request should be authenticated with the given username and password, by first creating an auth token then issuing the request.
 

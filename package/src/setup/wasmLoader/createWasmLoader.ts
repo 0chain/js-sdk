@@ -99,13 +99,17 @@ export const createWasmLoader = ({
 // Utils
 // ----------------------------------------
 
+/** Returns the "desired mode" value of the GoSDK WASM. */
 export const getDesiredMode = (): WasmType => {
   const isEnterpriseModeDesired =
     localStorage.getItem('enterpriseAlloc') === 'enabled'
   return isEnterpriseModeDesired ? 'enterprise' : 'normal'
 }
 
-/** @param onLog Optional logger, e.g., console.log */
+/**
+ * Checks if the desired GoSDK WASM mode is initialized. Returns `true` if the WASM is initialized, `false` otherwise.
+ * @param onLog Optional logger, e.g., console.log
+ */
 export const isDesiredWasmInitialized = (onLog?: OnLog): boolean => {
   const isEnterpriseModeDesired =
     localStorage.getItem('enterpriseAlloc') === 'enabled'
@@ -125,7 +129,13 @@ export const isDesiredWasmInitialized = (onLog?: OnLog): boolean => {
     : wasmType === 'normal'
 }
 
-/** @param onLog Optional logger, e.g., console.log */
+/**
+ * Waits until the GoSDK WASM is loaded and initialized.
+ * 
+ * Unlike `checkIfWasmLoaded` method, this method doesn't check if the desired WASM mode is initialized. It just returns a promise that will only resolve once the GoSDK WASM is loaded and initialized.
+ *
+ * @param onLog Optional logger, e.g., console.log
+ */
 export const awaitWasmLoad = async (onLog?: OnLog): Promise<void> => {
   while (!window.__zcn_wasm__?.__wasm_initialized__) {
     onLog?.('debug', { message: 'Wasm: Waiting...', code: 'WASM_LOADING' })
@@ -140,6 +150,10 @@ export const awaitWasmLoad = async (onLog?: OnLog): Promise<void> => {
   await sleep(1000) // This avoids the error shown here: https://0chain.slack.com/archives/G01EXH6EYC9/p1729268246489569?thread_ts=1729214879.267689&cid=G01EXH6EYC9
 }
 
+/**
+ * `checkIfWasmLoaded` Waits for the "desired mode" GoSDK WASM to be loaded and initialized.
+ * @returns {Promise<boolean>} Returns a promise that resolves to `true` until the "desired mode" GoSDK WASM is loaded and initialized. If the desired WASM mode is not initialized, it resolves to `false`.
+ */
 export const checkIfWasmLoaded = async (): Promise<boolean> => {
   if (window.__zcn_wasm__?.__wasm_initialized__) {
     await sleep(300) // This avoids the error shown here: https://0chain.slack.com/archives/G01EXH6EYC9/p1729268246489569?thread_ts=1729214879.267689&cid=G01EXH6EYC9

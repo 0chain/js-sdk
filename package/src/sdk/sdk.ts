@@ -85,10 +85,8 @@ export const isWalletId = (walletId: string): boolean => {
   return true
 }
 
-export const getGosdkVersion = async (
-  domain: NetworkDomain
-): Promise<string> => {
-  const goWasm = await getWasm({ domain })
+export const getGosdkVersion = async (): Promise<string> => {
+  const goWasm = await getWasm({ domain: '' })
   return await goWasm.sdk.getVersion()
 }
 

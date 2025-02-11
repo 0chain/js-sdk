@@ -1,0 +1,196 @@
+---
+sidebar_position: 7
+---
+
+# Smart Contract SDK Methods
+
+In this section, we will learn about all the available Smart Contract methods provided by the SDK.
+
+## Prerequisites
+
+1. Initialize the SDK before using wallet methods. See the [Quick Start Guide](/docs/getting-started/quick-start) for details.
+2. All methods require a `wallet`. Refer to [`createWallet`](/docs/api/wallet#createwallet) for more information.
+3. All methods require a `domain` parameter, which is the network domain where your wallet and providers such as blobbers, sharders, miners, and validators are deployed. GoSDK will send requests to this domain.
+
+## Smart Contract Methods
+
+The smart contract methods allow you to interact with smart contracts of the network.
+
+### makeSCRestAPICall
+Issues a request to the public API of one of the smart contracts. This method is used to interact with smart contract endpoints.
+
+#### Parameters
+| Name | Type | Description | Default value |
+|---|---|---|---|
+| `domain` | `NetworkDomain` | Network domain for the request | |
+| `scType` | `'sharders' \| 'miners'` | Smart contract type:<br/>- `'sharders'`: Storage smart contract<br/>- `'miners'`: Miner smart contract | `'sharders'` |
+| `endpoint` | `string` | Relative path of the endpoint | |
+| `params` | `Record<string, string>` | Parameters in JSON format | |
+
+#### Return Type
+
+```typescript
+Promise<string>
+```
+
+#### Example
+```typescript
+import { makeSCRestAPICall } from '@zerochain/sdk'
+
+const jsonResponse = await makeSCRestAPICall({
+  domain: 'mainnet.zus.network',
+  scType: 'sharders',
+  endpoint: '/storage-config',
+  // params: { key: 'value' }
+})
+```
+
+### getStakePoolInfo
+Retrieves information about the stake pool for the allocation.
+
+#### Parameters
+| Name | Type | Description | Default value |
+|---|---|---|---|
+| `domain` | `NetworkDomain` | Network domain for the request | |
+| `wallet` | `ActiveWallet` | Active Wallet details | |
+| `providerType` | `"miner" \| "sharder" \| "blobber" \| "validator" \| "authorizer"` | Type of provider (e.g., blobber, validator) | |
+| `providerId` | `string` | ID of the provider | |
+
+#### Return Type
+```typescript
+Promise<StakePoolInfo>
+```
+
+#### Example
+```typescript
+import { getStakePoolInfo } from '@zerochain/sdk'
+
+const stakePoolInfo = await getStakePoolInfo({
+  domain: 'mainnet.zus.network',
+  wallet: activeWallet,
+  providerType: 'blobber',
+  providerId: blobberId
+})
+```
+
+### lockWritePool
+Locks a given number of tokens for a specified duration in the write pool.
+
+#### Parameters
+| Name | Type | Description | Default value |
+|---|---|---|---|
+| `domain` | `NetworkDomain` | Network domain for the operation | |
+| `wallet` | `ActiveWallet` | Active Wallet details | |
+| `allocationId` | `string` | Allocation ID where the tokens will be locked | |
+| `tokens` | `number` | Number of tokens to lock (in SAS) | |
+| `fee` | `number` | Transaction fee (in SAS) | |
+
+#### Return Type
+```typescript
+Promise<string>
+```
+
+#### Example
+```typescript
+import { lockWritePool } from '@zerochain/sdk'
+
+const txnHash = await lockWritePool({
+  domain: 'mainnet.zus.network',
+  wallet: activeWallet,
+  allocationId: '8695f8af52cdfc1e66d879407a5278703579d31de7ce0e2cf1707fdec9cc14c3',
+  tokens: lockTokens,
+  fee: txnFee
+})
+```
+
+### lockStakePool
+Stakes a given number of tokens for a specific provider (e.g., blobber, validator) by its type and ID.
+
+#### Parameters
+| Name | Type | Description | Default value |
+|---|---|---|---|
+| `domain` | `NetworkDomain` | Network domain for the operation | |
+| `wallet` | `ActiveWallet` | Active Wallet details | |
+| `providerType` | `"miner" \| "sharder" \| "blobber" \| "validator" \| "authorizer"` | Type of provider (e.g., blobber, validator) | |
+| `tokens` | `number` | Number of tokens to lock (in SAS) | |
+| `fee` | `number` | Transaction fee (in SAS) | |
+| `providerId` | `string` | ID of the provider | |
+
+#### Return Type
+```typescript
+Promise<string>
+```
+
+#### Example
+```typescript
+import { lockStakePool } from '@zerochain/sdk'
+
+const txnHash = await lockStakePool({
+  domain: 'mainnet.zus.network',
+  wallet: activeWallet,
+  providerType: 'blobber',
+  providerId: blobberId,
+  tokens: lockTokens,
+  fee: txnFee
+})
+```
+
+### unlockStakePool
+Unlocks the stake pool for a specific provider by its type and ID.
+
+#### Parameters
+| Name | Type | Description | Default value |
+|---|---|---|---|
+| `domain` | `NetworkDomain` | Network domain for the operation | |
+| `wallet` | `ActiveWallet` | Active Wallet details | |
+| `providerType` | `"miner" \| "sharder" \| "blobber" \| "validator" \| "authorizer"` | Type of provider (e.g., blobber, validator) | |
+| `fee` | `number` | Transaction fee (in SAS) | |
+| `providerId` | `string` | ID of the provider | |
+| `clientId` | `string` | Wallet ID of the client unlocking the stake pool | |
+
+#### Return Type
+```typescript
+Promise<string>
+```
+
+#### Example
+```typescript
+import { unlockStakePool } from '@zerochain/sdk'
+
+const txnHash = await unlockStakePool({
+  domain: 'mainnet.zus.network',
+  wallet: activeWallet,
+  providerType: 'blobber',
+  providerId: blobberId,
+  fee: txnFee,
+  clientId: walletId
+})
+```
+
+### collectRewards
+Collects all rewards available for a delegate and provider pair. This method triggers the `storagesc.collect_reward` transaction.
+
+#### Parameters
+| Name | Type | Description | Default value |
+|---|---|---|---|
+| `domain` | `NetworkDomain` | Network domain for the operation | |
+| `wallet` | `ActiveWallet` | Active Wallet details | |
+| `providerType` | `"miner" \| "sharder" \| "blobber" \| "validator" \| "authorizer"` | Type of provider (e.g., blobber, validator) | |
+| `providerId` | `string` | ID of the provider | |
+
+#### Return Type
+```typescript
+Promise<string>
+```
+
+#### Example
+```typescript
+import { collectRewards } from '@zerochain/sdk'
+
+const txnHash = await collectRewards({
+  domain: 'mainnet.zus.network',
+  wallet: activeWallet,
+  providerType: 'blobber',
+  providerId: blobberId
+})
+```

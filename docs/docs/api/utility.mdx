@@ -1,0 +1,209 @@
+---
+sidebar_position: 8
+---
+
+# SDK Utility Methods
+
+In this section, we will learn about all the available utility methods provided by the SDK.
+
+## Utility Methods
+
+### decodeAuthTicket
+Decodes an auth ticket to extract its details.
+
+#### Parameters
+| Name | Type | Description |
+|---|---|---|
+| `authTicket` | `string` | Auth ticket to decode |
+
+#### Return Type
+```typescript
+type DecodedAuthTicket = {
+  fileName?: string
+  walletId?: string
+  lookupHash?: string
+  referenceType?: string
+  allocationId?: string
+  isEncrypted?: boolean
+}
+```
+
+#### Example
+```typescript
+import { decodeAuthTicket } from '@zerochain/sdk'
+
+const decodedTicket = decodeAuthTicket(authTicket)
+```
+
+### getGosdkVersion
+Retrieves the version of the GoSDK.
+
+:::warning
+Initialize the GoSDK WASM before using this method. See the [Quick Start Guide](/docs/getting-started/quick-start) for details.
+:::
+
+#### Return Type
+```typescript
+Promise<string>
+```
+
+#### Example
+```typescript
+import { getGosdkVersion } from '@zerochain/sdk'
+
+const wasmVersion = await getGosdkVersion()
+```
+
+### getWasmType
+Retrieves the type of GoSDK WASM being used by the SDK. If the WASM is not initialized, it returns `undefined`.
+
+#### Return Type
+```typescript
+WasmType | undefined
+```
+
+#### Example
+```typescript
+import { getWasmType } from '@zerochain/sdk'
+
+const wasmType = getWasmType()
+if (wasmType) {
+  console.log('Wasm type:', wasmType);
+} else {
+  console.log('WASM is not initialized.');
+}
+```
+
+### sasTokenToZcn
+Converts SAS tokens value to ZCN (the main token unit).
+
+#### Parameters
+| Name | Type | Description |
+|---|---|---|
+| `token` | `number` | Amount of SAS tokens to convert |
+
+#### Return Type
+```typescript
+number
+```
+
+#### Example
+```typescript
+import { sasTokenToZcn } from '@zerochain/sdk'
+
+const zcnAmount = sasTokenToZcn(10000000000) // 10000000000 SAS = 1 ZCN
+console.log('ZCN amount:', zcnAmount); // Output: 1
+```
+
+### zcnToSasToken
+Converts ZCN value to SAS tokens.
+
+:::note
+SAS tokens are always integers and cannot be floating-point numbers.
+ZCN are the main token unit and can be floating-point numbers.
+:::
+
+#### Parameters
+| Name | Type | Description |
+|---|---|---|
+| `zcn` | `number` | Amount of ZCN to convert |
+
+#### Return Type
+```typescript
+number
+```
+
+#### Example
+```typescript
+import { zcnToSasToken } from '@zerochain/sdk'
+
+const sasTokenAmount = zcnToSasToken(1) // 1 ZCN = 10000000000 SAS
+console.log('SAS token amount:', sasTokenAmount); // Output: 10000000000
+```
+
+### checkIfWasmLoaded
+
+Waits until the "desired mode" GoSDK WASM is loaded and initialized. 
+
+Returns a promise that resolves to `true` when the "desired mode" GoSDK WASM is loaded and initialized. If the desired WASM mode is not initialized, it resolves to `false`.
+
+#### Return Type
+```typescript
+Promise<boolean>
+```
+
+#### Example
+```typescript
+import { checkIfWasmLoaded } from '@zerochain/sdk'
+
+const isLoaded = await checkIfWasmLoaded()
+```
+
+### awaitWasmLoad
+Waits until the GoSDK WASM is loaded and initialized. 
+
+:::info
+Unlike [`checkIfWasmLoaded`](#checkifwasmloaded), this method doesn't check if the desired WASM mode is initialized. It just returns a promise that will only resolve once the GoSDK WASM is loaded and initialized.
+:::
+
+#### Parameters
+| Name | Type | Description | Default value |
+|---|---|---|---|
+| `onLog` | `OnLog` | Optional logger, e.g., `console.log` | |
+
+#### Example
+```typescript
+import { awaitWasmLoad } from '@zerochain/sdk'
+
+await awaitWasmLoad(console.log)
+```
+
+### updateWasmMode
+Updates the "desired mode" value of the GoSDK WASM.
+
+#### Parameters
+| Name | Type | Description |
+|---|---|---|
+| `desiredAllocationType` | `"enterprise" \| "normal"` | The desired WASM allocation type |
+
+#### Example
+```typescript
+import { updateWasmMode } from '@zerochain/sdk'
+
+updateWasmMode('enterprise')
+```
+
+### getDesiredMode
+Returns the "desired mode" value of the GoSDK WASM.
+
+#### Return Type
+```typescript
+type WasmType = 'normal' | 'enterprise'
+```
+
+#### Example
+```typescript
+import { getDesiredMode } from '@zerochain/sdk'
+
+const mode = getDesiredMode()
+```
+
+### isDesiredWasmInitialized
+Checks if the desired GoSDK WASM mode is initialized.
+
+#### Parameters
+| Name | Type | Description | Default value |
+|---|---|---|---|
+| `onLog` | `OnLog` | Optional logger, e.g., `console.log` | |
+
+#### Return Type
+```typescript
+boolean
+```
+
+#### Example
+```typescript
+import { isDesiredWasmInitialized } from '@zerochain/sdk'
+
+const isInitialized = isDesiredWasmInitialized(console.log)
+```

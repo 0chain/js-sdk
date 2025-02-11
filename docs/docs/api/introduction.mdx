@@ -121,14 +121,18 @@ The smart contract methods allow you to interact with smart contracts.
 | `lockWritePool` | Lock given number of tokens for given duration in write pool |
 | `lockStakePool` | Stake number of tokens for a given provider given its type and ID |
 | `unlockStakePool` | Unlock the write pool |
+| `collectRewards` | Collect all rewards for a given delegate and provider pair. |
 
-### Other Methods
+### Utility Functions
 
 | Method | Description |
 | --- | --- |
 | `decodeAuthTicket` | Decode the AuthTicket of a shared file |
 | `getGosdkVersion` | Retrieves the version of the initialized GoSDK WASM. |
 | `getWasmType` | Returns the type of the GoSDK WASM file (standard or enterprise). |
-| `collectRewards` | Collect all rewards for a given delegate and provider pair. |
-| `sasTokenToZcn` | Returns SAS token value in ZCN |
-| `zcnToSasToken` | Returns ZCN value in SAS token |
+| `sasTokenToZcn` | Converts SAS token value in ZCN |
+| `zcnToSasToken` | Converts ZCN value in SAS token |
+| `checkIfWasmLoaded` | Checks if the GoSDK WASM is initialized. Returns `true` if the WASM is loaded, `false` otherwise. |
+| `updateWasmMode` | Updates the desired mode of the GoSDK WASM. |
+| `getDesiredMode` | Returns the desired mode of the GoSDK WASM. |
+| `isDesiredWasmInitialized` | Checks if the desired GoSDK WASM mode is initialized. Returns `true` if the WASM is initialized, `false` otherwise. |

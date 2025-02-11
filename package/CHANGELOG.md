@@ -1,5 +1,11 @@
 # @zerochain/sdk
 
+## 1.1.2
+
+### Patch Changes
+
+- 0dcd501: Refactoring and Doc corrections
+
 ## 1.1.1
 
 ### Patch Changes

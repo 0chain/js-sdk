@@ -31,7 +31,7 @@ Creates an allocation with the specified allocation terms and preferred blobber 
 | `maxReadPrice` | `number` | Maximum read price | |
 | `minWritePrice` | `number` | Minimum write price | |
 | `maxWritePrice` | `number` | Maximum write price | |
-| `lock` | `number` | Lock value to add to the allocation. Use [`getAllocationMinLock`](/docs/api/allocation#getallocationminlock) to calculate this value | |
+| `lock` | `number` | Lock value to add to the allocation. Use [`getAllocationMinLock`](#getallocationminlock) to calculate this value | |
 | `blobberIds` | `string[]` | List of blobber IDs of your preferred blobbers for the allocation | `[]` |
 | `blobberAuthTickets` | `string[]` | List of blobber auth tickets in case of using restricted blobbers | |
 | `setThirdPartyExtendable` | `boolean` | Determines whether third-parties are allowed to update the allocation's size and expiration property. When `true`, third-parties (e.g., 0box) can modify the allocation. | |
@@ -76,7 +76,7 @@ const allocation = await createAllocation({
 
 ### `getAllocationMinLock`
 Retrieves the minimum lock value for the allocation creation. The lock value is the amount of tokens that the client needs to lock in the allocation's write pool to be able to pay for the write operations.
-{/* is ZCN or SAS and update code docs too // DOTODO */}
+
 #### Parameters
 | Name | Type | Description |
 |---|---|---|
@@ -92,6 +92,7 @@ To determine `maxWritePrice`, use the [`makeSCRestAPICall`](/docs/api/smart-cont
 :::
 
 #### Return Type
+minLock token amount in terms of SAS tokens
 ```typescript
 Promise<number>
 ```
@@ -365,7 +366,7 @@ const transactionHash = await updateAllocationWithRepair({
 
 ### `getUpdateAllocationMinLock`
 Retrieves the minimum lock value for the allocation after an update, as calculated by the network based on the update parameters. The lock value is the amount of tokens that the client needs to lock in the allocation's write pool to be able to pay for the write operations.
-{/* ZCN or SAS and update code docs too // DOTODO: https://0chain.slack.com/archives/D06680GNC49/p1739211606792009  */}
+
 #### Parameters
 | Name | Type | Description | Default value |
 |---|---|---|---|
@@ -378,6 +379,7 @@ Retrieves the minimum lock value for the allocation after an update, as calculat
 | `removeBlobberId` | `string` | Blobber ID to remove from the allocation | |
 
 #### Return Type
+minLock token amount in terms of SAS tokens
 ```typescript
 Promise<number>
 ```

@@ -408,7 +408,7 @@ export const updateAllocationWithRepair = async ({
  *
  * To determine `maxWritePrice`, use the `makeSCRestAPICall` SDK method to call the `/storage-config` endpoint of the sharder smart contract.
  *
- * @returns the minimum lock value (in ZCN)
+ * @returns the minimum lock value (in SAS)
  */
 export const getAllocationMinLock = async ({
   domain,
@@ -444,7 +444,7 @@ export const getAllocationMinLock = async ({
  *
  * Lock value is the amount of tokens that the client needs to lock in the allocation's write pool to be able to pay for the write operations.
  *
- * @returns the minimum lock value (in ZCN)
+ * @returns the minimum lock value (in SAS)
  */
 export const getUpdateAllocationMinLock = async ({
   domain,

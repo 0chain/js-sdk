@@ -6,7 +6,7 @@ import { themes as prismThemes } from 'prism-react-renderer'
 
 const config: Config = {
   title: 'Züs JS SDK',
-  tagline: 'Simplifying JavaScript integration with the Züs Network.',
+  tagline: 'Simplifying JavaScript integration with the Züs Network',
   favicon: 'img/favicon.ico',
 
   // Set the production url of your site here
@@ -71,27 +71,30 @@ const config: Config = {
       { name: 'robots', content: 'max-image-preview:large' },
       {
         name: 'description',
-        content: 'Simplifying JavaScript integration with the Züs Network',
+        content:
+          'The Züs JS SDK is a JavaScript client library that provides a convenient interface for interacting with the Züs Network.',
       },
 
       // Google / Search Engine Tags
       { itemprop: 'name', content: 'Züs JS SDK' },
       {
         itemprop: 'description',
-        content: 'Simplifying JavaScript integration with the Züs Network',
+        content:
+          'The Züs JS SDK is a JavaScript client library that provides a convenient interface for interacting with the Züs Network.',
       },
       {
         itemprop: 'image',
         content: 'https://0chain.github.io/js-sdk/img/social-card.png',
       },
 
-      // Facebook Meta Tags
+      // Open Graph / Facebook Meta Tags
       { property: 'og:url', content: 'https://0chain.github.io/js-sdk/' },
       { property: 'og:type', content: 'website' },
       { property: 'og:title', content: 'Züs JS SDK' },
       {
         property: 'og:description',
-        content: 'Simplifying JavaScript integration with the Züs Network',
+        content:
+          'The Züs JS SDK is a JavaScript client library that provides a convenient interface for interacting with the Züs Network.',
       },
       {
         property: 'og:image',
@@ -103,12 +106,14 @@ const config: Config = {
       { name: 'twitter:title', content: 'Züs JS SDK' },
       {
         name: 'twitter:description',
-        content: 'Simplifying JavaScript integration with the Züs Network',
+        content:
+          'The Züs JS SDK is a JavaScript client library that provides a convenient interface for interacting with the Züs Network.',
       },
       {
         name: 'twitter:image',
         content: 'https://0chain.github.io/js-sdk/img/social-card.png',
       },
+      { name: 'twitter:image:alt', content: 'Züs JS SDK logo' },
     ],
     navbar: {
       title: 'Züs JS SDK',

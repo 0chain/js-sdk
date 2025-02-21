@@ -206,7 +206,10 @@ export const reloadAllocation = async ({
   return await goWasm.sdk.reloadAllocation(allocationId)
 }
 
-/** transferAllocation transfers the ownership of an allocation to a new owner */
+/**
+ * transferAllocation transfers the ownership of an allocation to a new owner
+ * @deprecated
+ */
 export const transferAllocation = async ({
   wallet,
   domain,
@@ -562,7 +565,7 @@ export const createFreeAllocation = async ({
 }
 
 /**
- * This method is used to sign an "Update Allocation ticket". This ticket is needed to allow someone else to run update transaction for your allocation on your terms.
+ * Generates and signs an "Update Allocation ticket", which authorizes the "add blobber" or "replace blobber" operation from other wallets. This ticket must be signed by the allocation owner.
  */
 export const getUpdateAllocTicket = async ({
   domain,
@@ -575,9 +578,11 @@ export const getUpdateAllocTicket = async ({
   domain: NetworkDomain
   wallet: ActiveWallet
   allocationId: string
-  // get from zcnContracts
+  // TODO: get from zcnContracts? Check for other zcnContracts teamWallet mentions too. Are they valid?
+  /** UserID is the wallet ID which will be allowed to update your allocation */
   userId: string // TODO: Should we directly add teamWallet here
-  operationType: string // TODO
+  operationType: 'replace_blobber' | 'add_blobber'
+  /** Round expiry is the round after which the auth ticket will no longer be valid. */
   roundExpiry: number
 }): Promise<string> => {
   const goWasm = await getWasm({ domain, wallet })

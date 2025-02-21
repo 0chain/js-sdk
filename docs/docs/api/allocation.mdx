@@ -438,17 +438,17 @@ const transactionHash = await updateForbidAllocation({
 ```
 
 ### `getUpdateAllocTicket`
-Signs an "Update Allocation ticket," which is needed to allow someone else to run an update transaction for your allocation on your terms.
-{/* Get details of params and update code docs too // DOTODO: https://0chain.slack.com/archives/D06680GNC49/p1739215304759299 */}
+Generates and signs an "Update Allocation ticket", which authorizes the "add blobber" or "replace blobber" operation from other wallets.
+
 #### Parameters
 | Name | Type | Description | Default value |
 |---|---|---|---|
 | `domain` | `NetworkDomain` | Network domain for the allocation | |
 | `wallet` | `ActiveWallet` | Active Wallet details | |
 | `allocationId` | `string` | Allocation ID to update | |
-| `userId` | `string` | Wallet ID of the user updating the allocation. | |
-| `operationType` | `string` | Type of operation | |
-| `roundExpiry` | `number` | Expiry round for the ticket | |
+| `userId` | `string` | UserID is the wallet ID which will be allowed to update your allocation | |
+| `operationType` | `replace_blobber` \| `add_blobber` | Type of operation | |
+| `roundExpiry` | `number` | Round expiry is the round after which the auth ticket will no longer be valid. | |
 
 #### Return Type
 ```typescript
@@ -469,9 +469,9 @@ const authTicket = await getUpdateAllocTicket({
 })
 ```
 
-### `transferAllocation`
+{/* ### `transferAllocation`
 Transfers the ownership of an allocation to a new owner.
-{/* verify and update code docs too // DOTODO: https://0chain.slack.com/archives/D06680GNC49/p1739216420958469 */}
+
 #### Parameters
 | Name | Type | Description | Default value |
 |---|---|---|---|
@@ -492,7 +492,7 @@ await transferAllocation({
   newOwnerId: walledIdOfNewOwner,
   newOwnerPublicKey: walletPublicKeyOfNewOwner
 })
-```
+``` */}
 
 ### `checkAllocStatus`
 Checks the health status of the allocation.

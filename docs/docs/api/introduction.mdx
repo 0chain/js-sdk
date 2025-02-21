@@ -61,14 +61,14 @@ The allocation storage methods allow you to create, update, and manage allocatio
 | [`updateAllocationWithRepair`](/docs/api/allocation#updateallocationwithrepair) | Updates your allocation settings and repairs the allocation if any blobber was replaced or added |
 | [`getUpdateAllocationMinLock`](/docs/api/allocation#getupdateallocationminlock) | Retrieves the minimum lock value for the allocation after update. |
 | [`updateForbidAllocation`](/docs/api/allocation#updateforbidallocation) | UpdateForbidAllocation updates the permissions of an allocation, given the permission parameters in a forbid-first manner. |
-| [`getUpdateAllocTicket`](/docs/api/allocation#getupdateallocticket) | This method is used to sign an "Update Allocation ticket". This ticket is needed to allow someone else to run update transaction for your allocation on your terms. |
-| [`transferAllocation`](/docs/api/allocation#transferallocation) | Transfer the ownership of an allocation to a new owner |
+| [`getUpdateAllocTicket`](/docs/api/allocation#getupdateallocticket) | Generates and signs an "Update Allocation ticket", which authorizes the "add blobber" or "replace blobber" operation from other wallets. |
 | [`checkAllocStatus`](/docs/api/allocation#checkallocstatus) | Check the health status of the allocation.|
 | [`skipStatusCheck`](/docs/api/allocation#skipstatuscheck) | Skips the `checkAlloctionStatus` health status check of the allocation. |
 | [`repairAllocation`](/docs/api/allocation#repairallocation) | Start a repair process for an allocation. |
 | [`repairSize`](/docs/api/allocation#repairsize) | Retrieves the repair size for a specific path in an allocation. |
 | [`createWorkers`](/docs/api/allocation#createworkers) | Manually create local workers that sync with the allocation. |
 | [`terminateWorkers`](/docs/api/allocation#terminateworkers) | Remove local workers that sync with the allocation. This is useful when switching between allocations. |
+{/* | [`transferAllocation`](/docs/api/allocation#transferallocation) | Transfer the ownership of an allocation to a new owner | */}
 {/* createFreeAllocation // DOTODO */}
 
 ### Blobber Methods

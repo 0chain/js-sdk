@@ -1,5 +1,12 @@
 # @zerochain/sdk
 
+## 1.1.3
+
+### Patch Changes
+
+- be499c7: - Add missing code documentation / corrections
+  - transferAllocation is marked as deprecated
+
 ## 1.1.2
 
 ### Patch Changes

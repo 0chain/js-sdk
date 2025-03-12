@@ -4,10 +4,12 @@
   "version": "1.0.0",
   "scripts": {
     "publish": "yarn changeset publish",
-    "version": "yarn changeset"
+    "version": "yarn changeset",
+    "dev": "concurrently -n lib,docs -c cyan,magenta \"yarn workspace @zerochain/sdk dev\" \"yarn workspace docs start\""
   },
   "devDependencies": {
     "@changesets/cli": "^2.27.10",
+    "concurrently": "^9.1.2",
     "@eslint/js": "^9.19.0",
     "eslint": "^9.19.0",
     "tsup": "^8.3.5",

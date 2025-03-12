@@ -28,7 +28,28 @@ import TabItem from '@theme/TabItem'
 
 ## Initialize the SDK
 
-The SDK must be initialized before use. This process includes fetching the appropriate WASM file and then initializing the WASM.
+Before using the SDK, it must be initialized. This process involves loading the required scripts, fetching the appropriate WASM file, and then initializing the WASM.
+
+### Adding Required Scripts
+
+Include the following scripts in the `<head>` of your HTML:
+
+```html
+<script
+  defer
+  src="https://cdn.jsdelivr.net/gh/herumi/bls-wasm@v1.1.1/browser/bls.js"
+/>
+<script
+  defer
+  src="https://cdn.jsdelivr.net/gh/golang/go@go1.22.5/misc/wasm/wasm_exec.js"
+/>
+```
+
+:::note
+
+The WASM relies on the scripts above and requires specific versions to function correctly. Make sure to use the exact versions listed. These may be updated periodically based on the latest WASM `v1.x.x` release requirements.
+
+:::
 
 ### Fetching the WASM
 

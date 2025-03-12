@@ -1,5 +1,11 @@
 # @zerochain/sdk
 
+## 1.1.4
+
+### Patch Changes
+
+- bdf1ea1: Add missing dist folder in final release build
+
 ## 1.1.3
 
 ### Patch Changes

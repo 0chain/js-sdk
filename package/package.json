@@ -1,6 +1,6 @@
 {
   "name": "@zerochain/sdk",
-  "version": "1.1.3",
+  "version": "1.1.4",
   "description": "The Züs JS SDK is a JavaScript client library that provides a convenient interface for interacting with the Züs Network. It allows developers to perform various operations such as creating and managing allocations, uploading and downloading files, executing smart contracts, and more.",
   "source": "src/index.ts",
   "main": "dist/index.js",

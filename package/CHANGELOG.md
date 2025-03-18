@@ -1,5 +1,11 @@
 # @zerochain/sdk
 
+## 1.1.5
+
+### Patch Changes
+
+- 660cfcd: Fix: add domain param in getGosdkVersion method
+
 ## 1.1.4
 
 ### Patch Changes

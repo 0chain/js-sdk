@@ -1,0 +1,12 @@
+{
+  "private": true,
+  "name": "examples-workspace",
+  "version": "1.0.0",
+  "scripts": {},
+  "devDependencies": {},
+  "author": "Ashutosh Khanduala (@ashuvssut)",
+  "license": "MIT",
+  "workspaces": [
+    "vite-react/"
+  ]
+}

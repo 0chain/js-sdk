@@ -11,10 +11,20 @@
     {
       "name": "Package",
       "path": "./package/"
+    },
+    {
+      "name": "Examples",
+      "path": "./examples/"
     }
   ],
   "settings": {
     "svg.preview.background": "dark-transparent",
-    "terminal.integrated.cwd": "${workspaceFolder}"
+    "terminal.integrated.cwd": "${workspaceFolder}",
+    "[javascriptreact]": {
+      "editor.defaultFormatter": "vscode.typescript-language-features"
+    },
+    "[json]": {
+      "editor.defaultFormatter": "vscode.json-language-features"
+    }
   }
 }

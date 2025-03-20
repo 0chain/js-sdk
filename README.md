@@ -9,6 +9,8 @@ The Züs JS SDK is a JavaScript client library that provides a convenient interf
 - [JS SDK Documentation](https://0chain.github.io/js-sdk/)
 - [Go SDK Documentation](https://docs-old.zus.network/guides/zus-gosdk)
 - [Whitepapers](https://zus.network/whitepapers/?v=1)
+- Example projects using the SDK:
+  - [Vite React Example App](https://github.com/0chain/js-sdk/tree/main/examples/vite-react)
 <!--
 ## Configure package and its deployment on NPM
 - Replace all instances of `your-package-name` with your package name
@@ -25,3 +27,4 @@ The Züs JS SDK is a JavaScript client library that provides a convenient interf
 - Is `changeset` unable to publish? 
   - https://github.com/changesets/action/issues/98#issuecomment-2546826646
 -->
+

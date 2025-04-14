@@ -217,7 +217,8 @@ type BulkUploadOption = {
   remotePath: string
   /** Whether to encrypt the file */
   encrypt: boolean
-  thumbnailBytes: number[]
+  /** Use `fileToByteString` to generate the thumbnail byte string, or assign an empty string if unavailable. */
+  thumbnailBytes: string
   /** Callback function will be invoked with progress updates */
   callback?: (
     totalBytes: number,

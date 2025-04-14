@@ -119,7 +119,8 @@ type BulkUploadOption = {
   remotePath: string
   /** Whether to encrypt the file */
   encrypt: boolean
-  thumbnailBytes: number[]
+  /** Use `fileToByteString` to generate the thumbnail byte string, or assign an empty string if unavailable. */
+  thumbnailBytes: string
   /** Callback function will be invoked with progress updates */
   callback?: (
     totalBytes: number,
@@ -162,7 +163,7 @@ const result = await multiUpload({
       file: new File(['file content'], 'file1.txt'),
       remotePath: '/my-folder/file1.txt',
       encrypt: true,
-      thumbnailBytes: [],
+      thumbnailBytes: "",
       callback: (totalBytes, completedBytes, fileName, blobURL, error) => {
         console.log(`Upload progress for ${fileName}: ${completedBytes}/${totalBytes} bytes`);
         if (error) {

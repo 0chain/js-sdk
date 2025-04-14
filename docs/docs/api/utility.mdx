@@ -207,3 +207,22 @@ import { isDesiredWasmInitialized } from '@zerochain/sdk'
 
 const isInitialized = isDesiredWasmInitialized(console.log)
 ```
+
+### `fileToByteString`
+Converts a JS `File` object to a byte string.
+
+:::info
+If you want to upload a thumbnail for your file in [`multiUpload`](/docs/api/file#multiupload), you will need to add the `thumbnailBytes` param in the `BulkUploadOption` of that file. To get `thumbnailBytes`, use this method to convert the thumbnail file to a byte string.
+:::
+
+#### Parameters
+
+| Name | Type | Description | Default value |
+|--------|--------|---------------------------------|---------------|
+| `file` | `File` | The JS file object to convert to a byte string. | |
+
+#### Return Type
+
+```ts
+Promise<string>
+```

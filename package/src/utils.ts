@@ -81,9 +81,9 @@ export const decodeAuthTicket = (authTicket: string): DecodedAuthTicket => {
 //   marker: string
 //   tokens: number
 // }
-// /** 
+// /**
 //  * decodeAuthTicket decodes the auth ticket and returns the recipient public key and the tokens
-//  * @deprecated 
+//  * @deprecated
 //  */
 // export const decodeAuthTicket = async ({
 //   domain,
@@ -98,3 +98,19 @@ export const decodeAuthTicket = (authTicket: string): DecodedAuthTicket => {
 //   const resp = await goWasm.sdk.decodeAuthTicket(authTicket)
 //   return resp
 // }
+
+export const bufferToByteString = (buffer: Buffer<ArrayBuffer>): string => {
+  return Array.from(buffer || []).toString()
+}
+
+export const fileToBuffer = async (
+  file: File
+): Promise<Buffer<ArrayBuffer>> => {
+  const arrayBuffer = await file.arrayBuffer()
+  return Buffer.from(arrayBuffer) as Buffer<ArrayBuffer>
+}
+
+export const fileToByteString = async (file: File): Promise<string> => {
+  const buffer = await fileToBuffer(file)
+  return bufferToByteString(buffer)
+}

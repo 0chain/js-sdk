@@ -22,6 +22,7 @@ export const createWalletKeys = async (
     publicKey: string
     /** BLS private key */
     privateKey: string
+    walletMnemonic: string
   }
   mnemonic: string
 }> => {
@@ -30,7 +31,10 @@ export const createWalletKeys = async (
   )
   const { publicKey, privateKey } = await getBlsKeys(buffer)
   const walletId = getSha3HashFromHexString(publicKey)
-  return { keys: { walletId, privateKey, publicKey }, mnemonic }
+  return {
+    keys: { walletId, privateKey, publicKey, walletMnemonic: mnemonic },
+    mnemonic,
+  }
 }
 
 // TODO: check if we need goWasm.sdk.getPublicEncryptionKey or not
@@ -45,10 +49,16 @@ export const getPublicEncryptionKey = async ({
     publicKey: string
     /** BLS private key */
     privateKey: string
+    walletMnemonic: string
   }
   domain: NetworkDomain
 }): Promise<string> => {
-  const goWasm = await getWasm({ domain, wallet: { id: keys.walletId, keys } })
+  if (!keys.walletMnemonic)
+    throw new Error('Wallet mnemonic is missing in keys (keys.walletMnemonic)')
+  const goWasm = await getWasm({
+    domain,
+    wallet: { id: keys.walletId, keys, mnemonic: keys.walletMnemonic },
+  })
   return (await goWasm.sdk.getPublicEncryptionKeyV2(keys?.publicKey)) as string
 }
 

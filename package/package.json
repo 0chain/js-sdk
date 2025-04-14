@@ -50,7 +50,7 @@
   "scripts": {
     "dev:tsc": "tsc -w -p tsc.tsconfig.json",
     "dev": "NODE_ENV=development tsup",
-    "build": "tsup",
+    "build": "tsup && tsc -p tsconfig.types.json",
     "lint:tsc": "tsc --noEmit",
     "lint": "yarn lint:tsc"
   },

@@ -1,5 +1,11 @@
 # @zerochain/sdk
 
+## 1.1.6
+
+### Patch Changes
+
+- 559ff03: Export necessary TS types + fileToByteString utility
+
 ## 1.1.5
 
 ### Patch Changes

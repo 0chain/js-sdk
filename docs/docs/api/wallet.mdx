@@ -67,7 +67,7 @@ Promise<{
     walletId: string
     publicKey: string
     privateKey: string
-    walletMnemonic?: string
+    walletMnemonic: string
   }
   mnemonic: string
 }>
@@ -103,6 +103,7 @@ The `publicEncryptionKey` is essential for private file sharing. In [private fil
 | `keys.walletId` | `string` | Wallet ID |
 | `keys.publicKey` | `string` | BLS public key |
 | `keys.privateKey` | `string` | BLS private key |
+| `keys.walletMnemonic` | `string` | Wallet mnemonic |
 | `domain` | `NetworkDomain` | Network domain for the wallet |
 
 #### Return Type

@@ -41,6 +41,27 @@ Creates a new wallet. It also helps to recover a wallet using its mnemonic phras
 Promise<BasicWallet>
 ```
 
+#### `BasicWallet`
+
+Represents a basic wallet structure.
+
+```ts
+export type BasicWallet = {
+  id: string
+  name: string
+  mnemonic: string
+  version: string
+  creationDate: number
+  keys: {
+    walletId: string
+    publicKey: string
+    privateKey: string
+    publicEncryptionKey: string
+    walletMnemonic: string
+  }
+}
+```
+
 #### Example
 
 ```js

@@ -7,7 +7,7 @@ The Züs JS SDK is a JavaScript client library that provides a convenient interf
 ## Resources
 
 - [JS SDK Documentation](https://0chain.github.io/js-sdk/)
-- [Go SDK Documentation](https://docs-old.zus.network/guides/zus-gosdk)
+- [Go SDK Documentation](https://docs.zus.network/zus-docs/sdks/go-sdk)
 - [Whitepapers](https://zus.network/whitepapers/?v=1)
 - Example projects using the SDK:
   - [Vite React Example App](https://github.com/0chain/js-sdk/tree/main/examples/vite-react)

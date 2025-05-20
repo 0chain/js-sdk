@@ -580,10 +580,10 @@
     "@types/babel__core" "^7.20.5"
     react-refresh "^0.14.2"
 
-"@zerochain/sdk@^1.1.5":
-  version "1.1.5"
-  resolved "https://registry.yarnpkg.com/@zerochain/sdk/-/sdk-1.1.5.tgz#be9559d0fc684ab56c95245a8421b25ed332789a"
-  integrity sha512-EL42Ww2/1geRyboSA7y8aAaIS3ZFzzRG3oRDA2QgrKr+3cxzEak8B4CM48h4n12pptQm2R6DBrZwOXnCu9jpwg==
+"@zerochain/sdk@^1.1.8":
+  version "1.1.8"
+  resolved "https://registry.yarnpkg.com/@zerochain/sdk/-/sdk-1.1.8.tgz#b0e32e61daecb19d3a937cb5a7a5fb751ae56b30"
+  integrity sha512-3wq6/lfc6nqNLTKYHZ0yhR9lEL2/fWT0FIlhIIinF9SJMy1SM8k48ZJZjBYI7DvGmzDOdpUkkLa0xSYtQnQong==
   dependencies:
     bip39 "^3.1.0"
     js-sha3 "^0.9.3"

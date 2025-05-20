@@ -92,6 +92,8 @@ export type Config = {
   zus?: ZusConfig
   /** **NOTE**: Only needed if you are using the SDK for uploading files. */
   md5WorkerUrl?: string
+  /** @default `true` */
+  isWasmGzipped?: boolean
 } & (
   | { useCachedWasm?: false; cacheConfig?: never }
   | { useCachedWasm: true; cacheConfig: CacheConfig }

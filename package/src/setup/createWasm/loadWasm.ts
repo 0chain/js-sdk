@@ -9,6 +9,7 @@ import {
 const DEFAULT_CONFIG: Config = {
   wasmBaseUrl: '',
   useCachedWasm: false,
+  isWasmGzipped: true,
 }
 
 export const getConfig = (): Config => getBridge().__config__ || DEFAULT_CONFIG
@@ -118,14 +119,13 @@ const fetchWasm = async ({
 
   let shouldCache = false
   if (!response?.ok) {
+    let headers: Record<string, string> = { 'Content-Type': 'application/wasm' }
+    const cfg = getConfig()
+    if (cfg.isWasmGzipped) headers['Content-Encoding'] = 'gzip'
+
     // WASM not found in cache, fetching from CDN
     if (wasmUrl) {
-      response = await fetch(wasmUrl, {
-        headers: {
-          'Content-Encoding': 'gzip',
-          'Content-Type': 'application/wasm',
-        },
-      }).catch(err => {
+      response = await fetch(wasmUrl, { headers }).catch(err => {
         console.error('Failed to fetch from CDN, trying CDN fallback:', err)
         return null
       })
@@ -133,12 +133,7 @@ const fetchWasm = async ({
     }
 
     if (!response?.ok && wasmUrl !== defaultUrl && defaultUrl) {
-      response = await fetch(defaultUrl, {
-        headers: {
-          'Content-Encoding': 'gzip',
-          'Content-Type': 'application/wasm',
-        },
-      }).catch(err => {
+      response = await fetch(defaultUrl, { headers }).catch(err => {
         console.error('Failed to fetch from CDN fallback, trying local:', err)
         return null
       })
@@ -147,7 +142,7 @@ const fetchWasm = async ({
     // If CDN network request fails, fallback to the local WASM path
     if (!response?.ok) {
       wasmUrl = wasmPath
-      response = await fetch(wasmUrl)
+      response = await fetch(wasmUrl, { headers })
     }
 
     if (!response?.ok) throw new Error(`Failed to fetch WASM`)
@@ -156,11 +151,10 @@ const fetchWasm = async ({
       // Cache the fetched WASM response
       await wasmCache?.put(wasmPath, response.clone())
 
-      const c = getConfig()
-      if (c.useCachedWasm) {
+      if (cfg.useCachedWasm) {
         const storedWasmVersion = getIsEnterpriseMode()
-          ? c.cacheConfig.enterpriseGosdkVersion
-          : c.cacheConfig.standardGosdkVersion
+          ? cfg.cacheConfig.enterpriseGosdkVersion
+          : cfg.cacheConfig.standardGosdkVersion
         localStorage.setItem(wasmPath, storedWasmVersion)
       }
     }

@@ -60,6 +60,12 @@ There are two WASM file types available, `standard` and `enterprise`.
       - Download `zcn.wasm` from the "Assets" section of any GoSDK Release [here](https://github.com/0chain/gosdk/releases)
     - **Enterprise WASM** is for interacting with an Enterprise Allocation:
       - Download `enterprise-zcn.wasm` from the "Assets" section of any eGoSDK Release [here](https://github.com/0chain/egosdk/releases)
+    <br/>
+    :::warning
+
+    - The WASM files are compressed with gzip. If you are going to use a decompressed WASM file, change the `isWasmGzipped` config to `false` in `loadWasm` to avoid wasm file initialization errors .
+
+    :::
 
 2. Upload your WASM file for `wasmBaseUrl` config:
    - You can place it in your website’s static assets folder.
@@ -113,7 +119,8 @@ There are two WASM file types available, `standard` and `enterprise`.
         // highlight-start
         loadWasm({
           md5WorkerUrl: 'md5worker.js',
-          wasmBaseUrl: '/wasm', // Or, 'https://example.com/wasm'
+          wasmBaseUrl: '/wasm', // Or, 'https://example.com/wasm'\
+          isWasmGzipped: true
         })
         // highlight-end
       }, [loadWasm])
@@ -134,6 +141,7 @@ There are two WASM file types available, `standard` and `enterprise`.
     loadWasm({
       md5WorkerUrl: 'md5worker.js',
       wasmBaseUrl: '/wasm', // Or, 'https://example.com/wasm'
+      isWasmGzipped: true
     })
     ```
     </TabItem>
@@ -164,6 +172,7 @@ loadWasm({
   // Set other options as needed
   md5WorkerUrl: 'md5worker.js',
   wasmBaseUrl: '/wasm', // Or, 'https://example.com/wasm'
+  isWasmGzipped: true
 });
 ```
 

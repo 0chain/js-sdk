@@ -1,5 +1,11 @@
 # @zerochain/sdk
 
+## 1.1.8
+
+### Patch Changes
+
+- 47efe15: fix: add `isWasmGzipped` config for `loadWasm`
+
 ## 1.1.7
 
 ### Patch Changes

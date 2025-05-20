@@ -131,3 +131,6 @@ out
 # custom
 .dump
 .DS_Store
+
+# We use yarn.lock from parent repository (web-apps repo). This js-sdk repo is a git sub-module of the parent web-apps repo.
+yarn.lock
